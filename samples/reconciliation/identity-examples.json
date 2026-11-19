@@ -1,0 +1,4 @@
+[
+  {"existing":"pass","incoming":"pass","incoming_campaign_id":"fixture-pass","expected":"idempotent"},
+  {"existing":"pass","incoming":"fail","incoming_campaign_id":"fixture-pass","expected":"reject-conflict"}
+]

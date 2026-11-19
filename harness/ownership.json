@@ -1,0 +1,27 @@
+{
+  "A": [
+    "backend/ingestion/",
+    "backend/gate/"
+  ],
+  "B": [
+    "backend/investigator/",
+    "evaluators/"
+  ],
+  "C": [
+    "frontend/"
+  ],
+  "reviewer": [],
+  "lead": [
+    "AGENTS.md",
+    "SPEC.md",
+    "PLAN.md",
+    "contracts/",
+    "samples/",
+    "harness/",
+    ".agents/",
+    ".github/",
+    "infrastructure/",
+    "integration/",
+    "tests/"
+  ]
+}

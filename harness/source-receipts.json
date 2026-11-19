@@ -1,0 +1,25 @@
+{
+  "fixture-pass": {
+    "x": "526b21d655b2a468a1ecf2aea7effe2309dcad5e984b01d92230cf199e2e8605",
+    "y": "aabd65c36af628371f65282cd7a4e33380912b4a918daeafc34a4d818e51fd23"
+  },
+  "fixture-fail": {
+    "x": "5bc7a324add21c4ed73a8cb939e6ab64c7b687faefbec8b4f46989ac2f264c57",
+    "y": "aabd65c36af628371f65282cd7a4e33380912b4a918daeafc34a4d818e51fd23"
+  },
+  "fixture-missing": {
+    "x": "526b21d655b2a468a1ecf2aea7effe2309dcad5e984b01d92230cf199e2e8605"
+  },
+  "fixture-partial": {
+    "x": "526b21d655b2a468a1ecf2aea7effe2309dcad5e984b01d92230cf199e2e8605"
+  },
+  "fixture-mixed": {
+    "x": "5bc7a324add21c4ed73a8cb939e6ab64c7b687faefbec8b4f46989ac2f264c57"
+  },
+  "fixture-partial-failure": {
+    "x": "526b21d655b2a468a1ecf2aea7effe2309dcad5e984b01d92230cf199e2e8605"
+  },
+  "fixture-unverified-failure": {
+    "y": "aabd65c36af628371f65282cd7a4e33380912b4a918daeafc34a4d818e51fd23"
+  }
+}

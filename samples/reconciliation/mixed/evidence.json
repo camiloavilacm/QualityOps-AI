@@ -1,0 +1,46 @@
+{
+  "schema_version": "2.0.0-draft.1",
+  "campaign_id": "fixture-mixed",
+  "collected_at": "2026-11-19T00:00:00Z",
+  "source": {
+    "kind": "synthetic",
+    "repository": null,
+    "revision": null,
+    "run_id": null,
+    "adapter_version": "fixture-v1"
+  },
+  "expected": [
+    {
+      "execution_id": "x",
+      "test_id": "login",
+      "slot": "x",
+      "requirement_ids": []
+    },
+    {
+      "execution_id": "y",
+      "test_id": "login",
+      "slot": "y",
+      "requirement_ids": []
+    }
+  ],
+  "observed": [
+    {
+      "execution_id": "x",
+      "outcome": "failed",
+      "observation": "complete",
+      "artifact_ids": [
+        "x"
+      ]
+    }
+  ],
+  "completeness": "partial",
+  "artifacts": [
+    {
+      "id": "x",
+      "path": "artifacts/x.json",
+      "kind": "execution-report",
+      "sha256": "5bc7a324add21c4ed73a8cb939e6ab64c7b687faefbec8b4f46989ac2f264c57",
+      "source_path": "synthetic/x.json"
+    }
+  ]
+}

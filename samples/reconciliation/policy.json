@@ -1,0 +1,23 @@
+{
+  "version": "mandatory-v2",
+  "required": [
+    {
+      "execution_id": "x",
+      "test_id": "login",
+      "slot": "x",
+      "requirement_ids": []
+    },
+    {
+      "execution_id": "y",
+      "test_id": "login",
+      "slot": "y",
+      "requirement_ids": []
+    }
+  ],
+  "confirmed_failure": "Complete mandatory failure corroborated by a trusted source receipt for the campaign, execution and artifact digest.",
+  "precedence": [
+    "BLOCKED",
+    "INCONCLUSIVE",
+    "ELIGIBLE"
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "schema_version": "2.0.0-draft.1",
+  "campaign_id": "fixture-pass",
+  "collected_at": "2026-11-19T00:00:00Z",
+  "source": {
+    "kind": "synthetic",
+    "repository": null,
+    "revision": null,
+    "run_id": null,
+    "adapter_version": "fixture-v1"
+  },
+  "expected": [
+    {
+      "execution_id": "x",
+      "test_id": "login",
+      "slot": "x",
+      "requirement_ids": []
+    },
+    {
+      "execution_id": "y",
+      "test_id": "login",
+      "slot": "y",
+      "requirement_ids": []
+    }
+  ],
+  "observed": [
+    {
+      "execution_id": "x",
+      "outcome": "passed",
+      "observation": "complete",
+      "artifact_ids": [
+        "x"
+      ]
+    },
+    {
+      "execution_id": "y",
+      "outcome": "passed",
+      "observation": "complete",
+      "artifact_ids": [
+        "y"
+      ]
+    }
+  ],
+  "completeness": "complete",
+  "artifacts": [
+    {
+      "id": "x",
+      "path": "artifacts/x.json",
+      "kind": "execution-report",
+      "sha256": "526b21d655b2a468a1ecf2aea7effe2309dcad5e984b01d92230cf199e2e8605",
+      "source_path": "synthetic/x.json"
+    },
+    {
+      "id": "y",
+      "path": "artifacts/y.json",
+      "kind": "execution-report",
+      "sha256": "aabd65c36af628371f65282cd7a4e33380912b4a918daeafc34a4d818e51fd23",
+      "source_path": "synthetic/y.json"
+    }
+  ]
+}

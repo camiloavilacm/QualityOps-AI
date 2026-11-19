@@ -1,0 +1,55 @@
+{
+  "checks": [
+    {
+      "check": "contracts",
+      "command": [
+        "/usr/bin/sandbox-exec",
+        "-D",
+        "SCRATCH=/private/var/folders/_3/10m7xtq97r916_mrqdcv241h0000gn/T/tmp_wi_i7d_",
+        "-p",
+        "(version 1)\n(allow default)\n(deny network*)\n(deny file-write*)\n(allow file-write* (subpath (param \"SCRATCH\")) (literal \"/dev/null\"))\n",
+        "/Users/camiloavila/Documents/qa-workspace/qa-features/.venv/bin/python",
+        "-B",
+        "checks.py",
+        "contracts"
+      ],
+      "exit_code": 0,
+      "result": "PASS",
+      "output": "Three schemas and the requirement bundle validated.\n"
+    },
+    {
+      "check": "tests",
+      "command": [
+        "/usr/bin/sandbox-exec",
+        "-D",
+        "SCRATCH=/private/var/folders/_3/10m7xtq97r916_mrqdcv241h0000gn/T/tmp_wi_i7d_",
+        "-p",
+        "(version 1)\n(allow default)\n(deny network*)\n(deny file-write*)\n(allow file-write* (subpath (param \"SCRATCH\")) (literal \"/dev/null\"))\n",
+        "/Users/camiloavila/Documents/qa-workspace/qa-features/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-v"
+      ],
+      "exit_code": 0,
+      "result": "PASS",
+      "output": "test_duplicate_id_with_distinct_path (test_checks.BundleTests.test_duplicate_id_with_distinct_path) ... ok\ntest_duplicate_key (test_checks.BundleTests.test_duplicate_key) ... ok\ntest_missing_revision (test_checks.BundleTests.test_missing_revision) ... ok\ntest_path_traversal (test_checks.BundleTests.test_path_traversal) ... ok\ntest_symlink_directory (test_checks.BundleTests.test_symlink_directory) ... ok\ntest_tamper (test_checks.BundleTests.test_tamper) ... ok\ntest_valid_requirement (test_checks.BundleTests.test_valid_requirement) ... ok\ntest_synthetic_output_shapes (test_checks.DraftOutputTests.test_synthetic_output_shapes) ... ok\ntest_local_network_bind_denied (test_checks.ExecutionTests.test_local_network_bind_denied) ... ok\ntest_owner_scope (test_checks.ExecutionTests.test_owner_scope) ... ok\ntest_repo_write_denied (test_checks.ExecutionTests.test_repo_write_denied) ... ok\ntest_bundle_cannot_shrink_or_redefine_mandatory_matrix (test_reconciliation.ReconciliationTests.test_bundle_cannot_shrink_or_redefine_mandatory_matrix) ... ok\ntest_immutable_identity_examples (test_reconciliation.ReconciliationTests.test_immutable_identity_examples) ... ok\ntest_investigation (test_reconciliation.ReconciliationTests.test_investigation) ... ok\ntest_policy_examples (test_reconciliation.ReconciliationTests.test_policy_examples) ... ok\ntest_private_label_absent_from_source_fixtures (test_reconciliation.ReconciliationTests.test_private_label_absent_from_source_fixtures) ... ok\ntest_schema_valid_eligible_mutation_conflicts_with_policy_fixture (test_reconciliation.ReconciliationTests.test_schema_valid_eligible_mutation_conflicts_with_policy_fixture) ... ok\ntest_semantic_rejections_after_schema_success (test_reconciliation.ReconciliationTests.test_semantic_rejections_after_schema_success) ... ok\ntest_visible_inputs_are_exact_projection (test_reconciliation.ReconciliationTests.test_visible_inputs_are_exact_projection) ... ok\n\n----------------------------------------------------------------------\nRan 19 tests in 2.828s\n\nOK\n"
+    },
+    {
+      "check": "application and live checks",
+      "command": null,
+      "exit_code": null,
+      "result": "NOT RUN",
+      "reason": "outside Stage 0"
+    },
+    {
+      "check": "candidate file scope",
+      "command": null,
+      "exit_code": null,
+      "result": "NOT RUN",
+      "reason": "no owner and approved baseline supplied"
+    }
+  ],
+  "contract_freeze": "Pending human review; harness success cannot authorize freeze"
+}

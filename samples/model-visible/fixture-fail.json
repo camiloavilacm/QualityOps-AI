@@ -1,0 +1,1 @@
+{"campaign_id":"fixture-fail","observations":[{"execution_id":"x","outcome":"failed","evidence_id":"x"},{"execution_id":"y","outcome":"passed","evidence_id":"y"}]}

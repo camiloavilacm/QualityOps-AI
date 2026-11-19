@@ -1,0 +1,163 @@
+{
+  "pass": {
+    "ingestion": "accept",
+    "gate": {
+      "schema_version": "2.0.0-draft.1",
+      "campaign_id": "fixture-pass",
+      "evidence_sha256": "6ba8c6b1446e7f993537c3eae8d9a9ec5c6a04db667aca46b4b43d43629f1b25",
+      "policy_sha256": "dcd4cf622cfdfd3f7842c69eff601f9d191577a31efe67eaf91d652886c7c1ae",
+      "policy_version": "mandatory-v2",
+      "evaluated_at": "2026-11-19T00:00:00Z",
+      "decision": "ELIGIBLE",
+      "reasons": [
+        {
+          "code": "ALL_REQUIRED_PASSED",
+          "execution_id": "x",
+          "artifact_ids": [
+            "x"
+          ]
+        },
+        {
+          "code": "ALL_REQUIRED_PASSED",
+          "execution_id": "y",
+          "artifact_ids": [
+            "y"
+          ]
+        }
+      ]
+    }
+  },
+  "fail": {
+    "ingestion": "accept",
+    "gate": {
+      "schema_version": "2.0.0-draft.1",
+      "campaign_id": "fixture-fail",
+      "evidence_sha256": "7d7d4c1d1f0ffbc71f3644053a925a42f8adb9f64a61fd42b08ea2482d51870c",
+      "policy_sha256": "dcd4cf622cfdfd3f7842c69eff601f9d191577a31efe67eaf91d652886c7c1ae",
+      "policy_version": "mandatory-v2",
+      "evaluated_at": "2026-11-19T00:00:00Z",
+      "decision": "BLOCKED",
+      "reasons": [
+        {
+          "code": "REQUIRED_FAILURE",
+          "execution_id": "x",
+          "artifact_ids": [
+            "x"
+          ]
+        }
+      ]
+    }
+  },
+  "missing": {
+    "ingestion": "accept",
+    "gate": {
+      "schema_version": "2.0.0-draft.1",
+      "campaign_id": "fixture-missing",
+      "evidence_sha256": "a85eddc32886a57a4a9ae12cc57c08766b4140f3d048d08517e5b1348a075e09",
+      "policy_sha256": "dcd4cf622cfdfd3f7842c69eff601f9d191577a31efe67eaf91d652886c7c1ae",
+      "policy_version": "mandatory-v2",
+      "evaluated_at": "2026-11-19T00:00:00Z",
+      "decision": "INCONCLUSIVE",
+      "reasons": [
+        {
+          "code": "INSUFFICIENT_EVIDENCE",
+          "execution_id": "y",
+          "artifact_ids": []
+        }
+      ]
+    }
+  },
+  "partial": {
+    "ingestion": "accept",
+    "gate": {
+      "schema_version": "2.0.0-draft.1",
+      "campaign_id": "fixture-partial",
+      "evidence_sha256": "4622183eacd3c1e8f57cdc995ff65e7e3395ae6dddc470ee7071c32dd9e7ac43",
+      "policy_sha256": "dcd4cf622cfdfd3f7842c69eff601f9d191577a31efe67eaf91d652886c7c1ae",
+      "policy_version": "mandatory-v2",
+      "evaluated_at": "2026-11-19T00:00:00Z",
+      "decision": "INCONCLUSIVE",
+      "reasons": [
+        {
+          "code": "INSUFFICIENT_EVIDENCE",
+          "execution_id": "y",
+          "artifact_ids": [
+            "y"
+          ]
+        }
+      ]
+    }
+  },
+  "mixed": {
+    "ingestion": "accept",
+    "gate": {
+      "schema_version": "2.0.0-draft.1",
+      "campaign_id": "fixture-mixed",
+      "evidence_sha256": "0511d43d97e80a6ffe0849b4c84004a37e43784aa046b47804c8eb98cd6f796c",
+      "policy_sha256": "dcd4cf622cfdfd3f7842c69eff601f9d191577a31efe67eaf91d652886c7c1ae",
+      "policy_version": "mandatory-v2",
+      "evaluated_at": "2026-11-19T00:00:00Z",
+      "decision": "BLOCKED",
+      "reasons": [
+        {
+          "code": "REQUIRED_FAILURE",
+          "execution_id": "x",
+          "artifact_ids": [
+            "x"
+          ]
+        },
+        {
+          "code": "INSUFFICIENT_EVIDENCE",
+          "execution_id": "y",
+          "artifact_ids": []
+        }
+      ]
+    }
+  },
+  "tamper": {
+    "ingestion": "reject",
+    "gate": null
+  },
+  "partial-failure": {
+    "ingestion": "accept",
+    "gate": {
+      "schema_version": "2.0.0-draft.1",
+      "campaign_id": "fixture-partial-failure",
+      "evidence_sha256": "06af2482d219c31b9bae853579b2ce36eef3e75d14a2f65a6f2b567aff8cc1d4",
+      "policy_sha256": "dcd4cf622cfdfd3f7842c69eff601f9d191577a31efe67eaf91d652886c7c1ae",
+      "policy_version": "mandatory-v2",
+      "evaluated_at": "2026-11-19T00:00:00Z",
+      "decision": "INCONCLUSIVE",
+      "reasons": [
+        {
+          "code": "INSUFFICIENT_EVIDENCE",
+          "execution_id": "y",
+          "artifact_ids": [
+            "y"
+          ]
+        }
+      ]
+    }
+  },
+  "unverified-failure": {
+    "ingestion": "accept",
+    "gate": {
+      "schema_version": "2.0.0-draft.1",
+      "campaign_id": "fixture-unverified-failure",
+      "evidence_sha256": "b09cd78c659970c67c6b019f08b9f8747c536deaf2e87fe897a46c70001dbec9",
+      "policy_sha256": "dcd4cf622cfdfd3f7842c69eff601f9d191577a31efe67eaf91d652886c7c1ae",
+      "policy_version": "mandatory-v2",
+      "evaluated_at": "2026-11-19T00:00:00Z",
+      "decision": "INCONCLUSIVE",
+      "reasons": [
+        {
+          "code": "INSUFFICIENT_EVIDENCE",
+          "execution_id": "x",
+          "artifact_ids": [
+            "x"
+          ]
+        }
+      ]
+    }
+  }
+}

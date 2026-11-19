@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0.0",
+  "bundle_id": "qa-features-seed-1",
+  "repository": "camiloavilacm/qa-features",
+  "revision": "e7c566ff831139889195643a1b906b7edab76f48",
+  "artifacts": [
+    {
+      "id": "login-feature",
+      "path": "artifacts/login.feature",
+      "kind": "requirement",
+      "sha256": "916baf659389700171aa1eac7fef318947de33ba0d6bbcf17a07af0e7fd1ff78"
+    }
+  ]
+}
