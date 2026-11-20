@@ -1,0 +1,38 @@
+{
+  "campaign_id": "gh-1461074056-44051378117",
+  "capture": "tracked",
+  "capture_revision": "e7c566ff831139889195643a1b906b7edab76f48",
+  "collected_at": "2026-11-17T09:01:42Z",
+  "complete_artifact_names": [
+    "checks.json",
+    "network.json"
+  ],
+  "feature_ref": "12a55fb4b9312303378af72f96a28734b6b9ec9a",
+  "issue_id": "SEED-1",
+  "manifest_sha256": "9ad598735e5c6d1d6b4b559f2ebbcc968cbb2446d2a949be46ebb95f60daf7e4",
+  "repository": "camiloavilacm/qa-features",
+  "run_attempt": 1,
+  "run_id": "44051378117",
+  "run_revision": "c8e60c7dd0c2adeb9857c518dd665c35dec85d84",
+  "scenarios": {
+    "AC-1": [
+      "SEED-1"
+    ],
+    "AC-2": [
+      "SEED-1"
+    ],
+    "AC-3": [
+      "SEED-1"
+    ]
+  },
+  "slots": {
+    "sut-node:cypress": "sut-node-cypress",
+    "sut-node:playwright": "sut-node-playwright",
+    "sut-node:selenium": "sut-node-selenium",
+    "sut-python:cypress": "sut-python-cypress",
+    "sut-python:playwright": "sut-python-playwright",
+    "sut-python:selenium": "sut-python-selenium"
+  },
+  "source_location": "tools/release/baseline-evidence",
+  "workflow_conclusion": "success"
+}

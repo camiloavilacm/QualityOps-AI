@@ -1,0 +1,155 @@
+{
+  "confirmed_failure": "Complete mandatory failure corroborated by a trusted source receipt for the campaign, execution and artifact digest.",
+  "precedence": [
+    "BLOCKED",
+    "INCONCLUSIVE",
+    "ELIGIBLE"
+  ],
+  "required": [
+    {
+      "execution_id": "sut-node-cypress.AC-1",
+      "requirement_ids": [
+        "SEED-1"
+      ],
+      "slot": "sut-node-cypress",
+      "test_id": "AC-1"
+    },
+    {
+      "execution_id": "sut-node-cypress.AC-2",
+      "requirement_ids": [
+        "SEED-1"
+      ],
+      "slot": "sut-node-cypress",
+      "test_id": "AC-2"
+    },
+    {
+      "execution_id": "sut-node-cypress.AC-3",
+      "requirement_ids": [
+        "SEED-1"
+      ],
+      "slot": "sut-node-cypress",
+      "test_id": "AC-3"
+    },
+    {
+      "execution_id": "sut-node-playwright.AC-1",
+      "requirement_ids": [
+        "SEED-1"
+      ],
+      "slot": "sut-node-playwright",
+      "test_id": "AC-1"
+    },
+    {
+      "execution_id": "sut-node-playwright.AC-2",
+      "requirement_ids": [
+        "SEED-1"
+      ],
+      "slot": "sut-node-playwright",
+      "test_id": "AC-2"
+    },
+    {
+      "execution_id": "sut-node-playwright.AC-3",
+      "requirement_ids": [
+        "SEED-1"
+      ],
+      "slot": "sut-node-playwright",
+      "test_id": "AC-3"
+    },
+    {
+      "execution_id": "sut-node-selenium.AC-1",
+      "requirement_ids": [
+        "SEED-1"
+      ],
+      "slot": "sut-node-selenium",
+      "test_id": "AC-1"
+    },
+    {
+      "execution_id": "sut-node-selenium.AC-2",
+      "requirement_ids": [
+        "SEED-1"
+      ],
+      "slot": "sut-node-selenium",
+      "test_id": "AC-2"
+    },
+    {
+      "execution_id": "sut-node-selenium.AC-3",
+      "requirement_ids": [
+        "SEED-1"
+      ],
+      "slot": "sut-node-selenium",
+      "test_id": "AC-3"
+    },
+    {
+      "execution_id": "sut-python-cypress.AC-1",
+      "requirement_ids": [
+        "SEED-1"
+      ],
+      "slot": "sut-python-cypress",
+      "test_id": "AC-1"
+    },
+    {
+      "execution_id": "sut-python-cypress.AC-2",
+      "requirement_ids": [
+        "SEED-1"
+      ],
+      "slot": "sut-python-cypress",
+      "test_id": "AC-2"
+    },
+    {
+      "execution_id": "sut-python-cypress.AC-3",
+      "requirement_ids": [
+        "SEED-1"
+      ],
+      "slot": "sut-python-cypress",
+      "test_id": "AC-3"
+    },
+    {
+      "execution_id": "sut-python-playwright.AC-1",
+      "requirement_ids": [
+        "SEED-1"
+      ],
+      "slot": "sut-python-playwright",
+      "test_id": "AC-1"
+    },
+    {
+      "execution_id": "sut-python-playwright.AC-2",
+      "requirement_ids": [
+        "SEED-1"
+      ],
+      "slot": "sut-python-playwright",
+      "test_id": "AC-2"
+    },
+    {
+      "execution_id": "sut-python-playwright.AC-3",
+      "requirement_ids": [
+        "SEED-1"
+      ],
+      "slot": "sut-python-playwright",
+      "test_id": "AC-3"
+    },
+    {
+      "execution_id": "sut-python-selenium.AC-1",
+      "requirement_ids": [
+        "SEED-1"
+      ],
+      "slot": "sut-python-selenium",
+      "test_id": "AC-1"
+    },
+    {
+      "execution_id": "sut-python-selenium.AC-2",
+      "requirement_ids": [
+        "SEED-1"
+      ],
+      "slot": "sut-python-selenium",
+      "test_id": "AC-2"
+    },
+    {
+      "execution_id": "sut-python-selenium.AC-3",
+      "requirement_ids": [
+        "SEED-1"
+      ],
+      "slot": "sut-python-selenium",
+      "test_id": "AC-3"
+    }
+  ],
+  "version": "local-recorded-seed-1-v1"
+}
