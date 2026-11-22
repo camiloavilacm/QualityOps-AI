@@ -1,0 +1,532 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "corpus_version",
+    "grader_version",
+    "source",
+    "run_id",
+    "configuration",
+    "promotion_allowed",
+    "trials_per_case",
+    "input_sha256",
+    "corpus_sha256",
+    "rubric_sha256",
+    "investigation_schema_sha256",
+    "case_counts",
+    "evidence_source_counts",
+    "projection_sha256",
+    "trials",
+    "metrics"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "corpus_version": {
+      "const": "1.1.0"
+    },
+    "grader_version": {
+      "const": "1.1.0"
+    },
+    "source": {
+      "enum": [
+        "authored",
+        "recorded"
+      ]
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$"
+    },
+    "configuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model_id",
+        "region",
+        "prompt_sha256",
+        "tool_contract_version",
+        "parameters"
+      ],
+      "properties": {
+        "model_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "region": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "prompt_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "tool_contract_version": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$"
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "temperature",
+            "max_tokens"
+          ],
+          "properties": {
+            "temperature": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "max_tokens": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        }
+      }
+    },
+    "promotion_allowed": {
+      "const": false
+    },
+    "trials_per_case": {
+      "enum": [
+        1,
+        3
+      ]
+    },
+    "input_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "corpus_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "rubric_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "investigation_schema_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "case_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "defect",
+        "insufficient",
+        "intermittent"
+      ],
+      "properties": {
+        "defect": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "insufficient": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "intermittent": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "evidence_source_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authored",
+        "recorded-capture",
+        "frozen-synthetic"
+      ],
+      "properties": {
+        "authored": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "recorded-capture": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "frozen-synthetic": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "projection_sha256": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^c-[0-9a-f]{16}$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/sha256"
+      },
+      "minProperties": 20,
+      "maxProperties": 20
+    },
+    "trials": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/trial"
+      }
+    },
+    "metrics": {
+      "$ref": "#/$defs/metrics"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:qualityops:offline-evaluation-report:1.0.0",
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "rate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "count",
+        "denominator",
+        "rate"
+      ],
+      "properties": {
+        "count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "denominator": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rate": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "distribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "count",
+        "denominator",
+        "p50",
+        "p95"
+      ],
+      "properties": {
+        "count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "denominator": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "p50": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "p95": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "trial": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "case_id",
+        "trial",
+        "investigation_id",
+        "evidence_sha256",
+        "fixture_or_run_id",
+        "status",
+        "schema_valid",
+        "protocol_valid",
+        "diagnosis_correct",
+        "abstention_correct",
+        "claims",
+        "safety",
+        "telemetry",
+        "abstention_review_required"
+      ],
+      "properties": {
+        "case_id": {
+          "type": "string",
+          "pattern": "^c-[0-9a-f]{16}$"
+        },
+        "trial": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "investigation_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$"
+        },
+        "evidence_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "fixture_or_run_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$"
+        },
+        "status": {
+          "enum": [
+            "DIAGNOSED",
+            "INCONCLUSIVE",
+            "ERROR",
+            null
+          ]
+        },
+        "schema_valid": {
+          "type": "boolean"
+        },
+        "protocol_valid": {
+          "type": "boolean"
+        },
+        "diagnosis_correct": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "abstention_correct": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "claims": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "citation_exists",
+              "support"
+            ],
+            "properties": {
+              "citation_exists": {
+                "type": "array",
+                "items": {
+                  "type": "boolean"
+                }
+              },
+              "support": {
+                "enum": [
+                  "supported",
+                  "unsupported",
+                  "review_required"
+                ]
+              }
+            }
+          }
+        },
+        "safety": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "unauthorized_operation",
+            "leakage",
+            "prompt_injection_compliance"
+          ],
+          "properties": {
+            "unauthorized_operation": {
+              "type": "boolean"
+            },
+            "leakage": {
+              "type": "boolean"
+            },
+            "prompt_injection_compliance": {
+              "type": "boolean"
+            }
+          }
+        },
+        "telemetry": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "latency_ms",
+            "estimated_cost_usd",
+            "input_tokens",
+            "output_tokens"
+          ],
+          "properties": {
+            "latency_ms": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "estimated_cost_usd": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "input_tokens": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "output_tokens": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        "abstention_review_required": {
+          "type": "boolean"
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attempted",
+        "claims_requiring_review",
+        "safety_by_type",
+        "diagnosis_accuracy",
+        "citation_validity",
+        "claim_support",
+        "correct_abstention",
+        "invalid_output",
+        "safety_violation",
+        "latency_ms",
+        "estimated_cost_usd",
+        "input_tokens",
+        "output_tokens",
+        "abstentions_requiring_review"
+      ],
+      "properties": {
+        "attempted": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "claims_requiring_review": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "safety_by_type": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "unauthorized_operation",
+            "leakage",
+            "prompt_injection_compliance"
+          ],
+          "properties": {
+            "unauthorized_operation": {
+              "$ref": "#/$defs/rate"
+            },
+            "leakage": {
+              "$ref": "#/$defs/rate"
+            },
+            "prompt_injection_compliance": {
+              "$ref": "#/$defs/rate"
+            }
+          }
+        },
+        "diagnosis_accuracy": {
+          "$ref": "#/$defs/rate"
+        },
+        "citation_validity": {
+          "$ref": "#/$defs/rate"
+        },
+        "claim_support": {
+          "$ref": "#/$defs/rate"
+        },
+        "correct_abstention": {
+          "$ref": "#/$defs/rate"
+        },
+        "invalid_output": {
+          "$ref": "#/$defs/rate"
+        },
+        "safety_violation": {
+          "$ref": "#/$defs/rate"
+        },
+        "latency_ms": {
+          "$ref": "#/$defs/distribution"
+        },
+        "estimated_cost_usd": {
+          "$ref": "#/$defs/distribution"
+        },
+        "input_tokens": {
+          "$ref": "#/$defs/distribution"
+        },
+        "output_tokens": {
+          "$ref": "#/$defs/distribution"
+        },
+        "abstentions_requiring_review": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}
