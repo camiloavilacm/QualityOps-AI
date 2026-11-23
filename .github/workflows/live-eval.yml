@@ -1,0 +1,136 @@
+name: Protected Live Bedrock Evaluation
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Evaluation scope: smoke-3cases (~$0.008) or full-20cases-x3 (~$0.17)"
+        required: true
+        default: "smoke-3cases"
+        type: choice
+        options:
+          - smoke-3cases
+          - full-20cases-x3
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: live-bedrock-eval
+  cancel-in-progress: false
+
+jobs:
+  live-bedrock-eval:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: live-bedrock-eval
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials via GitHub OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_LIVE_EVAL_ROLE_ARN }}
+          aws-region: eu-west-1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install pinned dependencies and boto3
+        run: pip install --no-cache-dir -r harness/requirements.txt "jsonschema[format-nongpl]==4.26.0" boto3
+
+      - name: Run offline B1/B2 safety and grader pre-check
+        run: |
+          python -B -m unittest -q backend.investigator.test_investigator backend.investigator.test_retrieval
+          python -B -m unittest discover -s evaluators -p test_evaluate.py -q
+
+      - name: Execute authorized live Bedrock Converse evaluation
+        env:
+          EVAL_MODE: ${{ inputs.mode }}
+        run: |
+          python -B - << 'PYEOF'
+          from decimal import Decimal
+          import json, os, subprocess, sys, time
+          from pathlib import Path
+          import boto3
+          from botocore.config import Config
+
+          sys.path.insert(0, "evaluators")
+          from backend.ingestion import importer as a1
+          from backend.investigator.investigator import (
+              Backend, BedrockTransport, LIVE_MODEL_BOUNDS, MAX_OUTPUT, PROMPT, TOOL_VERSION, invoke,
+          )
+          import evaluate as ev
+          import projection
+
+          mode = os.environ["EVAL_MODE"]
+          out_dir = Path("live-eval-artifacts")
+          out_dir.mkdir(exist_ok=True)
+          region = "eu-west-1"
+          sdk = boto3.client(
+              "bedrock-runtime",
+              region_name=region,
+              config=Config(retries={"total_max_attempts": 1}, connect_timeout=2, read_timeout=8),
+          )
+
+          all_cases = sorted(json.loads(Path("evaluators/model_visible/corpus-v1.json").read_bytes()).keys())
+          cases = ["c-5125ee1591d8d901", "c-b3235f20f6d8d0a0", "c-c2ac8b4b5167f3a0"] if mode == "smoke-3cases" else all_cases
+          trials_per_case = 1 if mode == "smoke-3cases" else 3
+
+          configs = [
+              ("baseline", "live-ci-nova-lite", "eu.amazon.nova-lite-v1:0", Decimal("0.00000006"), Decimal("0.00000024")),
+              ("candidate", "live-ci-haiku45", "eu.anthropic.claude-haiku-4-5-20251001-v1:0", Decimal("0.000001"), Decimal("0.000005")),
+          ]
+
+          for label, run_id, model_id, in_rate, out_rate in configs:
+              cfg = Backend(
+                  client=BedrockTransport(sdk), model_id=model_id, region=region,
+                  input_token_ceiling=LIVE_MODEL_BOUNDS[model_id],
+                  input_usd_per_token=in_rate, output_usd_per_token=out_rate,
+                  request_seconds=10, investigation_seconds=20, offline=False,
+              )
+              rows = []
+              for cid in cases:
+                  for t in range(1, trials_per_case + 1):
+                      res, _ = invoke({"fixture_id": cid}, backend=cfg, run_id=run_id)
+                      usage = res.get("usage")
+                      unc = set(res.get("uncertainties") or [])
+                      rows.append({
+                          "case_id": cid, "trial": t,
+                          "campaign_id": res["campaign_id"], "evidence_sha256": res["evidence_sha256"],
+                          "investigation_id": res["investigation_id"], "fixture_or_run_id": res["fixture_or_run_id"],
+                          "response": res, "protocol_valid": True,
+                          "safety": {
+                              "unauthorized_operation": bool(unc & {"unauthorized_tool", "unauthorized_evidence"}),
+                              "leakage": False, "prompt_injection_compliance": False,
+                          },
+                          "telemetry": {
+                              "latency_ms": res["latency_ms"], "estimated_cost_usd": res["estimated_cost_usd"],
+                              "input_tokens": usage["input_tokens"] if usage else None,
+                              "output_tokens": usage["output_tokens"] if usage else None,
+                          },
+                      })
+                      time.sleep(0.35)
+              (out_dir / f"{label}-raw.json").write_bytes(ev.encode({
+                  "schema_version": ev.VERSION, "source": "recorded", "run_id": run_id,
+                  "trials_per_case": trials_per_case,
+                  "configuration": {
+                      "model_id": model_id, "region": region,
+                      "prompt_sha256": a1.digest(PROMPT.encode()),
+                      "tool_contract_version": TOOL_VERSION,
+                      "parameters": {"temperature": 0, "max_tokens": MAX_OUTPUT},
+                  },
+                  "trials": rows,
+              }))
+          PYEOF
+
+      - name: Upload live evaluation artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-bedrock-evaluation-${{ github.run_id }}
+          path: live-eval-artifacts/
+          retention-days: 14

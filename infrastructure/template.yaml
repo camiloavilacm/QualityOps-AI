@@ -1,0 +1,194 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  QualityOps AI MVP — Least-privilege private evidence S3 bucket, read-only
+  Bedrock Converse investigator Lambda, and GitHub Actions OIDC evaluation role
+  (zero-standing-cost serverless configuration).
+
+Parameters:
+  GitHubOrg:
+    Type: String
+    Default: camiloavilacm
+    AllowedPattern: "[A-Za-z0-9_.-]+"
+    Description: GitHub organization or user owning the repository.
+  GitHubRepo:
+    Type: String
+    Default: QualityOps-AI
+    AllowedPattern: "[A-Za-z0-9_.-]+"
+    Description: GitHub repository name.
+  GitHubEnvironment:
+    Type: String
+    Default: live-bedrock-eval
+    AllowedPattern: "[A-Za-z0-9_.-]+"
+    Description: Protected GitHub Actions environment required for live Bedrock runs.
+  GitHubOIDCProviderArn:
+    Type: String
+    Default: ""
+    Description: >-
+      Optional ARN of an existing iam:OpenIDConnectProvider for
+      token.actions.githubusercontent.com. Leave empty to skip creating the
+      GitHub Actions OIDC role until the provider is registered.
+
+Conditions:
+  HasOIDCProvider: !Not [!Equals [!Ref GitHubOIDCProviderArn, ""]]
+
+Resources:
+  CanonicalEvidenceBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+      LifecycleConfiguration:
+        Rules:
+          - Id: ExpireNoncurrentVersionsAndIncompleteUploads
+            Status: Enabled
+            NoncurrentVersionExpiration:
+              NoncurrentDays: 30
+            AbortIncompleteMultipartUpload:
+              DaysAfterInitiation: 7
+
+  CanonicalEvidenceBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref CanonicalEvidenceBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: DenyInsecureTransport
+            Effect: Deny
+            Principal: "*"
+            Action: "s3:*"
+            Resource:
+              - !GetAtt CanonicalEvidenceBucket.Arn
+              - !Sub "${CanonicalEvidenceBucket.Arn}/*"
+            Condition:
+              Bool:
+                "aws:SecureTransport": "false"
+
+  InvestigatorLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/qualityops-investigator
+      RetentionInDays: 14
+
+  InvestigatorLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: ReadOnlyEvidenceAndScopedBedrockConverse
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: AllowCloudWatchLogs
+                Effect: Allow
+                Action:
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: !GetAtt InvestigatorLogGroup.Arn
+              - Sid: AllowReadOnlyCampaignEvidence
+                Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                  - "s3:GetObjectVersion"
+                Resource: !Sub "${CanonicalEvidenceBucket.Arn}/campaigns/*"
+              - Sid: ExplicitDenyGroundTruthAccess
+                Effect: Deny
+                Action: "s3:*"
+                Resource:
+                  - !Sub "${CanonicalEvidenceBucket.Arn}/ground_truth/*"
+                  - !Sub "${CanonicalEvidenceBucket.Arn}/*/ground_truth/*"
+              - Sid: AllowScopedBedrockConverseModels
+                Effect: Allow
+                Action:
+                  - "bedrock:InvokeModel"
+                Resource:
+                  - !Sub "arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/eu.amazon.nova-micro-v1:0"
+                  - !Sub "arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/eu.amazon.nova-lite-v1:0"
+                  - !Sub "arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/eu.anthropic.claude-haiku-4-5-20251001-v1:0"
+                  - "arn:aws:bedrock:*::foundation-model/amazon.nova-micro-v1:0"
+                  - "arn:aws:bedrock:*::foundation-model/amazon.nova-lite-v1:0"
+                  - "arn:aws:bedrock:*::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0"
+
+  InvestigatorFunction:
+    Type: AWS::Lambda::Function
+    DependsOn: InvestigatorLogGroup
+    Properties:
+      FunctionName: qualityops-investigator
+      Description: Read-only QualityOps AI failure investigator (no public endpoint).
+      Runtime: python3.12
+      Handler: index.handler
+      Role: !GetAtt InvestigatorLambdaRole.Arn
+      MemorySize: 256
+      Timeout: 20
+      ReservedConcurrentExecutions: 2
+      Environment:
+        Variables:
+          QUALITYOPS_EVIDENCE_BUCKET: !Ref CanonicalEvidenceBucket
+          QUALITYOPS_COST_LIMIT_USD: "0.10"
+      Code:
+        ZipFile: |
+          def handler(event, context):
+              """Placeholder packaging stub; deploy repository bundle for live Lambda invocation."""
+              return {"status": "ERROR", "uncertainties": ["lambda_bundle_not_packaged"]}
+
+  GitHubActionsLiveEvalRole:
+    Type: AWS::IAM::Role
+    Condition: HasOIDCProvider
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Ref GitHubOIDCProviderArn
+            Action: "sts:AssumeRoleWithWebIdentity"
+            Condition:
+              StringEquals:
+                "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+                "token.actions.githubusercontent.com:sub": !Sub "repo:${GitHubOrg}/${GitHubRepo}:environment:${GitHubEnvironment}"
+      MaxSessionDuration: 3600
+      Policies:
+        - PolicyName: ScopedLiveBedrockEvaluation
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: AllowScopedBedrockConverseForEvaluation
+                Effect: Allow
+                Action:
+                  - "bedrock:InvokeModel"
+                Resource:
+                  - !Sub "arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/eu.amazon.nova-micro-v1:0"
+                  - !Sub "arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/eu.amazon.nova-lite-v1:0"
+                  - !Sub "arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/eu.anthropic.claude-haiku-4-5-20251001-v1:0"
+                  - "arn:aws:bedrock:*::foundation-model/amazon.nova-micro-v1:0"
+                  - "arn:aws:bedrock:*::foundation-model/amazon.nova-lite-v1:0"
+                  - "arn:aws:bedrock:*::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0"
+
+Outputs:
+  CanonicalEvidenceBucketName:
+    Description: Private S3 bucket for versioned campaign evidence.
+    Value: !Ref CanonicalEvidenceBucket
+  InvestigatorFunctionArn:
+    Description: ARN of the read-only investigator Lambda function.
+    Value: !GetAtt InvestigatorFunction.Arn
+  GitHubActionsLiveEvalRoleArn:
+    Condition: HasOIDCProvider
+    Description: IAM role ARN for the protected GitHub Actions live-bedrock-eval environment.
+    Value: !GetAtt GitHubActionsLiveEvalRole.Arn
