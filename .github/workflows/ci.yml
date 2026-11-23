@@ -15,6 +15,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Fetch pinned read-only qa-features reference (e7c566ff)
+        run: |
+          mkdir -p ../qa-workspace/qa-features
+          git -C ../qa-workspace/qa-features init -q
+          git -C ../qa-workspace/qa-features remote add origin https://github.com/camiloavilacm/qa-features.git
+          git -C ../qa-workspace/qa-features fetch --depth 1 origin e7c566ff831139889195643a1b906b7edab76f48
+          git -C ../qa-workspace/qa-features checkout -q FETCH_HEAD
+          echo "QUALITYOPS_QA_FEATURES_ROOT=$(cd ../qa-workspace/qa-features && pwd)" >> "$GITHUB_ENV"
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
