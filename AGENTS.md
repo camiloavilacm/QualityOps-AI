@@ -1,7 +1,7 @@
 QualityOps AI — Codex Agent Operating Instructions
 Repository: qualityops-ai
 Applies to: Every Codex session, subagent, and worktree operating on this repository.
-Status: Contract freeze pending. No feature implementation is authorized until the human owner approves the contract-freeze report.
+Status: Stage 1 authorized against the human-approved contract baseline a33bc9dba103e321b4513ccf6b57ccf0b61c5106.
 This file governs how agents work. SPEC.md defines what the product must do. The existing qa-ai-generation-pipeline agent instructions do not apply here.
 
 1. Read first; establish the operating stage
@@ -46,7 +46,7 @@ Non-negotiable rules:
 - camiloavilacm/qa-payroll-gate-eval — Converse, fixtures, graders, model/prompt evaluation patterns; not reusable payroll-specific truth labels.
 Inspect exact, pinned upstream revisions before relying on a file or interface. Record repo URL, commit SHA, paths, and any adapters used. Do not write to these repositories, copy held-out evaluation answers into investigator inputs, or claim interoperability without running a real adapter test.
 4. Stage gates and authorization
-Stage 0 — Contract reconciliation (CURRENT STAGE)
+Stage 0 — Contract reconciliation (approved baseline)
 Allowed:
 - Inspect reference repositories and current workspace.
 - Edit SPEC.md, PLAN.md, AGENTS.md, contracts/v2/, samples/, and planning/contract tests only when instructed to reconcile.
@@ -59,7 +59,7 @@ Not allowed yet:
 - Invoke paid Bedrock models, provision AWS resources, push changes, or deploy.
 - Claim contracts are frozen before explicit human approval.
 Contract freeze requires validation of three core schemas, positive and negative fixtures, provenance/integrity/completeness semantics, gate-policy examples, held-out ground-truth separation, and non-overlapping ownership. Stop and request the human's approval of the freeze report.
-Stage 1 — Approved implementation
+Stage 1 — Approved implementation (CURRENT STAGE)
 Only after the human explicitly approves the contract freeze may the lead allocate bounded tasks and create isolated worktrees. Each task must name the owning agent, allowed paths, accepted schemas, tests, and definition of done. Agents may implement only their approved work packages.
 Stage 2 — Integration and review
 The lead integrates tested changes, verifies contracts and security invariants, runs available checks, and requests independent review. No agent self-approves its own PR. A human authorizes pushing, merging, protected live evaluations, and deployments.

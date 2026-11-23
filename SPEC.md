@@ -1,5 +1,5 @@
 QualityOps AI — Product and Engineering Specification
-Status: Proposed; contract freeze pending
+Status: Human-approved v2 contract baseline at a33bc9dba103e321b4513ccf6b57ccf0b61c5106
 Version: 0.1.0
 Purpose: Small, reproducible showcase of evidence-driven release eligibility and evaluated, read-only AI failure investigation.
 1. Problem and audience
