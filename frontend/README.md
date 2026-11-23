@@ -1,25 +1,43 @@
-# Local release review
+# Local Release Review & Playwright Test Agents
 
-C1 presents the synthetic mixed campaign. From this directory, install the lockfile and run the local dashboard with Node 22.12 or newer.
+The static dashboard presents sanitized campaign exports (`src/mixed-campaign.json`, `src/showcase-export.json`) and the sanitized 120-trial live Bedrock benchmark report (`src/live-evaluation.json`).
+
+## Run Locally
+
+Requires Node.js 22.12+ and Python 3.11+ with `jsonschema[format-nongpl]==4.26.0`:
 
 ```sh
 npm ci
 npm run dev -- --port 4173
 ```
 
-Open `http://127.0.0.1:4173/` and follow the **Mixed campaign** link. The detail view also opens at `/?campaign=fixture-mixed`. The release decision is `BLOCKED` with `REQUIRED_FAILURE` for execution `x` and `INSUFFICIENT_EVIDENCE` for execution `y`. The evidence link opens the sanitized entry for `x`. The page reports the absence of investigation and evaluation records.
+Open `http://127.0.0.1:4173/` to inspect all cinque campaign cards (`ELIGIBLE`, `BLOCKED`, `INCONCLUSIVE`, and `DIAGNOSED` projection) and the evaluation comparison report (`/?view=evaluation`).
 
-## Verified fixture
+## Verify Exports & Run E2E Tests
 
-The only dashboard data source is `src/mixed-campaign.json`, a local export with version `1.0.0`. Its SHA-256 is `1bdda5cadd7c835f08123d29af8c56eb51c7356cdd9153bd34c865c0c84f0662`. It contains the closed v2 gate record, source kind, completeness, and allowlisted evidence identifiers and types. The bundle manifest, execution reports, paths, and held-out evaluation data remain in their source directories.
-
-From the repository root, use Python 3.11 or later with the dependency pinned in `harness/requirements.txt`.
+From the repository root:
 
 ```sh
 python -B frontend/scripts/export_mixed.py --check
-python -B -m unittest -q backend.gate.test_gate
+python -B frontend/scripts/export_showcase.py --check
 npm --prefix frontend run build
-npm --prefix frontend run preview -- --port 4183
+npm --prefix frontend run test:e2e
 ```
 
-The fixture check replays the gate from A1 revision `9e298860ea326e41e3ed953c70d6f6953bcdf2c9` against the v2 synthetic evidence, trusted local policy, and independent source receipts. The export must match the frozen mixed-campaign expectation and bind to the exact source manifest bytes. Omit `--check` to regenerate the export. The production build uses relative asset paths and can be served by a static host.
+## Playwright Test Agents (Local Dev-Time Only)
+
+This directory includes official Playwright v1.56+ (`@playwright/test@1.65.1`) Test Agent definitions initialized via:
+
+```sh
+npx --prefix frontend playwright init-agents --loop=codex --config=playwright.config.ts --project=chromium
+```
+
+- **Seed test:** `tests/seed.spec.ts` verifies clean dashboard boot (`5` campaign cards, zero console/page errors).
+- **Reviewed plan:** `specs/dashboard-plan.md` defines the human-reviewed scenarios before spec generation.
+- **Generated specs:** `tests/mixed-campaign.spec.ts` and `tests/dashboard-flows.spec.ts`.
+
+### Strict Healer Guardrails ([SPEC.md §2](../SPEC.md) & [PLAN.md](../PLAN.md))
+
+1. **No CI self-healing:** GitHub Actions CI runs `npm --prefix frontend run test:e2e` (`--retries=0`) deterministically with zero agent/Healer invocation.
+2. **Human approval required:** Every Planner Markdown plan, Generator spec, or Healer repair diff requires independent review and human approval before promotion.
+3. **Never weaken assertions:** Accept a Healer locator repair only after verifying it targets the intended control and preserves all decision and reason assertions. If a UI change drops a required reason or alters a decision, retain the failing test as a product regression—never delete assertions, skip tests, or increase retries.
