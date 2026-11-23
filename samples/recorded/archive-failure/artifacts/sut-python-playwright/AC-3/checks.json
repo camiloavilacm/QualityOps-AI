@@ -1,0 +1,17 @@
+{
+  "scenario": "AC-3",
+  "outcome": "passed",
+  "checks": [
+    "baseline-fixture-loaded",
+    "fresh-cookie-and-storage-context",
+    "rejected-login-response-and-ui",
+    "rejection-no-browser-session",
+    "protected-route-denied",
+    "protected-identity-absent-and-storage-empty"
+  ],
+  "identity_id": null,
+  "slot_id": "sut-python:playwright",
+  "execution_id": "4d0c84097e7d4cd7a577142d729dbe5e",
+  "runner_revision": "91345e0923a656044b30c06f7cb02d408b89c0e8f5f5f8c02c6bbaa8782d2ad4",
+  "sut_revision": "ba550eda6f3d812de883dfd2c6f14b58cb6dc63a06860ea007f517d608dd8b16"
+}

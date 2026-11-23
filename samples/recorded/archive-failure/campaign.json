@@ -1,0 +1,885 @@
+{
+  "schema_version": "1.0",
+  "issue_id": "SEED-1",
+  "campaign_id": "smoke-gh-1461074056-44088601282",
+  "feature_ref": "12a55fb4b9312303378af72f96a28734b6b9ec9a",
+  "status": "passed",
+  "slots": [
+    {
+      "slot_id": "sut-python:playwright",
+      "state": "complete",
+      "result": {
+        "schema_version": "1.0",
+        "issue_id": "SEED-1",
+        "campaign_id": "smoke-gh-1461074056-44088601282",
+        "execution_id": "4d0c84097e7d4cd7a577142d729dbe5e",
+        "feature_ref": "12a55fb4b9312303378af72f96a28734b6b9ec9a",
+        "tooling_ref": "2a39aa1ad0e7fde7c2fedc3f94fbf0daa3f708d0",
+        "slot_id": "sut-python:playwright",
+        "sut_revision": "ba550eda6f3d812de883dfd2c6f14b58cb6dc63a06860ea007f517d608dd8b16",
+        "runner_revision": "91345e0923a656044b30c06f7cb02d408b89c0e8f5f5f8c02c6bbaa8782d2ad4",
+        "started_at": "2026-11-17T13:09:18.119286+00:00",
+        "finished_at": "2026-11-17T13:09:24.434269+00:00",
+        "status": "passed",
+        "scenarios": [
+          {
+            "id": "AC-1",
+            "status": "passed",
+            "duration_ms": 4223.100465000016,
+            "observer": {
+              "state": "complete",
+              "events": [
+                {
+                  "method": "POST",
+                  "path": "/users",
+                  "authorization_present": false,
+                  "status": 201
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "authorization_present": true,
+                  "status": 200
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "authorization_present": true,
+                  "status": 200
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "authorization_present": true,
+                  "status": 200
+                }
+              ],
+              "detail": null
+            },
+            "artifacts": [
+              {
+                "path": "AC-1/network.json",
+                "sha256": "e900d3f9c7aeec8222d650d69dd3815e0b3b4f3db7f7e506ea375bd001473323",
+                "kind": "network"
+              },
+              {
+                "path": "AC-1/checks.json",
+                "sha256": "e8172e57bd1e2ced177ca1bf033087ac86096d2b02fb67bd21ad6c588cbec68f",
+                "kind": "log"
+              }
+            ],
+            "error": null
+          },
+          {
+            "id": "AC-2",
+            "status": "passed",
+            "duration_ms": 918.3363380000173,
+            "observer": {
+              "state": "complete",
+              "events": [
+                {
+                  "method": "POST",
+                  "path": "/users/login",
+                  "authorization_present": false,
+                  "status": 200
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "authorization_present": true,
+                  "status": 200
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "authorization_present": true,
+                  "status": 200
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "authorization_present": true,
+                  "status": 200
+                }
+              ],
+              "detail": null
+            },
+            "artifacts": [
+              {
+                "path": "AC-2/network.json",
+                "sha256": "21283b28513d771039c40361e3712ddad504ff4e94624f1939136d7ac81533b3",
+                "kind": "network"
+              },
+              {
+                "path": "AC-2/checks.json",
+                "sha256": "a157732b670d23f6f401818bdbe17cce7798b3b56b232536b04ef7b7886780f1",
+                "kind": "log"
+              }
+            ],
+            "error": null
+          },
+          {
+            "id": "AC-3",
+            "status": "passed",
+            "duration_ms": 869.7775939999985,
+            "observer": {
+              "state": "complete",
+              "events": [
+                {
+                  "method": "POST",
+                  "path": "/users/login",
+                  "authorization_present": false,
+                  "status": 422
+                }
+              ],
+              "detail": null
+            },
+            "artifacts": [
+              {
+                "path": "AC-3/network.json",
+                "sha256": "3c15bb1f57f9125f8b02f7aa56ac5c2b9884bb3407f1e7f5f92643dc5b614d36",
+                "kind": "network"
+              },
+              {
+                "path": "AC-3/checks.json",
+                "sha256": "db4ef7c88a4bfebfff68f7f5364fba50e4dea8eaf6ae041d67199c6af1fe7fc1",
+                "kind": "log"
+              }
+            ],
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "slot_id": "sut-python:selenium",
+      "state": "complete",
+      "result": {
+        "schema_version": "1.0",
+        "issue_id": "SEED-1",
+        "campaign_id": "smoke-gh-1461074056-44088601282",
+        "execution_id": "74a7328d1aa24e6b860f3e8705046d9c",
+        "feature_ref": "12a55fb4b9312303378af72f96a28734b6b9ec9a",
+        "tooling_ref": "2a39aa1ad0e7fde7c2fedc3f94fbf0daa3f708d0",
+        "slot_id": "sut-python:selenium",
+        "sut_revision": "ba550eda6f3d812de883dfd2c6f14b58cb6dc63a06860ea007f517d608dd8b16",
+        "runner_revision": "91345e0923a656044b30c06f7cb02d408b89c0e8f5f5f8c02c6bbaa8782d2ad4",
+        "started_at": "2026-11-17T13:08:35.580559+00:00",
+        "finished_at": "2026-11-17T13:08:40.827162+00:00",
+        "status": "passed",
+        "scenarios": [
+          {
+            "id": "AC-1",
+            "status": "passed",
+            "duration_ms": 2361.342358999991,
+            "observer": {
+              "state": "complete",
+              "events": [
+                {
+                  "method": "POST",
+                  "path": "/users",
+                  "authorization_present": false,
+                  "status": 201
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "authorization_present": true,
+                  "status": 200
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "authorization_present": true,
+                  "status": 200
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "authorization_present": true,
+                  "status": 200
+                }
+              ],
+              "detail": null
+            },
+            "artifacts": [
+              {
+                "path": "AC-1/network.json",
+                "sha256": "e900d3f9c7aeec8222d650d69dd3815e0b3b4f3db7f7e506ea375bd001473323",
+                "kind": "network"
+              },
+              {
+                "path": "AC-1/checks.json",
+                "sha256": "851fb470238f142f2446a7a8a23fff951eae0cbeddf137fd783d1798219847b8",
+                "kind": "log"
+              }
+            ],
+            "error": null
+          },
+          {
+            "id": "AC-2",
+            "status": "passed",
+            "duration_ms": 1338.9402890000213,
+            "observer": {
+              "state": "complete",
+              "events": [
+                {
+                  "method": "POST",
+                  "path": "/users/login",
+                  "authorization_present": false,
+                  "status": 200
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "authorization_present": true,
+                  "status": 200
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "authorization_present": true,
+                  "status": 200
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "authorization_present": true,
+                  "status": 200
+                }
+              ],
+              "detail": null
+            },
+            "artifacts": [
+              {
+                "path": "AC-2/network.json",
+                "sha256": "21283b28513d771039c40361e3712ddad504ff4e94624f1939136d7ac81533b3",
+                "kind": "network"
+              },
+              {
+                "path": "AC-2/checks.json",
+                "sha256": "a94b598364de43595c6095f34071c46403b367d38005aca481ec307843e2f8d8",
+                "kind": "log"
+              }
+            ],
+            "error": null
+          },
+          {
+            "id": "AC-3",
+            "status": "passed",
+            "duration_ms": 1217.4555259999806,
+            "observer": {
+              "state": "complete",
+              "events": [
+                {
+                  "method": "POST",
+                  "path": "/users/login",
+                  "authorization_present": false,
+                  "status": 422
+                }
+              ],
+              "detail": null
+            },
+            "artifacts": [
+              {
+                "path": "AC-3/network.json",
+                "sha256": "3c15bb1f57f9125f8b02f7aa56ac5c2b9884bb3407f1e7f5f92643dc5b614d36",
+                "kind": "network"
+              },
+              {
+                "path": "AC-3/checks.json",
+                "sha256": "164c07306357694b2ee5c056f585d080166d632c0b910d5ce053e6aa369af877",
+                "kind": "log"
+              }
+            ],
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "slot_id": "sut-python:cypress",
+      "state": "complete",
+      "result": {
+        "schema_version": "1.0",
+        "issue_id": "SEED-1",
+        "campaign_id": "smoke-gh-1461074056-44088601282",
+        "execution_id": "b2e2c842-f619-427a-8461-3c06003e2f6a",
+        "feature_ref": "12a55fb4b9312303378af72f96a28734b6b9ec9a",
+        "tooling_ref": "2a39aa1ad0e7fde7c2fedc3f94fbf0daa3f708d0",
+        "slot_id": "sut-python:cypress",
+        "sut_revision": "ba550eda6f3d812de883dfd2c6f14b58cb6dc63a06860ea007f517d608dd8b16",
+        "runner_revision": "e3bc3b4bfa4368a783b4e90a01112296c6635d5a5790e3fdf827639dcfa42a2d",
+        "started_at": "2026-11-17T13:08:39.852Z",
+        "finished_at": "2026-11-17T13:08:47.656Z",
+        "status": "passed",
+        "scenarios": [
+          {
+            "id": "AC-1",
+            "status": "passed",
+            "duration_ms": 0,
+            "observer": {
+              "state": "complete",
+              "events": [
+                {
+                  "method": "POST",
+                  "path": "/users",
+                  "status": 201,
+                  "authorization_present": false
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "status": 200,
+                  "authorization_present": true
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "status": 200,
+                  "authorization_present": true
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "status": 200,
+                  "authorization_present": true
+                }
+              ],
+              "detail": null
+            },
+            "artifacts": [
+              {
+                "path": "AC-1/network.json",
+                "sha256": "29fd52a707375bd51ffb645d2b03d1ce806cbe41f6834f3b4d0adaff4640ab49",
+                "kind": "network"
+              },
+              {
+                "path": "AC-1/checks.json",
+                "sha256": "76a90e4f69c32e19cfb6eecbb514fee535d50592bdb0fb0c970e871882d59d0b",
+                "kind": "log"
+              }
+            ],
+            "error": null
+          },
+          {
+            "id": "AC-2",
+            "status": "passed",
+            "duration_ms": 0,
+            "observer": {
+              "state": "complete",
+              "events": [
+                {
+                  "method": "POST",
+                  "path": "/users/login",
+                  "status": 200,
+                  "authorization_present": false
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "status": 200,
+                  "authorization_present": true
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "status": 200,
+                  "authorization_present": true
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "status": 200,
+                  "authorization_present": true
+                }
+              ],
+              "detail": null
+            },
+            "artifacts": [
+              {
+                "path": "AC-2/network.json",
+                "sha256": "2b2bea50c346a8468d4d4d3e9b9bc9dada72f5906254da4b924dbaeaf17da53a",
+                "kind": "network"
+              },
+              {
+                "path": "AC-2/checks.json",
+                "sha256": "4e673875aa375f619c082bf1aa6695f4c3fd24e2b384b86ba93c19094ec76699",
+                "kind": "log"
+              }
+            ],
+            "error": null
+          },
+          {
+            "id": "AC-3",
+            "status": "passed",
+            "duration_ms": 0,
+            "observer": {
+              "state": "complete",
+              "events": [
+                {
+                  "method": "POST",
+                  "path": "/users/login",
+                  "status": 422,
+                  "authorization_present": false
+                }
+              ],
+              "detail": null
+            },
+            "artifacts": [
+              {
+                "path": "AC-3/network.json",
+                "sha256": "a23ac35323de3ea3684e87b961c034dcba30d70e6c7fac388eb02cd32e54375e",
+                "kind": "network"
+              },
+              {
+                "path": "AC-3/checks.json",
+                "sha256": "d31fbd5a7c7a8e8006d62c9ce70dca91491b319ae8396f0607102fd6851ffa4e",
+                "kind": "log"
+              }
+            ],
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "slot_id": "sut-node:playwright",
+      "state": "complete",
+      "result": {
+        "schema_version": "1.0",
+        "issue_id": "SEED-1",
+        "campaign_id": "smoke-gh-1461074056-44088601282",
+        "execution_id": "457ca444185a4dcc9a95bf53a8903c01",
+        "feature_ref": "12a55fb4b9312303378af72f96a28734b6b9ec9a",
+        "tooling_ref": "2a39aa1ad0e7fde7c2fedc3f94fbf0daa3f708d0",
+        "slot_id": "sut-node:playwright",
+        "sut_revision": "25e5c5bd5675b471ea597ffc638f058eb22a0cb45e7f15057a682b7a9fce1331",
+        "runner_revision": "91345e0923a656044b30c06f7cb02d408b89c0e8f5f5f8c02c6bbaa8782d2ad4",
+        "started_at": "2026-11-17T13:08:46.271650+00:00",
+        "finished_at": "2026-11-17T13:08:49.276337+00:00",
+        "status": "passed",
+        "scenarios": [
+          {
+            "id": "AC-1",
+            "status": "passed",
+            "duration_ms": 1202.0396430000062,
+            "observer": {
+              "state": "complete",
+              "events": [
+                {
+                  "method": "POST",
+                  "path": "/users",
+                  "authorization_present": false,
+                  "status": 201
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "authorization_present": true,
+                  "status": 200
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "authorization_present": true,
+                  "status": 200
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "authorization_present": true,
+                  "status": 200
+                }
+              ],
+              "detail": null
+            },
+            "artifacts": [
+              {
+                "path": "AC-1/network.json",
+                "sha256": "e900d3f9c7aeec8222d650d69dd3815e0b3b4f3db7f7e506ea375bd001473323",
+                "kind": "network"
+              },
+              {
+                "path": "AC-1/checks.json",
+                "sha256": "9bb566c61477987fbf5338a7d39784f6456c04ae0ac2b2cd1da1409b9c3274e9",
+                "kind": "log"
+              }
+            ],
+            "error": null
+          },
+          {
+            "id": "AC-2",
+            "status": "passed",
+            "duration_ms": 803.5545369999966,
+            "observer": {
+              "state": "complete",
+              "events": [
+                {
+                  "method": "POST",
+                  "path": "/users/login",
+                  "authorization_present": false,
+                  "status": 200
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "authorization_present": true,
+                  "status": 200
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "authorization_present": true,
+                  "status": 200
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "authorization_present": true,
+                  "status": 200
+                }
+              ],
+              "detail": null
+            },
+            "artifacts": [
+              {
+                "path": "AC-2/network.json",
+                "sha256": "21283b28513d771039c40361e3712ddad504ff4e94624f1939136d7ac81533b3",
+                "kind": "network"
+              },
+              {
+                "path": "AC-2/checks.json",
+                "sha256": "c2e58963a8d8e443198325645e2737e2db817890cf1c61741757e35200531d8a",
+                "kind": "log"
+              }
+            ],
+            "error": null
+          },
+          {
+            "id": "AC-3",
+            "status": "passed",
+            "duration_ms": 801.2058989999957,
+            "observer": {
+              "state": "complete",
+              "events": [
+                {
+                  "method": "POST",
+                  "path": "/users/login",
+                  "authorization_present": false,
+                  "status": 422
+                }
+              ],
+              "detail": null
+            },
+            "artifacts": [
+              {
+                "path": "AC-3/network.json",
+                "sha256": "3c15bb1f57f9125f8b02f7aa56ac5c2b9884bb3407f1e7f5f92643dc5b614d36",
+                "kind": "network"
+              },
+              {
+                "path": "AC-3/checks.json",
+                "sha256": "d2683ec49b21b9fd7633c32b3a45e3691ff861179e353c15767b8ee0f054114c",
+                "kind": "log"
+              }
+            ],
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "slot_id": "sut-node:selenium",
+      "state": "complete",
+      "result": {
+        "schema_version": "1.0",
+        "issue_id": "SEED-1",
+        "campaign_id": "smoke-gh-1461074056-44088601282",
+        "execution_id": "826c502cd1084870acc3960ef2b4bb4b",
+        "feature_ref": "12a55fb4b9312303378af72f96a28734b6b9ec9a",
+        "tooling_ref": "2a39aa1ad0e7fde7c2fedc3f94fbf0daa3f708d0",
+        "slot_id": "sut-node:selenium",
+        "sut_revision": "25e5c5bd5675b471ea597ffc638f058eb22a0cb45e7f15057a682b7a9fce1331",
+        "runner_revision": "91345e0923a656044b30c06f7cb02d408b89c0e8f5f5f8c02c6bbaa8782d2ad4",
+        "started_at": "2026-11-17T13:08:38.746711+00:00",
+        "finished_at": "2026-11-17T13:08:43.114914+00:00",
+        "status": "passed",
+        "scenarios": [
+          {
+            "id": "AC-1",
+            "status": "passed",
+            "duration_ms": 1474.5724240000015,
+            "observer": {
+              "state": "complete",
+              "events": [
+                {
+                  "method": "POST",
+                  "path": "/users",
+                  "authorization_present": false,
+                  "status": 201
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "authorization_present": true,
+                  "status": 200
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "authorization_present": true,
+                  "status": 200
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "authorization_present": true,
+                  "status": 200
+                }
+              ],
+              "detail": null
+            },
+            "artifacts": [
+              {
+                "path": "AC-1/network.json",
+                "sha256": "e900d3f9c7aeec8222d650d69dd3815e0b3b4f3db7f7e506ea375bd001473323",
+                "kind": "network"
+              },
+              {
+                "path": "AC-1/checks.json",
+                "sha256": "0d2c49d470ba6418f67051e3a6172a9290497227a74eefe948a5ee264883579c",
+                "kind": "log"
+              }
+            ],
+            "error": null
+          },
+          {
+            "id": "AC-2",
+            "status": "passed",
+            "duration_ms": 1258.5045459999974,
+            "observer": {
+              "state": "complete",
+              "events": [
+                {
+                  "method": "POST",
+                  "path": "/users/login",
+                  "authorization_present": false,
+                  "status": 200
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "authorization_present": true,
+                  "status": 200
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "authorization_present": true,
+                  "status": 200
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "authorization_present": true,
+                  "status": 200
+                }
+              ],
+              "detail": null
+            },
+            "artifacts": [
+              {
+                "path": "AC-2/network.json",
+                "sha256": "21283b28513d771039c40361e3712ddad504ff4e94624f1939136d7ac81533b3",
+                "kind": "network"
+              },
+              {
+                "path": "AC-2/checks.json",
+                "sha256": "092b779991dfc90ed79ee4527f34361aa794c5ada088ad5c5ca42d839c0cd41c",
+                "kind": "log"
+              }
+            ],
+            "error": null
+          },
+          {
+            "id": "AC-3",
+            "status": "passed",
+            "duration_ms": 1265.9419980000025,
+            "observer": {
+              "state": "complete",
+              "events": [
+                {
+                  "method": "POST",
+                  "path": "/users/login",
+                  "authorization_present": false,
+                  "status": 422
+                }
+              ],
+              "detail": null
+            },
+            "artifacts": [
+              {
+                "path": "AC-3/network.json",
+                "sha256": "3c15bb1f57f9125f8b02f7aa56ac5c2b9884bb3407f1e7f5f92643dc5b614d36",
+                "kind": "network"
+              },
+              {
+                "path": "AC-3/checks.json",
+                "sha256": "90b58d7b472f8c08d29316ab907b4fa53cdb3647b290d206aa79a60518ed9db5",
+                "kind": "log"
+              }
+            ],
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "slot_id": "sut-node:cypress",
+      "state": "complete",
+      "result": {
+        "schema_version": "1.0",
+        "issue_id": "SEED-1",
+        "campaign_id": "smoke-gh-1461074056-44088601282",
+        "execution_id": "8e321fc3-220b-4910-9897-ba0975db3e08",
+        "feature_ref": "12a55fb4b9312303378af72f96a28734b6b9ec9a",
+        "tooling_ref": "2a39aa1ad0e7fde7c2fedc3f94fbf0daa3f708d0",
+        "slot_id": "sut-node:cypress",
+        "sut_revision": "25e5c5bd5675b471ea597ffc638f058eb22a0cb45e7f15057a682b7a9fce1331",
+        "runner_revision": "e3bc3b4bfa4368a783b4e90a01112296c6635d5a5790e3fdf827639dcfa42a2d",
+        "started_at": "2026-11-17T13:08:41.436Z",
+        "finished_at": "2026-11-17T13:08:56.935Z",
+        "status": "passed",
+        "scenarios": [
+          {
+            "id": "AC-1",
+            "status": "passed",
+            "duration_ms": 0,
+            "observer": {
+              "state": "complete",
+              "events": [
+                {
+                  "method": "POST",
+                  "path": "/users",
+                  "status": 201,
+                  "authorization_present": false
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "status": 200,
+                  "authorization_present": true
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "status": 200,
+                  "authorization_present": true
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "status": 200,
+                  "authorization_present": true
+                }
+              ],
+              "detail": null
+            },
+            "artifacts": [
+              {
+                "path": "AC-1/network.json",
+                "sha256": "29fd52a707375bd51ffb645d2b03d1ce806cbe41f6834f3b4d0adaff4640ab49",
+                "kind": "network"
+              },
+              {
+                "path": "AC-1/checks.json",
+                "sha256": "5cdedc85c5a92d7344a9a60714fa193acef3ab23233e702bab50f4a8ef8e0989",
+                "kind": "log"
+              }
+            ],
+            "error": null
+          },
+          {
+            "id": "AC-2",
+            "status": "passed",
+            "duration_ms": 0,
+            "observer": {
+              "state": "complete",
+              "events": [
+                {
+                  "method": "POST",
+                  "path": "/users/login",
+                  "status": 200,
+                  "authorization_present": false
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "status": 200,
+                  "authorization_present": true
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "status": 200,
+                  "authorization_present": true
+                },
+                {
+                  "method": "GET",
+                  "path": "/user",
+                  "status": 200,
+                  "authorization_present": true
+                }
+              ],
+              "detail": null
+            },
+            "artifacts": [
+              {
+                "path": "AC-2/network.json",
+                "sha256": "2b2bea50c346a8468d4d4d3e9b9bc9dada72f5906254da4b924dbaeaf17da53a",
+                "kind": "network"
+              },
+              {
+                "path": "AC-2/checks.json",
+                "sha256": "a317834d5afed4e88c8434cfca7cd6a1d9065410416d619a1c5660ec85b3bd74",
+                "kind": "log"
+              }
+            ],
+            "error": null
+          },
+          {
+            "id": "AC-3",
+            "status": "passed",
+            "duration_ms": 0,
+            "observer": {
+              "state": "complete",
+              "events": [
+                {
+                  "method": "POST",
+                  "path": "/users/login",
+                  "status": 422,
+                  "authorization_present": false
+                }
+              ],
+              "detail": null
+            },
+            "artifacts": [
+              {
+                "path": "AC-3/network.json",
+                "sha256": "a23ac35323de3ea3684e87b961c034dcba30d70e6c7fac388eb02cd32e54375e",
+                "kind": "network"
+              },
+              {
+                "path": "AC-3/checks.json",
+                "sha256": "3d4188686a26cc8d72a51a37af6044ada42f15b092653c6cb0d3ecaf1855fbda",
+                "kind": "log"
+              }
+            ],
+            "error": null
+          }
+        ]
+      }
+    }
+  ]
+}

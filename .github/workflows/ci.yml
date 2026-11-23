@@ -22,6 +22,8 @@ jobs:
           git -C ../qa-workspace/qa-features remote add origin https://github.com/camiloavilacm/qa-features.git
           git -C ../qa-workspace/qa-features fetch --depth 1 origin e7c566ff831139889195643a1b906b7edab76f48
           git -C ../qa-workspace/qa-features checkout -q FETCH_HEAD
+          mkdir -p ../qa-workspace/qa-features/harness/evidence/readme-runs/failure
+          cp -R samples/recorded/archive-failure/. ../qa-workspace/qa-features/harness/evidence/readme-runs/failure/
           echo "QUALITYOPS_QA_FEATURES_ROOT=$(cd ../qa-workspace/qa-features && pwd)" >> "$GITHUB_ENV"
 
       - name: Set up Python
