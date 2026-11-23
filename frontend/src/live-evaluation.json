@@ -1,20 +1,19 @@
 {
   "baseline": {
     "error_breakdown": {
-      "backend_unavailable": 46,
-      "invalid_model_output": 2,
-      "invocation_limit": 2,
-      "unsafe_model_text": 3
+      "invalid_model_output": 22,
+      "invocation_limit": 3,
+      "unsafe_model_text": 7
     },
     "metrics": {
       "citation_validity": {
-        "count": 2,
-        "denominator": 2,
+        "count": 5,
+        "denominator": 5,
         "rate": 1.0
       },
       "claim_support": {
         "count": 0,
-        "denominator": 1,
+        "denominator": 3,
         "rate": 0.0
       },
       "correct_abstention": {
@@ -28,10 +27,10 @@
         "rate": 0.0
       },
       "estimated_cost_usd": {
-        "count": 14,
+        "count": 60,
         "denominator": 60,
-        "p50": 0.00019032,
-        "p95": 0.00023664
+        "p50": 0.0001884,
+        "p95": 0.0002472
       },
       "invalid_output": {
         "count": 0,
@@ -41,8 +40,8 @@
       "latency_ms": {
         "count": 60,
         "denominator": 60,
-        "p50": 137,
-        "p95": 2396
+        "p50": 2189,
+        "p95": 2714
       },
       "pass@3": {
         "count": 0,
@@ -72,31 +71,30 @@
     },
     "model_id": "eu.amazon.nova-lite-v1:0",
     "region": "eu-west-1",
-    "run_id": "live-baseline-nova-lite-v1",
+    "run_id": "live-baseline-nova-lite-v2",
     "statuses": {
-      "DIAGNOSED": 1,
-      "ERROR": 53,
-      "INCONCLUSIVE": 6
+      "DIAGNOSED": 3,
+      "ERROR": 32,
+      "INCONCLUSIVE": 25
     },
-    "total_estimated_cost_usd": 0.002656,
+    "total_estimated_cost_usd": 0.011788,
     "trials": 60
   },
-  "baseline_report_sha256": "4efc189e578acaa5dad258743913dc21e8564c89e368ac5bb0209f77a6cbbde8",
+  "baseline_report_sha256": "fdc7cbfca88fa82e4b3e170df09ba54e46ed2f5b566d395c86543ad1561556f8",
   "candidate": {
     "error_breakdown": {
-      "backend_unavailable": 27,
-      "invalid_model_output": 6,
+      "invalid_model_output": 12,
       "unsafe_model_text": 12
     },
     "metrics": {
       "citation_validity": {
-        "count": 12,
-        "denominator": 12,
+        "count": 15,
+        "denominator": 15,
         "rate": 1.0
       },
       "claim_support": {
         "count": 0,
-        "denominator": 6,
+        "denominator": 9,
         "rate": 0.0
       },
       "correct_abstention": {
@@ -110,10 +108,10 @@
         "rate": 0.0
       },
       "estimated_cost_usd": {
-        "count": 33,
+        "count": 60,
         "denominator": 60,
-        "p50": 0.002773,
-        "p95": 0.003057
+        "p50": 0.002663,
+        "p95": 0.002862
       },
       "invalid_output": {
         "count": 0,
@@ -123,8 +121,8 @@
       "latency_ms": {
         "count": 60,
         "denominator": 60,
-        "p50": 1436,
-        "p95": 2377
+        "p50": 1566,
+        "p95": 2356
       },
       "pass@3": {
         "count": 0,
@@ -154,16 +152,16 @@
     },
     "model_id": "eu.anthropic.claude-haiku-4-5-20251001-v1:0",
     "region": "eu-west-1",
-    "run_id": "live-candidate-haiku45-v1",
+    "run_id": "live-candidate-haiku45-v2",
     "statuses": {
-      "DIAGNOSED": 6,
-      "ERROR": 45,
-      "INCONCLUSIVE": 9
+      "DIAGNOSED": 9,
+      "ERROR": 24,
+      "INCONCLUSIVE": 27
     },
-    "total_estimated_cost_usd": 0.089139,
+    "total_estimated_cost_usd": 0.157806,
     "trials": 60
   },
-  "candidate_report_sha256": "0944654e22e899e1e87072b45e5227eb893f0819665a3695b3854a72e496ea88",
+  "candidate_report_sha256": "1333dec9bd9708c489150964a9e1187985f3dff8b41b48553416b68fdf7457ce",
   "cases": 20,
   "checks": {
     "citation_validity": {
@@ -212,19 +210,19 @@
       "count": 60,
       "denominator": 60,
       "limit": 20000,
-      "measured_p95": 2377,
-      "observed": 2377,
+      "measured_p95": 2356,
+      "observed": 2356,
       "operator": "<",
       "status": "pass"
     },
     "per_trial_cost_usd": {
-      "count": 33,
+      "count": 60,
       "denominator": 60,
       "limit": 0.1,
       "measured_max": 0.003057,
-      "observed": null,
+      "observed": 0.003057,
       "operator": "<=",
-      "status": "indeterminate"
+      "status": "pass"
     },
     "safety_violations": {
       "limit": 0,
@@ -233,12 +231,12 @@
       "status": "pass"
     },
     "unsupported_claims": {
-      "denominator": 6,
+      "denominator": 9,
       "known_unsupported": 0,
       "limit": 0,
       "observed": null,
       "operator": "==",
-      "pending_review": 6,
+      "pending_review": 9,
       "status": "indeterminate"
     }
   },

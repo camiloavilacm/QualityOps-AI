@@ -34,12 +34,14 @@ See [docs/architecture.md](docs/architecture.md) and [docs/threat-model.md](docs
 | **Offline CI** | A1 (`32`), B2 (`12`), B1 (`15`), Stage 2 vertical slice (`4`), export checks, Vite build | **PASS** (`63/63` tests) | [.github/workflows/ci.yml](.github/workflows/ci.yml) |
 | **Offline OWASP 2025 Review** | Independent read-only review of B1/B2 retrieval, safety, and grading | **PASS** | [harness/offline-review.md](harness/offline-review.md) |
 | **Playwright Dashboard Exercise** | Planner/Generator/Healer (2 UI variants) + CLI, MCP, WebMCP | **PASS** (independent verdict) | [harness/playwright-review.md](harness/playwright-review.md) |
-| **Live Bedrock Benchmark** | 120 live trials in `eu-west-1` (`Nova Lite` baseline vs. `Claude Haiku 4.5` candidate, total spend `$0.0918`) | **Completed — Promotion Blocked (`threshold_status: fail`)** | [frontend/src/live-evaluation.json](frontend/src/live-evaluation.json) |
+| **Live Bedrock Benchmark** | 120 sequential live trials in `eu-west-1` (`Nova Lite` baseline vs. `Claude Haiku 4.5` candidate, `60/60` measured on both, total spend `$0.1696`) | **Completed — Promotion Blocked (`threshold_status: fail`)** | [frontend/src/live-evaluation.json](frontend/src/live-evaluation.json) |
 
-### Live Benchmark Summary (120 Trials, `eu-west-1`)
+### Live Benchmark Summary (120 Sequential Trials, `eu-west-1`, Zero Throttling)
 
-- **Safety & Protocol:** `0/120` safety violations (`safety_pass^3 = 100%`), `0/120` schema-invalid outputs, `100%` citation validity (`12/12` candidate, `2/2` baseline), `p95` latency `2.38s` (`< 20s` ceiling), max measured cost `$0.0031` (`<= $0.10` ceiling).
-- **Promotion Gate:** `promotion_allowed: false` (`threshold_status: fail`). Concurrent invocations hit `eu-west-1` throttling (`backend_unavailable`) on `46/60` Nova Lite and `27/60` Haiku 4.5 trials, and strict rubric/vocabulary checks prevented reaching the `>= 80%` diagnosis and `100%` abstention thresholds. Per [SPEC.md](SPEC.md), blocking promotion on an underperforming run is the intended outcome of the evaluation framework.
+- **Complete Telemetry (`60/60` baseline + `60/60` candidate):** Zero `backend_unavailable` errors.
+- **Safety, Cost & Protocol (`PASS`):** `0/120` safety violations (`safety_pass@3 = 100%`, `safety_pass^3 = 100%`), `0/120` schema-invalid outputs, `100%` citation validity (`15/15` candidate, `5/5` baseline), `p95` latency `2.36s` (`< 20s` ceiling), max per-trial cost `$0.0031` (`<= $0.10` ceiling, `60/60` measured → **`PASS`**), and `PASS` on all three no-regression checks.
+- **Outcomes:** Candidate (`Claude Haiku 4.5`, `$0.1578`) produced `9 DIAGNOSED`, `27 INCONCLUSIVE`, and `24 ERROR` (`12 invalid_model_output`, `12 unsafe_model_text`) vs. Baseline (`Nova Lite`, `$0.0118`) with `3 DIAGNOSED`, `25 INCONCLUSIVE`, and `32 ERROR`.
+- **Promotion Gate:** `promotion_allowed: false` (`threshold_status: fail`) due to strict held-out rubric matching on `diagnosis_accuracy` (`>= 80%`) and `correct_abstention` (`100%`). Per [SPEC.md](SPEC.md), blocking promotion on an underperforming run is the intended outcome of the evaluation framework.
 
 ## Run Locally (Offline, `$0` AWS Cost)
 
