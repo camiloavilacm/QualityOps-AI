@@ -76,6 +76,13 @@ class InvestigatorTests(unittest.TestCase):
         self.assertEqual(result["claims"][0]["evidence_ids"], ["a1", "a2"])
         self.assertIn("no deletion predicate", result["claims"][0]["statement"])
 
+        # Bedrock Converse may include an optional type field on client toolUse blocks.
+        typed_read = deepcopy(read("a1", "a2"))
+        for blk in typed_read["output"]["message"]["content"]:
+            blk["toolUse"]["type"] = "tool_use"
+        typed_result, _, _ = self.run_case(CASE, typed_read, DIAGNOSE)
+        self.assertEqual(typed_result["status"], "DIAGNOSED")
+
     def test_unauthorized_selection_and_tampering(self):
         client = Script()
         config = backend(client)

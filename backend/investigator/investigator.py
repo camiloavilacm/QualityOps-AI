@@ -38,10 +38,17 @@ REQUEST_ID = re.compile(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}", re.ASCII
 TOOL_ID = re.compile(r"[a-zA-Z0-9_-]{1,64}", re.ASCII)
 
 
-# Claude 3 Haiku has a 200,000-token context. Reserve above the entire context,
-# including service framing. An operator cannot override this live bound.
+# Allowlisted live Bedrock models and their fixed input reservation bounds.
+# An operator cannot override the bound for a live model.
 LIVE_MODEL = "anthropic.claude-3-haiku-20240307-v1:0"
 LIVE_INPUT_BOUND = 262144
+LIVE_MODEL_BOUNDS = {
+    LIVE_MODEL: LIVE_INPUT_BOUND,
+    "eu.amazon.nova-micro-v1:0": 131072,
+    "eu.amazon.nova-lite-v1:0": 300000,
+    "eu.anthropic.claude-haiku-4-5-20251001-v1:0": 65536,
+}
+MAX_INPUT_BOUND = max(LIVE_MODEL_BOUNDS.values())
 WORKERS = BoundedSemaphore(4)
 AMBIGUITY = re.compile(
     r"no execution receipt|no final outcome|capture omits|without timing breakdown|"
@@ -115,7 +122,7 @@ def validate_backend(config):
         if not condition:
             raise ValueError(message)
 
-    require(type(config.input_token_ceiling) is int and 1 <= config.input_token_ceiling <= LIVE_INPUT_BOUND
+    require(type(config.input_token_ceiling) is int and 1 <= config.input_token_ceiling <= MAX_INPUT_BOUND
             and all(type(value) in (int, float) for value in
                     (config.request_seconds, config.investigation_seconds))
             and 0 < config.request_seconds <= config.investigation_seconds <= 20
@@ -134,8 +141,9 @@ def validate_backend(config):
                 and getattr(config.client, "meta", None) is None, "unsafe_backend_transport")
         return
 
-    require(type(config.client) is BedrockTransport and config.model_id == LIVE_MODEL
-            and config.input_token_ceiling == LIVE_INPUT_BOUND, "unverified_live_token_bound")
+    expected_bound = LIVE_MODEL_BOUNDS.get(config.model_id)
+    require(type(config.client) is BedrockTransport and expected_bound is not None
+            and config.input_token_ceiling == expected_bound, "unverified_live_token_bound")
     meta = getattr(config.client.sdk, "meta", None)
     settings = getattr(meta, "config", None)
     require(getattr(getattr(meta, "service_model", None), "service_name", None) == "bedrock-runtime"
@@ -214,7 +222,9 @@ def tool_exchange(content, observations, retrieved, used_ids):
             continue  # Never send model prose back to the provider.
         check(block.keys() == {"toolUse"} and len(requests) < 4)
         call = block["toolUse"]
-        check(isinstance(call, dict) and call.keys() == {"name", "input", "toolUseId"})
+        check(isinstance(call, dict)
+              and {"name", "input", "toolUseId"} <= call.keys() <= {"name", "input", "toolUseId", "type"}
+              and ("type" not in call or call["type"] in (None, "tool_use", "client_tool_use")))
         ident = call["toolUseId"]
         check(isinstance(ident, str) and TOOL_ID.fullmatch(ident) and ident not in used_ids)
         check(call["name"] == "read_evidence", "unauthorized_tool")
