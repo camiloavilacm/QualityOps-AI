@@ -80,6 +80,13 @@ class ReplayTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "response provenance mismatch"):
             self.replay(updated)
 
+    def test_one_turn_support_and_abstention(self):
+        rows = {row["case_id"]: row for row in self.replay(example())["trials"]}
+        self.assertTrue(rows["c-5125ee1591d8d901"]["diagnosis_correct"])
+        self.assertEqual(rows["c-876a870bcba73cec"]["claims"],
+                         [{"citation_exists": [True], "support": "unsupported"}])
+        self.assertTrue(rows[ev.PARTIAL_CASE]["abstention_correct"])
+
     def test_raw_manifest_binding(self):
         runs = example(True)
         trial = next(row for row in runs["trials"] if row["case_id"] == ev.PARTIAL_CASE)
@@ -113,6 +120,60 @@ class ReplayTests(unittest.TestCase):
                                         input_tokens=slot, output_tokens=1)
                 run["trials"].append(row)
         return run
+
+    def test_offline_converse_exchange_grades_unchanged_result(self):
+        with patch.object(sys, "path", [str(ev.ROOT.parent), *sys.path]):
+            from backend.investigator.examples import CASE, FINDING, Script, answer, backend, read
+            from backend.investigator.investigator import invoke
+        script = Script(read("a1", "a2"), answer(**FINDING))
+        run_id = "offline-exchange"
+        result, audit = invoke({"fixture_id": CASE}, backend=backend(script), run_id=run_id)
+        self.assertTrue(audit["offline"])
+        self.assertEqual(len(script.requests), 2)
+        calls, replies = script.requests[1]["messages"][-2:]
+        self.assertEqual([(item["toolUse"]["name"], item["toolUse"]["input"]) for item in calls["content"]],
+                         [("read_evidence", {"evidence_id": key}) for key in ("a1", "a2")])
+        fixture = projection.model_input(CASE)
+        observed = [item["toolResult"]["content"][0]["json"] for item in replies["content"]]
+        self.assertEqual(observed, fixture["observations"])
+        self.assertEqual(result["status"], "DIAGNOSED")
+        original = ev.encode(result)
+        row = {key: result[key] for key in ("campaign_id", "investigation_id", "fixture_or_run_id",
+                                            "evidence_sha256")}
+        row.update(case_id=CASE, trial=1, response=result, protocol_valid=True,
+                   safety=dict.fromkeys(ev.SAFETY, False),
+                   telemetry=dict(result["usage"], latency_ms=result["latency_ms"],
+                                  estimated_cost_usd=result["estimated_cost_usd"]))
+        config = {key: result[key] for key in ("model_id", "prompt_sha256", "tool_contract_version", "parameters")}
+        # Exercise the collector's per-response grading path only. The script
+        # generates synthetic usage and provides no independent trial groups.
+        grade = ev.grade(row, {"source": "recorded", "run_id": run_id}, config,
+                         ev.corpus()[CASE], fixture, ev.validators()[0])
+        # The script's category and phrasing differ from the pinned rubric.
+        self.assertFalse(grade["diagnosis_correct"])
+        self.assertEqual(grade["claims"], [{"citation_exists": [True, True], "support": "review_required"}])
+        self.assertEqual(ev.encode(result), original)
+
+    def test_three_trial_reliability_counts_groups_and_retains_failures(self):
+        authored = self.replay(example(True))
+        for metric in ("pass@3", "pass^3", "safety_pass@3", "safety_pass^3"):
+            self.assertEqual(authored["metrics"][metric], ev.rate([]))
+        run = self.recorded_fixture()
+        case = run["trials"][0]["case_id"]
+        incorrect = run["trials"][1]["case_id"]
+        for row in run["trials"]:
+            if row["case_id"] == incorrect:
+                row["response"]["category"] = "wrong-category"
+            if row["case_id"] == case and row["trial"] == 2:
+                row["safety"]["unauthorized_operation"] = True
+        raw = ev.encode(run)
+        report = ev.replay(raw, ev.digest(raw))
+        self.assertEqual(report["metrics"]["pass@3"], ev.rate([True] * 19 + [False]))
+        self.assertEqual(report["metrics"]["pass^3"], ev.rate([True] * 18 + [False] * 2))
+        self.assertEqual(report["metrics"]["safety_pass@3"], ev.rate([True] * 20))
+        self.assertEqual(report["metrics"]["safety_pass^3"], ev.rate([True] * 19 + [False]))
+        self.assertEqual(report["metrics"]["safety_violation"]["count"], 1)
+        self.assertEqual(len(report["trials"]), 60)
 
     def test_recorded_protocol_validation_with_authored_test_values(self):
         run = self.recorded_fixture()

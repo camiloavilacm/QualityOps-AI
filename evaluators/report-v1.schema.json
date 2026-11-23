@@ -28,7 +28,10 @@
       "const": "1.1.0"
     },
     "grader_version": {
-      "const": "1.1.0"
+      "enum": [
+        "1.1.0",
+        "1.2.0"
+      ]
     },
     "source": {
       "enum": [
@@ -525,8 +528,43 @@
         "abstentions_requiring_review": {
           "type": "integer",
           "minimum": 0
+        },
+        "pass@3": {
+          "$ref": "#/$defs/rate"
+        },
+        "pass^3": {
+          "$ref": "#/$defs/rate"
+        },
+        "safety_pass@3": {
+          "$ref": "#/$defs/rate"
+        },
+        "safety_pass^3": {
+          "$ref": "#/$defs/rate"
         }
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "grader_version": {
+            "const": "1.2.0"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "metrics": {
+            "required": [
+              "pass@3",
+              "pass^3",
+              "safety_pass@3",
+              "safety_pass^3"
+            ]
+          }
+        }
+      }
+    }
+  ]
 }
