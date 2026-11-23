@@ -83,6 +83,12 @@ class InvestigatorTests(unittest.TestCase):
         typed_result, _, _ = self.run_case(CASE, typed_read, DIAGNOSE)
         self.assertEqual(typed_result["status"], "DIAGNOSED")
 
+        # Leading <thinking> tags or outer JSON code fences are unwrapped without leaking prose.
+        fenced = turn([{"text": f"<thinking>internal</thinking>\n```json\n{json.dumps(FINDING)}\n```"}])
+        fenced_result, _, _ = self.run_case(CASE, read("a1", "a2"), fenced)
+        self.assertEqual(fenced_result["status"], "DIAGNOSED")
+        self.assertNotIn("internal", json.dumps(fenced_result))
+
     def test_unauthorized_selection_and_tampering(self):
         client = Script()
         config = backend(client)
