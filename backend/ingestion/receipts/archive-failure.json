@@ -1,0 +1,38 @@
+{
+  "campaign_id": "smoke-gh-1461074056-44088601282",
+  "capture": "local-archive",
+  "capture_revision": null,
+  "collected_at": "2026-11-17T13:10:07Z",
+  "complete_artifact_names": [
+    "checks.json",
+    "network.json"
+  ],
+  "feature_ref": "12a55fb4b9312303378af72f96a28734b6b9ec9a",
+  "issue_id": "SEED-1",
+  "manifest_sha256": "56746ae9377e071d44670b833d9b113fd657c81333b2c8229602cf31f9d3e388",
+  "repository": "camiloavilacm/qa-features",
+  "run_attempt": 2,
+  "run_id": "44088601282",
+  "run_revision": "2a39aa1ad0e7fde7c2fedc3f94fbf0daa3f708d0",
+  "scenarios": {
+    "AC-1": [
+      "SEED-1"
+    ],
+    "AC-2": [
+      "SEED-1"
+    ],
+    "AC-3": [
+      "SEED-1"
+    ]
+  },
+  "slots": {
+    "sut-node:cypress": "sut-node-cypress",
+    "sut-node:playwright": "sut-node-playwright",
+    "sut-node:selenium": "sut-node-selenium",
+    "sut-python:cypress": "sut-python-cypress",
+    "sut-python:playwright": "sut-python-playwright",
+    "sut-python:selenium": "sut-python-selenium"
+  },
+  "source_location": "harness/evidence/readme-runs/failure",
+  "workflow_conclusion": "failure"
+}
