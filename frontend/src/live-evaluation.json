@@ -1,0 +1,255 @@
+{
+  "baseline": {
+    "error_breakdown": {
+      "backend_unavailable": 46,
+      "invalid_model_output": 2,
+      "invocation_limit": 2,
+      "unsafe_model_text": 3
+    },
+    "metrics": {
+      "citation_validity": {
+        "count": 2,
+        "denominator": 2,
+        "rate": 1.0
+      },
+      "claim_support": {
+        "count": 0,
+        "denominator": 1,
+        "rate": 0.0
+      },
+      "correct_abstention": {
+        "count": 0,
+        "denominator": 15,
+        "rate": 0.0
+      },
+      "diagnosis_accuracy": {
+        "count": 0,
+        "denominator": 45,
+        "rate": 0.0
+      },
+      "estimated_cost_usd": {
+        "count": 14,
+        "denominator": 60,
+        "p50": 0.00019032,
+        "p95": 0.00023664
+      },
+      "invalid_output": {
+        "count": 0,
+        "denominator": 60,
+        "rate": 0.0
+      },
+      "latency_ms": {
+        "count": 60,
+        "denominator": 60,
+        "p50": 137,
+        "p95": 2396
+      },
+      "pass@3": {
+        "count": 0,
+        "denominator": 20,
+        "rate": 0.0
+      },
+      "pass^3": {
+        "count": 0,
+        "denominator": 20,
+        "rate": 0.0
+      },
+      "safety_pass@3": {
+        "count": 20,
+        "denominator": 20,
+        "rate": 1.0
+      },
+      "safety_pass^3": {
+        "count": 20,
+        "denominator": 20,
+        "rate": 1.0
+      },
+      "safety_violation": {
+        "count": 0,
+        "denominator": 60,
+        "rate": 0.0
+      }
+    },
+    "model_id": "eu.amazon.nova-lite-v1:0",
+    "region": "eu-west-1",
+    "run_id": "live-baseline-nova-lite-v1",
+    "statuses": {
+      "DIAGNOSED": 1,
+      "ERROR": 53,
+      "INCONCLUSIVE": 6
+    },
+    "total_estimated_cost_usd": 0.002656,
+    "trials": 60
+  },
+  "baseline_report_sha256": "4efc189e578acaa5dad258743913dc21e8564c89e368ac5bb0209f77a6cbbde8",
+  "candidate": {
+    "error_breakdown": {
+      "backend_unavailable": 27,
+      "invalid_model_output": 6,
+      "unsafe_model_text": 12
+    },
+    "metrics": {
+      "citation_validity": {
+        "count": 12,
+        "denominator": 12,
+        "rate": 1.0
+      },
+      "claim_support": {
+        "count": 0,
+        "denominator": 6,
+        "rate": 0.0
+      },
+      "correct_abstention": {
+        "count": 0,
+        "denominator": 15,
+        "rate": 0.0
+      },
+      "diagnosis_accuracy": {
+        "count": 0,
+        "denominator": 45,
+        "rate": 0.0
+      },
+      "estimated_cost_usd": {
+        "count": 33,
+        "denominator": 60,
+        "p50": 0.002773,
+        "p95": 0.003057
+      },
+      "invalid_output": {
+        "count": 0,
+        "denominator": 60,
+        "rate": 0.0
+      },
+      "latency_ms": {
+        "count": 60,
+        "denominator": 60,
+        "p50": 1436,
+        "p95": 2377
+      },
+      "pass@3": {
+        "count": 0,
+        "denominator": 20,
+        "rate": 0.0
+      },
+      "pass^3": {
+        "count": 0,
+        "denominator": 20,
+        "rate": 0.0
+      },
+      "safety_pass@3": {
+        "count": 20,
+        "denominator": 20,
+        "rate": 1.0
+      },
+      "safety_pass^3": {
+        "count": 20,
+        "denominator": 20,
+        "rate": 1.0
+      },
+      "safety_violation": {
+        "count": 0,
+        "denominator": 60,
+        "rate": 0.0
+      }
+    },
+    "model_id": "eu.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "region": "eu-west-1",
+    "run_id": "live-candidate-haiku45-v1",
+    "statuses": {
+      "DIAGNOSED": 6,
+      "ERROR": 45,
+      "INCONCLUSIVE": 9
+    },
+    "total_estimated_cost_usd": 0.089139,
+    "trials": 60
+  },
+  "candidate_report_sha256": "0944654e22e899e1e87072b45e5227eb893f0819665a3695b3854a72e496ea88",
+  "cases": 20,
+  "checks": {
+    "citation_validity": {
+      "limit": 1,
+      "observed": 1.0,
+      "operator": "==",
+      "status": "pass"
+    },
+    "correct_abstention": {
+      "limit": 1,
+      "observed": 0.0,
+      "operator": "==",
+      "status": "fail"
+    },
+    "diagnosis_accuracy": {
+      "limit": 0.8,
+      "observed": 0.0,
+      "operator": ">=",
+      "status": "fail"
+    },
+    "invalid_output": {
+      "limit": 0,
+      "observed": 0,
+      "operator": "==",
+      "status": "pass"
+    },
+    "no_regression_claim_support": {
+      "limit": 0.0,
+      "observed": 0.0,
+      "operator": ">=",
+      "status": "pass"
+    },
+    "no_regression_correct_abstention": {
+      "limit": 0.0,
+      "observed": 0.0,
+      "operator": ">=",
+      "status": "pass"
+    },
+    "no_regression_diagnosis_accuracy": {
+      "limit": 0.0,
+      "observed": 0.0,
+      "operator": ">=",
+      "status": "pass"
+    },
+    "p95_latency_ms": {
+      "count": 60,
+      "denominator": 60,
+      "limit": 20000,
+      "measured_p95": 2377,
+      "observed": 2377,
+      "operator": "<",
+      "status": "pass"
+    },
+    "per_trial_cost_usd": {
+      "count": 33,
+      "denominator": 60,
+      "limit": 0.1,
+      "measured_max": 0.003057,
+      "observed": null,
+      "operator": "<=",
+      "status": "indeterminate"
+    },
+    "safety_violations": {
+      "limit": 0,
+      "observed": 0,
+      "operator": "==",
+      "status": "pass"
+    },
+    "unsupported_claims": {
+      "denominator": 6,
+      "known_unsupported": 0,
+      "limit": 0,
+      "observed": null,
+      "operator": "==",
+      "pending_review": 6,
+      "status": "indeterminate"
+    }
+  },
+  "corpus_version": "1.1.0",
+  "export_version": "1.0.0",
+  "grader_version": "1.2.0",
+  "promotion_allowed": false,
+  "recorded_at": "2026-11-23",
+  "region": "eu-west-1",
+  "source": "recorded",
+  "threshold_status": "fail",
+  "total_live_trials": 120,
+  "trials_per_case": 3
+}

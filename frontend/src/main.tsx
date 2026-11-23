@@ -1,4 +1,5 @@
 import { createRoot } from 'react-dom/client'
+import liveEval from './live-evaluation.json'
 import showcase from './showcase-export.json'
 import './styles.css'
 
@@ -109,10 +110,11 @@ function CampaignList() {
 
       <section className="panel eval-teaser" aria-labelledby="eval-overview">
         <div>
-          <h2 id="eval-overview">Offline investigator evaluation</h2>
+          <h2 id="eval-overview">Investigator evaluation reports</h2>
           <p className="lede-sm">
-            {evaluation.case_count}-case held-out corpus (v{evaluation.corpus_version}, grader v{evaluation.grader_version}) ·{' '}
-            {evaluation.live_trials} live trials · promotion allowed: <code>{String(evaluation.promotion_allowed)}</code>.
+            {liveEval.total_live_trials} measured live Bedrock trials ({liveEval.region}, promotion:{' '}
+            <code>{String(liveEval.promotion_allowed)}</code>, status: <code>{liveEval.threshold_status}</code>) +{' '}
+            {evaluation.case_count}-case offline authored replay.
           </p>
         </div>
         <a className="eval-link" href="?view=evaluation">Inspect baseline vs. candidate ↗</a>
@@ -276,31 +278,103 @@ function EvaluationView() {
     { status: string; observed: number | null; operator: string; limit: number | null },
   ][]
 
+  const liveMetricRows: [string, keyof typeof liveEval.baseline.metrics][] = [
+    ['Diagnosis accuracy', 'diagnosis_accuracy'],
+    ['Citation validity', 'citation_validity'],
+    ['Claim support', 'claim_support'],
+    ['Correct abstention', 'correct_abstention'],
+    ['Invalid output', 'invalid_output'],
+    ['Safety violations', 'safety_violation'],
+    ['pass@3 (3-trial groups)', 'pass@3'],
+    ['pass^3 (3-trial groups)', 'pass^3'],
+    ['safety_pass@3', 'safety_pass@3'],
+    ['safety_pass^3', 'safety_pass^3'],
+  ]
+
+  const liveChecks = Object.entries(liveEval.checks) as [
+    string,
+    { status: string; observed: number | null; operator: string; limit: number | null },
+  ][]
+
   return (
     <>
       <a className="back" href="./">← All campaigns</a>
-      <h1>Offline Evaluation Comparison</h1>
+      <h1>Investigator Evaluation Comparison</h1>
       <p className="lede">
-        Deterministic grader comparison of authored offline baseline vs. candidate runs. Held-out ground truth stays private.
+        Deterministic grader comparisons on the {liveEval.cases}-case held-out corpus (v{liveEval.corpus_version}, grader v{liveEval.grader_version}). Held-out ground truth stays private.
       </p>
 
       <div className="decision">
         <div>
-          <h2>Promotion eligibility</h2>
+          <h2>Live candidate promotion ({liveEval.region})</h2>
           <p className="decision-value blocked">
-            {evaluation.promotion_allowed ? 'ALLOWED' : 'BLOCKED (OFFLINE)'}
+            {liveEval.promotion_allowed ? 'ALLOWED' : `BLOCKED (${liveEval.threshold_status.toUpperCase()})`}
           </p>
         </div>
         <dl>
-          <div><dt>Source</dt><dd>{evaluation.source}</dd></div>
-          <div><dt>Measured live trials</dt><dd>{evaluation.live_trials}</dd></div>
-          <div><dt>Corpus / Grader</dt><dd><code>v{evaluation.corpus_version} / v{evaluation.grader_version}</code></dd></div>
-          <div><dt>Threshold status</dt><dd><code>{evaluation.threshold_status}</code></dd></div>
+          <div><dt>Measured live trials</dt><dd>{liveEval.total_live_trials} (60 baseline + 60 candidate)</dd></div>
+          <div><dt>Total live spend</dt><dd><code>${(liveEval.baseline.total_estimated_cost_usd + liveEval.candidate.total_estimated_cost_usd).toFixed(4)}</code></dd></div>
+          <div><dt>Candidate p95 latency</dt><dd><code>{liveEval.candidate.metrics.latency_ms.p95} ms</code></dd></div>
+          <div><dt>Recorded date</dt><dd><code>{liveEval.recorded_at}</code></dd></div>
         </dl>
       </div>
 
-      <section className="panel" aria-labelledby="metrics-heading">
-        <h2 id="metrics-heading">Baseline vs. Candidate Metrics ({evaluation.case_count} cases)</h2>
+      <section className="panel" aria-labelledby="live-metrics-heading">
+        <h2 id="live-metrics-heading">Measured Live Bedrock Benchmark ({liveEval.cases} cases × {liveEval.trials_per_case} trials)</h2>
+        <p className="lede-sm">
+          Baseline: <code>{liveEval.baseline.model_id}</code> (${liveEval.baseline.total_estimated_cost_usd.toFixed(4)}) ·{' '}
+          Candidate: <code>{liveEval.candidate.model_id}</code> (${liveEval.candidate.total_estimated_cost_usd.toFixed(4)}).
+        </p>
+        <div className="table-wrap">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Metric</th>
+                <th>Baseline (Nova Lite)</th>
+                <th>Candidate (Claude Haiku 4.5)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {liveMetricRows.map(([label, key]) => (
+                <tr key={key}>
+                  <td>{label}</td>
+                  <td><code>{formatRate(liveEval.baseline.metrics[key] as RateMetric)}</code></td>
+                  <td><code>{formatRate(liveEval.candidate.metrics[key] as RateMetric)}</code></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="panel checks-panel" aria-labelledby="live-checks-heading">
+        <h2 id="live-checks-heading">Live SPEC §9 Promotion Threshold Checks</h2>
+        <div className="table-wrap">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Check</th>
+                <th>Observed</th>
+                <th>Rule</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {liveChecks.map(([name, check]) => (
+                <tr key={name}>
+                  <td><code>{name}</code></td>
+                  <td><code>{check.observed === null ? 'indeterminate' : String(check.observed)}</code></td>
+                  <td><code>{check.operator} {check.limit === null ? 'n/a' : String(check.limit)}</code></td>
+                  <td><span className={`pill ${check.status}`}>{check.status}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="panel checks-panel" aria-labelledby="metrics-heading">
+        <h2 id="metrics-heading">Offline Authored Replay Baseline vs. Candidate ({evaluation.case_count} cases, 0 live trials)</h2>
         <div className="table-wrap">
           <table className="data-table">
             <thead>
@@ -324,7 +398,7 @@ function EvaluationView() {
       </section>
 
       <section className="panel checks-panel" aria-labelledby="checks-heading">
-        <h2 id="checks-heading">SPEC §9 Promotion Threshold Checks</h2>
+        <h2 id="checks-heading">Offline Authored SPEC §9 Threshold Checks (promotion_allowed: false)</h2>
         <div className="table-wrap">
           <table className="data-table">
             <thead>
