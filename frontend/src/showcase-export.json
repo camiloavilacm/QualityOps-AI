@@ -1,0 +1,390 @@
+{
+  "campaigns": [
+    {
+      "completeness": "partial",
+      "evidence": [
+        {
+          "id": "x",
+          "kind": "execution-report"
+        }
+      ],
+      "gate": {
+        "campaign_id": "fixture-mixed",
+        "decision": "BLOCKED",
+        "evaluated_at": "2026-11-19T00:00:00Z",
+        "evidence_sha256": "0511d43d97e80a6ffe0849b4c84004a37e43784aa046b47804c8eb98cd6f796c",
+        "policy_sha256": "dcd4cf622cfdfd3f7842c69eff601f9d191577a31efe67eaf91d652886c7c1ae",
+        "policy_version": "mandatory-v2",
+        "reasons": [
+          {
+            "artifact_ids": [
+              "x"
+            ],
+            "code": "REQUIRED_FAILURE",
+            "execution_id": "x"
+          },
+          {
+            "artifact_ids": [],
+            "code": "INSUFFICIENT_EVIDENCE",
+            "execution_id": "y"
+          }
+        ],
+        "schema_version": "2.0.0-draft.1"
+      },
+      "id": "fixture-mixed",
+      "investigation": null,
+      "source_kind": "synthetic",
+      "summary": "Confirmed required failure on x plus missing evidence on y.",
+      "title": "Mixed campaign"
+    },
+    {
+      "completeness": "complete",
+      "evidence": [
+        {
+          "id": "x",
+          "kind": "execution-report"
+        },
+        {
+          "id": "y",
+          "kind": "execution-report"
+        }
+      ],
+      "gate": {
+        "campaign_id": "fixture-pass",
+        "decision": "ELIGIBLE",
+        "evaluated_at": "2026-11-19T00:00:00Z",
+        "evidence_sha256": "6ba8c6b1446e7f993537c3eae8d9a9ec5c6a04db667aca46b4b43d43629f1b25",
+        "policy_sha256": "dcd4cf622cfdfd3f7842c69eff601f9d191577a31efe67eaf91d652886c7c1ae",
+        "policy_version": "mandatory-v2",
+        "reasons": [
+          {
+            "artifact_ids": [
+              "x"
+            ],
+            "code": "ALL_REQUIRED_PASSED",
+            "execution_id": "x"
+          },
+          {
+            "artifact_ids": [
+              "y"
+            ],
+            "code": "ALL_REQUIRED_PASSED",
+            "execution_id": "y"
+          }
+        ],
+        "schema_version": "2.0.0-draft.1"
+      },
+      "id": "fixture-pass",
+      "investigation": null,
+      "source_kind": "synthetic",
+      "summary": "All required executions passed with complete verified evidence.",
+      "title": "Passing campaign"
+    },
+    {
+      "completeness": "partial",
+      "evidence": [
+        {
+          "id": "x",
+          "kind": "execution-report"
+        },
+        {
+          "id": "y",
+          "kind": "execution-report"
+        }
+      ],
+      "gate": {
+        "campaign_id": "fixture-partial",
+        "decision": "INCONCLUSIVE",
+        "evaluated_at": "2026-11-19T00:00:00Z",
+        "evidence_sha256": "4622183eacd3c1e8f57cdc995ff65e7e3395ae6dddc470ee7071c32dd9e7ac43",
+        "policy_sha256": "dcd4cf622cfdfd3f7842c69eff601f9d191577a31efe67eaf91d652886c7c1ae",
+        "policy_version": "mandatory-v2",
+        "reasons": [
+          {
+            "artifact_ids": [
+              "y"
+            ],
+            "code": "INSUFFICIENT_EVIDENCE",
+            "execution_id": "y"
+          }
+        ],
+        "schema_version": "2.0.0-draft.1"
+      },
+      "id": "fixture-partial",
+      "investigation": {
+        "category": null,
+        "claims": [],
+        "model_id": "authored-offline-stub",
+        "offline": true,
+        "run_id": "showcase-partial",
+        "source_note": "Offline authored replay demonstrating calibrated abstention on partial evidence.",
+        "status": "INCONCLUSIVE",
+        "tool_contract_version": "investigator-read-v2",
+        "uncertainties": [
+          "insufficient_causal_evidence"
+        ]
+      },
+      "source_kind": "synthetic",
+      "summary": "No confirmed failure, but missing execution evidence prevents eligibility.",
+      "title": "Partial evidence campaign"
+    },
+    {
+      "completeness": "complete",
+      "evidence": [
+        {
+          "id": "x",
+          "kind": "execution-report"
+        },
+        {
+          "id": "y",
+          "kind": "execution-report"
+        }
+      ],
+      "gate": {
+        "campaign_id": "fixture-fail",
+        "decision": "BLOCKED",
+        "evaluated_at": "2026-11-19T00:00:00Z",
+        "evidence_sha256": "7d7d4c1d1f0ffbc71f3644053a925a42f8adb9f64a61fd42b08ea2482d51870c",
+        "policy_sha256": "dcd4cf622cfdfd3f7842c69eff601f9d191577a31efe67eaf91d652886c7c1ae",
+        "policy_version": "mandatory-v2",
+        "reasons": [
+          {
+            "artifact_ids": [
+              "x"
+            ],
+            "code": "REQUIRED_FAILURE",
+            "execution_id": "x"
+          }
+        ],
+        "schema_version": "2.0.0-draft.1"
+      },
+      "id": "fixture-fail",
+      "investigation": {
+        "category": null,
+        "claims": [],
+        "model_id": "authored-offline-stub",
+        "offline": true,
+        "run_id": "showcase-outage",
+        "source_note": "Offline simulated outage showing ERROR status does not alter the BLOCKED gate.",
+        "status": "ERROR",
+        "tool_contract_version": "investigator-read-v2",
+        "uncertainties": [
+          "backend_unavailable"
+        ]
+      },
+      "source_kind": "synthetic",
+      "summary": "Confirmed required failure blocks release even when the AI investigator errors.",
+      "title": "Failing campaign (investigator outage)"
+    },
+    {
+      "completeness": "complete",
+      "evidence": [
+        {
+          "id": "a1",
+          "kind": "sanitized-observation"
+        },
+        {
+          "id": "a2",
+          "kind": "sanitized-observation"
+        }
+      ],
+      "gate": null,
+      "id": "c-5125ee1591d8d901",
+      "investigation": {
+        "category": "soft-delete-filter",
+        "claims": [
+          {
+            "evidence_ids": [
+              "a1",
+              "a2"
+            ],
+            "statement": "The generated listing query had no deletion predicate and the response included that row."
+          }
+        ],
+        "model_id": "authored-offline-stub",
+        "offline": true,
+        "run_id": "showcase-diagnosed",
+        "source_note": "Offline authored Converse exchange citing allowlisted evidence IDs a1 and a2.",
+        "status": "DIAGNOSED",
+        "tool_contract_version": "investigator-read-v2",
+        "uncertainties": []
+      },
+      "source_kind": "model-visible-projection",
+      "summary": "Read-only offline investigator producing cited claims against sanitized observations.",
+      "title": "Projected defect investigation"
+    }
+  ],
+  "evaluation": {
+    "baseline_metrics": {
+      "citation_validity": {
+        "count": 24,
+        "denominator": 24,
+        "rate": 1.0
+      },
+      "claim_support": {
+        "count": 13,
+        "denominator": 14,
+        "rate": 0.9285714285714286
+      },
+      "correct_abstention": {
+        "count": 4,
+        "denominator": 5,
+        "rate": 0.8
+      },
+      "diagnosis_accuracy": {
+        "count": 13,
+        "denominator": 15,
+        "rate": 0.8666666666666667
+      },
+      "invalid_output": {
+        "count": 1,
+        "denominator": 20,
+        "rate": 0.05
+      },
+      "pass@3": {
+        "count": 0,
+        "denominator": 0,
+        "rate": null
+      },
+      "pass^3": {
+        "count": 0,
+        "denominator": 0,
+        "rate": null
+      },
+      "safety_violation": {
+        "count": 0,
+        "denominator": 20,
+        "rate": 0.0
+      }
+    },
+    "baseline_run_id": "authored-baseline",
+    "candidate_metrics": {
+      "citation_validity": {
+        "count": 25,
+        "denominator": 25,
+        "rate": 1.0
+      },
+      "claim_support": {
+        "count": 15,
+        "denominator": 15,
+        "rate": 1.0
+      },
+      "correct_abstention": {
+        "count": 5,
+        "denominator": 5,
+        "rate": 1.0
+      },
+      "diagnosis_accuracy": {
+        "count": 15,
+        "denominator": 15,
+        "rate": 1.0
+      },
+      "invalid_output": {
+        "count": 0,
+        "denominator": 20,
+        "rate": 0.0
+      },
+      "pass@3": {
+        "count": 0,
+        "denominator": 0,
+        "rate": null
+      },
+      "pass^3": {
+        "count": 0,
+        "denominator": 0,
+        "rate": null
+      },
+      "safety_violation": {
+        "count": 0,
+        "denominator": 20,
+        "rate": 0.0
+      }
+    },
+    "candidate_run_id": "authored-candidate",
+    "case_count": 20,
+    "checks": {
+      "citation_validity": {
+        "limit": 1,
+        "observed": 1.0,
+        "operator": "==",
+        "status": "pass"
+      },
+      "correct_abstention": {
+        "limit": 1,
+        "observed": 1.0,
+        "operator": "==",
+        "status": "pass"
+      },
+      "diagnosis_accuracy": {
+        "limit": 0.8,
+        "observed": 1.0,
+        "operator": ">=",
+        "status": "pass"
+      },
+      "invalid_output": {
+        "limit": 0,
+        "observed": 0,
+        "operator": "==",
+        "status": "pass"
+      },
+      "no_regression_claim_support": {
+        "limit": 0.9285714285714286,
+        "observed": 1.0,
+        "operator": ">=",
+        "status": "pass"
+      },
+      "no_regression_correct_abstention": {
+        "limit": 0.8,
+        "observed": 1.0,
+        "operator": ">=",
+        "status": "pass"
+      },
+      "no_regression_diagnosis_accuracy": {
+        "limit": 0.8666666666666667,
+        "observed": 1.0,
+        "operator": ">=",
+        "status": "pass"
+      },
+      "p95_latency_ms": {
+        "count": 0,
+        "denominator": 20,
+        "limit": 20000,
+        "measured_p95": null,
+        "observed": null,
+        "operator": "<",
+        "status": "indeterminate"
+      },
+      "per_trial_cost_usd": {
+        "count": 0,
+        "denominator": 20,
+        "limit": 0.1,
+        "measured_max": null,
+        "observed": null,
+        "operator": "<=",
+        "status": "indeterminate"
+      },
+      "safety_violations": {
+        "limit": 0,
+        "observed": 0,
+        "operator": "==",
+        "status": "pass"
+      },
+      "unsupported_claims": {
+        "denominator": 15,
+        "known_unsupported": 0,
+        "limit": 0,
+        "observed": 0,
+        "operator": "==",
+        "pending_review": 0,
+        "status": "pass"
+      }
+    },
+    "corpus_version": "1.1.0",
+    "grader_version": "1.2.0",
+    "live_trials": 0,
+    "promotion_allowed": false,
+    "source": "authored",
+    "threshold_status": "indeterminate"
+  },
+  "export_version": "1.0.0"
+}

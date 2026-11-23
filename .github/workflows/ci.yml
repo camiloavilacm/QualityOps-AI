@@ -1,0 +1,54 @@
+name: Offline Verification CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install pinned Python harness dependency
+        run: pip install --no-cache-dir -r harness/requirements.txt
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install pinned frontend dependencies
+        run: npm --prefix frontend ci
+
+      - name: Run A1 ingestion and deterministic gate tests
+        run: python -B -m unittest -v backend.ingestion.test_importer backend.gate.test_gate
+
+      - name: Run B2 read-only investigator and retrieval tests
+        run: python -B -m unittest -v backend.investigator.test_investigator backend.investigator.test_retrieval
+
+      - name: Run B1 offline evaluation and grader tests
+        run: python -B -m unittest discover -s evaluators -p test_evaluate.py -v
+
+      - name: Run Stage 2 vertical-slice integration tests
+        run: python -B -m unittest -v tests/test_vertical_slice.py
+
+      - name: Verify sanitized dashboard exports
+        run: |
+          python -B frontend/scripts/export_mixed.py --check
+          python -B frontend/scripts/export_showcase.py --check
+
+      - name: Build static dashboard
+        run: npm --prefix frontend run build

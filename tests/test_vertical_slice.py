@@ -141,6 +141,24 @@ class VerticalSliceIntegrationTests(unittest.TestCase):
                          truth, fixture, ev.validators()[0])
         self.assertEqual(grade["claims"], [{"citation_exists": [True, True], "support": "review_required"}])
 
+    def test_showcase_export_covers_all_gate_and_investigation_states_without_leakage(self):
+        proc = subprocess.run(
+            [sys.executable, "-B", str(ROOT / "frontend/scripts/export_showcase.py"), "--check"],
+            cwd=ROOT, check=True, capture_output=True, text=True,
+        )
+        self.assertEqual(len(proc.stdout.strip()), 64)
+        raw = (ROOT / "frontend/src/showcase-export.json").read_text(encoding="utf-8")
+        self.assertNotIn("artifacts/", raw)
+        self.assertNotIn("ground_truth", raw)
+        self.assertNotIn("expected_category", raw)
+        data = json.loads(raw)
+        gate_decisions = {c["gate"]["decision"] for c in data["campaigns"] if c["gate"]}
+        self.assertEqual(gate_decisions, {"ELIGIBLE", "BLOCKED", "INCONCLUSIVE"})
+        inv_statuses = {c["investigation"]["status"] if c["investigation"] else None for c in data["campaigns"]}
+        self.assertEqual(inv_statuses, {"DIAGNOSED", "INCONCLUSIVE", "ERROR", None})
+        self.assertFalse(data["evaluation"]["promotion_allowed"])
+        self.assertEqual(data["evaluation"]["live_trials"], 0)
+
 
 if __name__ == "__main__":
     unittest.main()
