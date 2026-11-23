@@ -63,3 +63,8 @@ jobs:
 
       - name: Build static dashboard
         run: npm --prefix frontend run build
+
+      - name: Run Playwright E2E dashboard verification
+        run: |
+          npx --prefix frontend playwright install --with-deps chromium
+          npm --prefix frontend run test:e2e

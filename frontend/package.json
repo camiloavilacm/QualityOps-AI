@@ -6,13 +6,15 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1 --strictPort",
     "build": "tsc --noEmit && vite build --base=./",
-    "preview": "vite preview --host 127.0.0.1 --strictPort"
+    "preview": "vite preview --host 127.0.0.1 --strictPort",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "react": "19.3.1",
     "react-dom": "19.3.1"
   },
   "devDependencies": {
+    "@playwright/test": "1.65.1",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "typescript": "5.9.3",
