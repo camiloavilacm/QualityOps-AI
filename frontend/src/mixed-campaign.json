@@ -1,0 +1,34 @@
+{
+  "completeness": "partial",
+  "evidence": [
+    {
+      "id": "x",
+      "kind": "execution-report"
+    }
+  ],
+  "export_version": "1.0.0",
+  "gate": {
+    "campaign_id": "fixture-mixed",
+    "decision": "BLOCKED",
+    "evaluated_at": "2026-11-19T00:00:00Z",
+    "evidence_sha256": "0511d43d97e80a6ffe0849b4c84004a37e43784aa046b47804c8eb98cd6f796c",
+    "policy_sha256": "dcd4cf622cfdfd3f7842c69eff601f9d191577a31efe67eaf91d652886c7c1ae",
+    "policy_version": "mandatory-v2",
+    "reasons": [
+      {
+        "artifact_ids": [
+          "x"
+        ],
+        "code": "REQUIRED_FAILURE",
+        "execution_id": "x"
+      },
+      {
+        "artifact_ids": [],
+        "code": "INSUFFICIENT_EVIDENCE",
+        "execution_id": "y"
+      }
+    ],
+    "schema_version": "2.0.0-draft.1"
+  },
+  "source_kind": "synthetic"
+}
