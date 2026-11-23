@@ -1,0 +1,81 @@
+:root {
+  font: 16px/1.5 'Inter', system-ui, sans-serif;
+  color: #182926;
+  background: #f4f5ef;
+  font-synthesis: none;
+  --muted: #4e6058;
+  --border: #dce3d9;
+  --surface: #fcfdf9;
+  --accent: #23594a;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+a { color: var(--accent); text-underline-offset: 0.2em; }
+a:focus-visible, [tabindex]:focus-visible {
+  outline: 3px solid #257b6a;
+  outline-offset: 4px;
+}
+h1, h2, h3, p, dl, dd, ul { margin: 0; }
+code { font: 0.88em/1.5 ui-monospace, monospace; overflow-wrap: anywhere; }
+
+.shell { width: min(100% - 3rem, 62rem); margin-inline: auto; }
+.topbar { background: #152b2a; color: #cfddd3; }
+.topbar-inner { display: flex; justify-content: space-between; align-items: center; min-height: 4rem; gap: 1rem; }
+.topbar-inner > span { font-size: 0.875rem; }
+.brand { color: #f5fbf4; display: inline-flex; align-items: center; gap: 0.65rem; font-weight: 700; text-decoration: none; }
+.brand-mark { display: grid; place-items: center; width: 1.7rem; aspect-ratio: 1; border-radius: 0.4rem; color: #172e29; background: #bee3ce; font: 700 0.95rem ui-monospace, monospace; }
+
+main { padding-block: clamp(2rem, 5vw, 4rem); }
+h1 { font-size: clamp(2.35rem, 6vw, 3.6rem); letter-spacing: -0.055em; line-height: 1.05; }
+h2 { font-size: 1.05rem; letter-spacing: -0.01em; }
+h3 { font-size: 1rem; }
+.lede, .campaign-id { color: var(--muted); margin-top: 0.8rem; }
+.campaign-id { display: flex; flex-wrap: wrap; align-items: center; gap: 0.8rem; }
+.campaign-id span { border: 1px solid var(--border); border-radius: 0.35rem; padding: 0.1rem 0.5rem; font-size: 0.8rem; }
+.campaign-card, .panel, .decision { border: 1px solid var(--border); border-radius: 0.8rem; }
+.campaign-card {
+  display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+  margin-top: 2rem; padding: 1.4rem; color: inherit; background: var(--surface); text-decoration: none;
+}
+.campaign-card:hover { border-color: var(--accent); background: #f8fcf5; }
+.campaign-card strong { display: block; font-size: 1.15rem; }
+.campaign-card code { color: var(--muted); }
+.open-label { font-size: 0.875rem; color: var(--accent); font-weight: 650; }
+.open-label span { padding-left: 0.3rem; }
+.back { display: inline-block; margin-bottom: 1rem; font-size: 0.9rem; }
+
+.decision {
+  background: #e8eee5; margin-block: 1.75rem 1.15rem; padding: 1.3rem 1.5rem;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.25rem;
+}
+.decision-value { font: 750 clamp(1.65rem, 5vw, 2.45rem)/1.2 ui-monospace, monospace; margin-top: 0.25rem; }
+.decision-value.blocked { color: #9a302c; }
+.decision dl { display: flex; flex-wrap: wrap; gap: 1rem 2rem; }
+.decision dt { font-size: 0.8rem; color: var(--muted); }
+.decision dd { font-weight: 650; overflow-wrap: anywhere; }
+.decision dl > div:first-child dd { text-transform: capitalize; }
+
+.panel { background: var(--surface); padding: 1.2rem 1.5rem; min-width: 0; }
+.reason-list, .artifact-list { list-style: none; padding: 0; }
+.reason-list { margin-top: 0.6rem; }
+.reason-list li { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem 1.25rem; padding-block: 0.95rem; border-bottom: 1px solid var(--border); }
+.reason-list li:last-child { border-bottom: 0; padding-bottom: 0.25rem; }
+.reason-main { display: flex; gap: 0.65rem; align-items: flex-start; }
+.reason-marker { margin-top: 0.48rem; width: 0.55rem; height: 0.55rem; border-radius: 50%; flex: none; background: #39725e; }
+.reason-marker.required_failure { background: #ac4038; }
+.reason-marker.insufficient_evidence { background: #88600d; }
+.reason-list p, .availability p { color: var(--muted); font-size: 0.9rem; }
+.reason-evidence p { display: flex; flex-wrap: wrap; gap: 0 0.75rem; }
+.support { display: grid; grid-template-columns: 1fr 1fr; gap: 1.15rem; margin-top: 1.15rem; }
+.artifact-list, .availability p { margin-top: 0.55rem; }
+.artifact-list li { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; padding: 0.4rem; margin-inline: -0.4rem; border-radius: 0.35rem; }
+.artifact-list li:target { background: #e0f2e5; box-shadow: 0 0 0 1px #6ea48e; }
+.artifact-list code { border: 1px solid var(--border); padding-inline: 0.35rem; border-radius: 0.25rem; }
+
+@media (max-width: 36rem) {
+  .shell { width: calc(100% - 2rem); }
+  .support, .reason-list li { grid-template-columns: 1fr; }
+  .reason-evidence { padding-left: 1.2rem; }
+  .panel, .decision { padding-inline: 1rem; }
+}
