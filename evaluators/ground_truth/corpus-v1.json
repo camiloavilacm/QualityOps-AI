@@ -1,0 +1,485 @@
+{
+  "c-0261b2654461eb4c": {
+    "binding": null,
+    "category": "failed-login-session",
+    "kind": "defect",
+    "oracle": "A rejected login left authentication state in the browser session.",
+    "seed": "BUG_SESSION_ON_FAILED_LOGIN",
+    "source": {
+      "capture_files": [
+        {
+          "path": "reports/run-c89dfj44/mutants/BUG_SESSION_ON_FAILED_LOGIN/result.json",
+          "sha256": "dec4a96882e8b675493f177efde7b24e7462db8d68c29b0649410f5f61afc9c9"
+        },
+        {
+          "path": "reports/run-c89dfj44/mutations.json",
+          "sha256": "91d94f7281a05a9aeabf12c89ec29edc59c47523bed16419e08b691db0268832"
+        }
+      ],
+      "capture_tracking": "untracked; capture revision unverified",
+      "kind": "recorded-capture",
+      "projection": {
+        "a1": "mutations.json matching row reason, checked against targeted result case",
+        "a2": "result.json health_passed, app_stayed_up, fault_hits and exit_code"
+      },
+      "reference_code": {
+        "path": "tools/run_mutants.py",
+        "sha256": "2b6cd259e70e48f60a1323e3daf1fd456291677f8eb208a0cf5d896f02bde603"
+      },
+      "reference_code_revision": "b0369e2ecb337dabe7cbb31437614807e2e3a417",
+      "repository_url": "https://github.com/camiloavilacm/qa-ai-generation-pipeline"
+    },
+    "support": [
+      {
+        "required": [
+          "a1"
+        ],
+        "statement": "A rejected login left authentication state in the browser session."
+      }
+    ],
+    "uncertainty": null
+  },
+  "c-5125ee1591d8d901": {
+    "binding": null,
+    "category": "soft-delete-filter-missing",
+    "kind": "defect",
+    "oracle": "The listing returned a deleted row because it omitted the deletion predicate.",
+    "seed": "Remove deleted-at filter from listing query.",
+    "source": {
+      "kind": "authored",
+      "version": "1.0.0"
+    },
+    "support": [
+      {
+        "required": [
+          "a1",
+          "a2"
+        ],
+        "statement": "The listing returned a deleted row because it omitted the deletion predicate."
+      }
+    ],
+    "uncertainty": null
+  },
+  "c-5845f53a2fe4cf15": {
+    "binding": null,
+    "category": null,
+    "kind": "insufficient",
+    "oracle": "The required execution receipt is missing.",
+    "seed": "Remove the execution receipt entirely.",
+    "source": {
+      "kind": "authored",
+      "version": "1.0.0"
+    },
+    "support": [],
+    "uncertainty": "The required execution receipt is missing."
+  },
+  "c-5862badbf8829b2f": {
+    "binding": null,
+    "category": "inventory-lost-update",
+    "kind": "defect",
+    "oracle": "The separate stock reads and writes lost one concurrent decrement.",
+    "seed": "Replace atomic decrement with separate read and write.",
+    "source": {
+      "kind": "authored",
+      "version": "1.0.0"
+    },
+    "support": [
+      {
+        "required": [
+          "a1",
+          "a2"
+        ],
+        "statement": "The separate stock reads and writes lost one concurrent decrement."
+      }
+    ],
+    "uncertainty": null
+  },
+  "c-6a03d7f5dfce8e62": {
+    "binding": null,
+    "category": "csv-quote-escaping",
+    "kind": "defect",
+    "oracle": "CSV serialization omitted escaping for an embedded double quote.",
+    "seed": "Remove doubling of embedded CSV quotes.",
+    "source": {
+      "kind": "authored",
+      "version": "1.0.0"
+    },
+    "support": [
+      {
+        "required": [
+          "a1",
+          "a2"
+        ],
+        "statement": "CSV serialization omitted escaping for an embedded double quote."
+      }
+    ],
+    "uncertainty": null
+  },
+  "c-73f20a5b8f49acd7": {
+    "binding": null,
+    "category": "expiry-unit-mismatch",
+    "kind": "defect",
+    "oracle": "The expiry comparison mixed epoch seconds and milliseconds.",
+    "seed": "Pass epoch seconds to a millisecond expiry comparison.",
+    "source": {
+      "kind": "authored",
+      "version": "1.0.0"
+    },
+    "support": [
+      {
+        "required": [
+          "a1",
+          "a2"
+        ],
+        "statement": "The expiry comparison mixed epoch seconds and milliseconds."
+      }
+    ],
+    "uncertainty": null
+  },
+  "c-765e2e1437918a1e": {
+    "binding": null,
+    "category": "wildcard-literal-unescaped",
+    "kind": "defect",
+    "oracle": "The filter interpreted a literal underscore as a SQL wildcard.",
+    "seed": "Remove LIKE escaping from literal prefix filtering.",
+    "source": {
+      "kind": "authored",
+      "version": "1.0.0"
+    },
+    "support": [
+      {
+        "required": [
+          "a1",
+          "a2"
+        ],
+        "statement": "The filter interpreted a literal underscore as a SQL wildcard."
+      }
+    ],
+    "uncertainty": null
+  },
+  "c-819d26361ad3b9c8": {
+    "binding": null,
+    "category": "retry-duplicates-charge",
+    "kind": "defect",
+    "oracle": "The retry duplicated a committed charge by changing the idempotency key.",
+    "seed": "Allocate a new idempotency key on each retry.",
+    "source": {
+      "kind": "authored",
+      "version": "1.0.0"
+    },
+    "support": [
+      {
+        "required": [
+          "a1",
+          "a2"
+        ],
+        "statement": "The retry duplicated a committed charge by changing the idempotency key."
+      }
+    ],
+    "uncertainty": null
+  },
+  "c-876a870bcba73cec": {
+    "binding": null,
+    "category": "invalid-login-status-mismatch",
+    "kind": "defect",
+    "oracle": "The invalid-credential request returned a status that violated the login contract.",
+    "seed": "BUG_ACCEPT_ANY_PASSWORD",
+    "source": {
+      "capture_files": [
+        {
+          "path": "reports/run-c89dfj44/mutants/BUG_ACCEPT_ANY_PASSWORD/result.json",
+          "sha256": "ff3b43ec2ac06a70fc9ef23a6976df35702e828605b592ee6c0f3cf158d6d45b"
+        },
+        {
+          "path": "reports/run-c89dfj44/mutations.json",
+          "sha256": "91d94f7281a05a9aeabf12c89ec29edc59c47523bed16419e08b691db0268832"
+        }
+      ],
+      "capture_limitations": "The witness records a status assertion failure without expected or observed HTTP status values or a session outcome. The seed records intent only.",
+      "capture_tracking": "untracked; capture revision unverified",
+      "kind": "recorded-capture",
+      "projection": {
+        "a1": "mutations.json matching row reason, checked against targeted result case",
+        "a2": "result.json health_passed, app_stayed_up, fault_hits and exit_code"
+      },
+      "reference_code": {
+        "path": "tools/run_mutants.py",
+        "sha256": "2b6cd259e70e48f60a1323e3daf1fd456291677f8eb208a0cf5d896f02bde603"
+      },
+      "reference_code_revision": "b0369e2ecb337dabe7cbb31437614807e2e3a417",
+      "repository_url": "https://github.com/camiloavilacm/qa-ai-generation-pipeline"
+    },
+    "support": [
+      {
+        "required": [
+          "a1"
+        ],
+        "statement": "The invalid-credential request returned a status that violated the login contract."
+      }
+    ],
+    "uncertainty": null
+  },
+  "c-90291263278212ae": {
+    "binding": null,
+    "category": "missing-route-guard",
+    "kind": "defect",
+    "oracle": "The settings route exposed an authenticated view without a redirect.",
+    "seed": "BUG_PROTECTED_ROUTE_OPEN",
+    "source": {
+      "capture_files": [
+        {
+          "path": "reports/run-c89dfj44/mutants/BUG_PROTECTED_ROUTE_OPEN/result.json",
+          "sha256": "f58c19ead45bf2aa5b7da88860a3db7be86bc3519069f3ac029ed1e75c88a79a"
+        },
+        {
+          "path": "reports/run-c89dfj44/mutations.json",
+          "sha256": "91d94f7281a05a9aeabf12c89ec29edc59c47523bed16419e08b691db0268832"
+        }
+      ],
+      "capture_tracking": "untracked; capture revision unverified",
+      "kind": "recorded-capture",
+      "projection": {
+        "a1": "mutations.json matching row reason, checked against targeted result case",
+        "a2": "result.json health_passed, app_stayed_up, fault_hits and exit_code"
+      },
+      "reference_code": {
+        "path": "tools/run_mutants.py",
+        "sha256": "2b6cd259e70e48f60a1323e3daf1fd456291677f8eb208a0cf5d896f02bde603"
+      },
+      "reference_code_revision": "b0369e2ecb337dabe7cbb31437614807e2e3a417",
+      "repository_url": "https://github.com/camiloavilacm/qa-ai-generation-pipeline"
+    },
+    "support": [
+      {
+        "required": [
+          "a1"
+        ],
+        "statement": "The settings route exposed an authenticated view without a redirect."
+      }
+    ],
+    "uncertainty": null
+  },
+  "c-affb47d8e240656c": {
+    "binding": null,
+    "category": "pagination-cursor-inclusive",
+    "kind": "defect",
+    "oracle": "Pagination duplicated the cursor row because it used an inclusive predicate.",
+    "seed": "Change the cursor predicate from strictly greater to greater-or-equal.",
+    "source": {
+      "kind": "authored",
+      "version": "1.0.0"
+    },
+    "support": [
+      {
+        "required": [
+          "a1",
+          "a2"
+        ],
+        "statement": "Pagination duplicated the cursor row because it used an inclusive predicate."
+      }
+    ],
+    "uncertainty": null
+  },
+  "c-b3235f20f6d8d0a0": {
+    "binding": {
+      "campaign_id": "fixture-partial",
+      "sha256": "4622183eacd3c1e8f57cdc995ff65e7e3395ae6dddc470ee7071c32dd9e7ac43"
+    },
+    "category": null,
+    "kind": "insufficient",
+    "oracle": "Execution y has only partial evidence.",
+    "seed": "Use the frozen partial-evidence fixture.",
+    "source": {
+      "kind": "frozen-synthetic",
+      "path": "samples/reconciliation/partial/evidence.json",
+      "projection": "Observed execution outcome and observation only; x/y artifact IDs retained.",
+      "revision": "9e298860ea326e41e3ed953c70d6f6953bcdf2c9",
+      "sha256": "4622183eacd3c1e8f57cdc995ff65e7e3395ae6dddc470ee7071c32dd9e7ac43"
+    },
+    "support": [],
+    "uncertainty": "Execution y has only partial evidence."
+  },
+  "c-b7410332704b7bef": {
+    "binding": null,
+    "category": "timezone-midnight-boundary",
+    "kind": "defect",
+    "oracle": "The daily statement used a UTC boundary in place of the account's local day.",
+    "seed": "Bucket transactions by UTC day before applying account time zone.",
+    "source": {
+      "kind": "authored",
+      "version": "1.0.0"
+    },
+    "support": [
+      {
+        "required": [
+          "a1",
+          "a2"
+        ],
+        "statement": "The daily statement used a UTC boundary in place of the account's local day."
+      }
+    ],
+    "uncertainty": null
+  },
+  "c-c2ac8b4b5167f3a0": {
+    "binding": null,
+    "category": null,
+    "kind": "intermittent",
+    "oracle": "The timeout did not reproduce, and no timing breakdown identifies its cause.",
+    "seed": "Alternate pass and timeout in the scripted observations, with no network timings.",
+    "source": {
+      "kind": "authored",
+      "version": "1.0.0"
+    },
+    "support": [],
+    "uncertainty": "The timeout did not reproduce, and no timing breakdown identifies its cause."
+  },
+  "c-c8378f64b674d538": {
+    "binding": null,
+    "category": "valid-login-status-mismatch",
+    "kind": "defect",
+    "oracle": "The valid-login request returned a status that violated the login contract.",
+    "seed": "BUG_REJECT_VALID_LOGIN",
+    "source": {
+      "capture_files": [
+        {
+          "path": "reports/run-c89dfj44/mutants/BUG_REJECT_VALID_LOGIN/result.json",
+          "sha256": "f3b2621ca0c20deea873c8f4edf1c48068c01c809e06f9d32ef7ef3f858d3896"
+        },
+        {
+          "path": "reports/run-c89dfj44/mutations.json",
+          "sha256": "91d94f7281a05a9aeabf12c89ec29edc59c47523bed16419e08b691db0268832"
+        }
+      ],
+      "capture_limitations": "The witness records a status assertion failure without expected or observed HTTP status values or a session outcome. The seed records intent only.",
+      "capture_tracking": "untracked; capture revision unverified",
+      "kind": "recorded-capture",
+      "projection": {
+        "a1": "mutations.json matching row reason, checked against targeted result case",
+        "a2": "result.json health_passed, app_stayed_up, fault_hits and exit_code"
+      },
+      "reference_code": {
+        "path": "tools/run_mutants.py",
+        "sha256": "2b6cd259e70e48f60a1323e3daf1fd456291677f8eb208a0cf5d896f02bde603"
+      },
+      "reference_code_revision": "b0369e2ecb337dabe7cbb31437614807e2e3a417",
+      "repository_url": "https://github.com/camiloavilacm/qa-ai-generation-pipeline"
+    },
+    "support": [
+      {
+        "required": [
+          "a1"
+        ],
+        "statement": "The valid-login request returned a status that violated the login contract."
+      }
+    ],
+    "uncertainty": null
+  },
+  "c-c8b5982efdae302a": {
+    "binding": null,
+    "category": null,
+    "kind": "intermittent",
+    "oracle": "Ordering varied between attempts, and scheduler evidence is missing.",
+    "seed": "Vary the ordering across authored attempts and omit the scheduler trace.",
+    "source": {
+      "kind": "authored",
+      "version": "1.0.0"
+    },
+    "support": [],
+    "uncertainty": "Ordering varied between attempts, and scheduler evidence is missing."
+  },
+  "c-cbf2888116e6a143": {
+    "binding": null,
+    "category": null,
+    "kind": "insufficient",
+    "oracle": "The trace lacks the terminal assertion.",
+    "seed": "Truncate the trace before the terminal assertion.",
+    "source": {
+      "kind": "authored",
+      "version": "1.0.0"
+    },
+    "support": [],
+    "uncertainty": "The trace lacks the terminal assertion."
+  },
+  "c-e2831d30740d3a36": {
+    "binding": null,
+    "category": "cache-key-omits-currency",
+    "kind": "defect",
+    "oracle": "The price cache reused a value across currencies because its key omitted currency.",
+    "seed": "Remove currency from the price cache key.",
+    "source": {
+      "kind": "authored",
+      "version": "1.0.0"
+    },
+    "support": [
+      {
+        "required": [
+          "a1",
+          "a2"
+        ],
+        "statement": "The price cache reused a value across currencies because its key omitted currency."
+      }
+    ],
+    "uncertainty": null
+  },
+  "c-f215b75de84477a2": {
+    "binding": null,
+    "category": "tax-rounding-per-line",
+    "kind": "defect",
+    "oracle": "Tax was overcharged because the calculation rounded each line before summing.",
+    "seed": "Round each line tax before summing instead of rounding order tax.",
+    "source": {
+      "kind": "authored",
+      "version": "1.0.0"
+    },
+    "support": [
+      {
+        "required": [
+          "a1",
+          "a2"
+        ],
+        "statement": "Tax was overcharged because the calculation rounded each line before summing."
+      }
+    ],
+    "uncertainty": null
+  },
+  "c-ffba488ed3f29b83": {
+    "binding": null,
+    "category": "registration-identity-mismatch",
+    "kind": "defect",
+    "oracle": "Registration returned a different user identity than expected.",
+    "seed": "BUG_WRONG_REGISTRATION_IDENTITY",
+    "source": {
+      "capture_files": [
+        {
+          "path": "reports/run-c89dfj44/mutants/BUG_WRONG_REGISTRATION_IDENTITY/result.json",
+          "sha256": "46c59f1f48901d63da15cc90d70e2f820a8e5f01efd117760e364979c00c8889"
+        },
+        {
+          "path": "reports/run-c89dfj44/mutations.json",
+          "sha256": "91d94f7281a05a9aeabf12c89ec29edc59c47523bed16419e08b691db0268832"
+        }
+      ],
+      "capture_tracking": "untracked; capture revision unverified",
+      "kind": "recorded-capture",
+      "projection": {
+        "a1": "mutations.json matching row reason, checked against targeted result case; AC-1 result binding supplies registration context",
+        "a2": "result.json health_passed, app_stayed_up, fault_hits and exit_code"
+      },
+      "reference_code": {
+        "path": "tools/run_mutants.py",
+        "sha256": "2b6cd259e70e48f60a1323e3daf1fd456291677f8eb208a0cf5d896f02bde603"
+      },
+      "reference_code_revision": "b0369e2ecb337dabe7cbb31437614807e2e3a417",
+      "repository_url": "https://github.com/camiloavilacm/qa-ai-generation-pipeline"
+    },
+    "support": [
+      {
+        "required": [
+          "a1"
+        ],
+        "statement": "Registration returned a different user identity than expected."
+      }
+    ],
+    "uncertainty": null
+  }
+}
