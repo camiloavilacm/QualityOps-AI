@@ -14,10 +14,11 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from check_healer_scope import check_scope, revision
 from pr_verification import (Blocked, bounded_command, cleanup_container, collect_publication,
-                             docker_arguments, evidence_files, export_files, read_json,
+                             allowed_evidence, docker_arguments, evidence_files, export_files, read_json,
                              reap_command_group, require_preparation_space, verify_inspection)
 
 POLICY = json.loads((Path(__file__).parent / "container/runtime-policy.json").read_bytes())
+REPORT_POLICY = json.loads((Path(__file__).parent / "pr-verification-policy.json").read_bytes())
 
 
 def inspection(tests, evidence):
@@ -152,9 +153,12 @@ class IsolationConfigurationTests(unittest.TestCase):
                 verify_inspection(altered, POLICY, tests, evidence)
 
     def test_launcher_flags_do_not_forward_credentials_or_host_access(self):
-        argv = docker_arguments('fixture', 'sha256:' + 'a' * 64, Path('/tmp/tests'), Path('/tmp/evidence'), Path('/tmp/seccomp'), POLICY)
+        argv = docker_arguments('fixture', 'sha256:' + 'a' * 64, Path('/tmp/tests'), Path('/tmp/evidence'),
+                                Path('/tmp/seccomp'), POLICY, '1' * 40, '2' * 40)
         self.assertIn('none', argv)
         self.assertIn('--read-only', argv)
+        self.assertIn('PW_VERIFIER_REVISION=' + '1' * 40, argv)
+        self.assertIn('PW_CANDIDATE_REVISION=' + '2' * 40, argv)
         self.assertNotIn('--privileged', argv)
         self.assertFalse(any(value.startswith(('AWS_', 'GITHUB_', '--env-file')) for value in argv))
         self.assertIn('type=bind,src=/tmp/tests,dst=/opt/qualityops/frontend/tests,readonly', argv)
@@ -165,6 +169,50 @@ class IsolationConfigurationTests(unittest.TestCase):
             with self.assertRaises(Blocked): read_json(file)
             file.symlink_to('/etc/passwd')
             with self.assertRaises(Blocked): read_json(file)
+
+
+class Stage2PolicyTests(unittest.TestCase):
+    def test_stage_two_artifacts_are_narrowly_allowlisted(self):
+        allowed = [
+            "container/hygiene/chromium/chromium-hygiene.json",
+            "container/hygiene/chromium/chromium-discovery.json",
+            "container/hygiene/chromium-guard-meta/chromium-guard-meta-report.json",
+            "container/canary/summary.json",
+            "container/canary/mutation/mutated-export.json",
+            "container/canary/positive/discovery.json",
+            "container/canary/mutated/test-results/DASH-003-retry0/trace.zip",
+        ]
+        for name in allowed:
+            with self.subTest(name=name):
+                self.assertTrue(allowed_evidence(name))
+        for name in ["container/hygiene/chromium/extra.json", "container/canary/summary.txt",
+                     "container/canary/positive/arbitrary.txt", "container/canary/../secret.json"]:
+            with self.subTest(name=name):
+                self.assertFalse(allowed_evidence(name))
+
+    def test_cumulative_stage_two_is_explicitly_enabled(self):
+        self.assertEqual(POLICY["implemented_stages"], [1, 2])
+
+    def test_trusted_inventory_has_unique_ids_and_reviewed_assertion_minima(self):
+        expected_counts = {"chromium": 8, "chromium-guard-meta": 8, "chromium-webmcp-lifecycle": 4}
+        for project, rows in REPORT_POLICY["projects"].items():
+            with self.subTest(project=project):
+                self.assertEqual(len(rows), expected_counts[project])
+                ids = [row["id"] for row in rows]
+                identities = [(row["file"], tuple(row["titles"])) for row in rows]
+                self.assertEqual(len(ids), len(set(ids)))
+                self.assertEqual(len(identities), len(set(identities)))
+                self.assertTrue(all(isinstance(row.get("min_expects"), int) and row["min_expects"] >= 0
+                                    for row in rows))
+        self.assertEqual(REPORT_POLICY["pending_projects"], {"chromium-webmcp": {"status": "NOT INTRODUCED", "count": 0}})
+
+    def test_canary_is_exact_dash003_missing_evidence_step(self):
+        canary = REPORT_POLICY["canary"]
+        dashboard = next(row for row in REPORT_POLICY["projects"]["chromium"] if row["id"] == "DASH-003")
+        self.assertEqual(canary["id"], dashboard["id"])
+        self.assertEqual(canary["titles"], dashboard["titles"])
+        self.assertEqual(canary["step_id"], "DASH-003-REASON-01")
+        self.assertEqual(canary["reason_code"], "INSUFFICIENT_EVIDENCE")
 
 
 class ScopeTests(unittest.TestCase):

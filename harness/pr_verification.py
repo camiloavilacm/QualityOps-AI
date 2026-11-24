@@ -101,11 +101,27 @@ def allowed_evidence(name):
     relative = name.removeprefix('container/')
     if relative in {'foundation.json', 'commands.json', 'versions.json', 'isolation.json',
                     'blocker.json', 'probe.json', 'probe.log', 'typecheck.log',
-                    'e2e.log', 'guard.log', 'lifecycle.log'}:
+                    'e2e.log', 'guard.log', 'lifecycle.log', 'canary.log',
+                    'hygiene-chromium.log', 'hygiene-chromium-guard-meta.log',
+                    'hygiene-chromium-webmcp-lifecycle.log'}:
         return True
     if re.fullmatch(r'(e2e|guard|lifecycle)/(report|discovery|orchestrator)[.]json', relative):
         return True
     parts = Path(relative).parts
+    if len(parts) == 3 and parts[0] == 'hygiene' and parts[1] in {
+            'chromium', 'chromium-guard-meta', 'chromium-webmcp-lifecycle'} and parts[2] in {
+                f'{parts[1]}-hygiene.json', f'{parts[1]}-discovery.json', f'{parts[1]}-report.json'}:
+        return True
+    if relative in {'canary/summary.json', 'canary/mutation/mutated-export.json'} or re.fullmatch(
+            r'canary/(positive|mutated)/(discovery|report)[.]json', relative):
+        return True
+    if len(parts) >= 4 and parts[0] == 'canary' and parts[1] in {'positive', 'mutated'} and parts[2] == 'test-results':
+        return (parts[-1] in {'trace.zip', 'error-context.md', '.last-run.json'} or
+                re.fullmatch(r'[A-Za-z0-9_.-]+[.](png|webm)', parts[-1]) is not None)
+    if len(parts) >= 4 and parts[0] == 'hygiene' and parts[1] in {
+            'chromium', 'chromium-guard-meta', 'chromium-webmcp-lifecycle'} and parts[2] == 'test-results':
+        return (parts[-1] in {'trace.zip', 'error-context.md', '.last-run.json'} or
+                re.fullmatch(r'[A-Za-z0-9_.-]+[.](png|webm)', parts[-1]) is not None)
     return (len(parts) >= 3 and parts[0] in {'e2e', 'guard', 'lifecycle'} and parts[1] == 'test-results'
             and (parts[-1] in {'trace.zip', 'error-context.md', '.last-run.json'} or
                  re.fullmatch(r'[A-Za-z0-9_.-]+[.](png|webm)', parts[-1]) is not None))
@@ -194,7 +210,8 @@ def collect_publication(output, report):
 
 def export_files(root, commit, target):
     """No archive extraction, Git checkout hooks, symlinks, or private directories."""
-    files = git(root, "ls-tree", "-rz", commit, "--", "frontend", "harness/container").split(b"\0")
+    files = git(root, "ls-tree", "-rz", commit, "--", "frontend", "harness/container",
+                "harness/pr-verification-policy.json", ".github/workflows/ci.yml").split(b"\0")
     for row in filter(None, files):
         header, raw_name = row.split(b"\t", 1)
         mode, kind, blob = header.split()
@@ -202,7 +219,7 @@ def export_files(root, commit, target):
         if mode not in (b"100644", b"100755") or kind != b"blob" or ".." in Path(name).parts:
             raise Blocked("source export requires ordinary files")
         # .npmrc, .env and other hidden configuration are never build inputs.
-        if any(part.startswith(".") for part in Path(name).parts):
+        if any(part.startswith(".") for part in Path(name).parts) and name != ".github/workflows/ci.yml":
             continue
         if any(part in {"node_modules", "dist", "artifacts", "test-results", "playwright-report"}
                for part in Path(name).parts):
@@ -215,12 +232,14 @@ def export_files(root, commit, target):
         output.write_bytes(payload)
 
 
-def docker_arguments(name, image, tests, evidence, seccomp, policy):
+def docker_arguments(name, image, tests, evidence, seccomp, policy, verifier_revision, candidate_revision):
     # No candidate/environment-controlled flags, mounts, host networking or secrets.
     return ["create", "--name", name, "--platform", policy["platform"],
             "--user", "pwuser", "--network", "none", "--read-only", "--cap-drop", "ALL",
             "--cap-add", policy["capabilities"][0],
             "--security-opt", "no-new-privileges", "--security-opt", "seccomp=" + str(seccomp),
+            "--env", "PW_VERIFIER_REVISION=" + verifier_revision,
+            "--env", "PW_CANDIDATE_REVISION=" + candidate_revision,
             "--cpus", "2", "--memory", "4294967296", "--memory-swap", "4294967296",
             "--pids-limit", "512", "--ipc", "private", "--shm-size", "1073741824",
             "--tmpfs", "/tmp:rw,nosuid,nodev,size=1073741824,mode=1777",
@@ -323,6 +342,7 @@ def main():
         # Verify all executable host code and policies against the chosen immutable verifier.
         for file in ["harness/pr_verification.py", "harness/run_pr_verification.mjs",
                      "harness/check_healer_scope.py", "harness/check_pr_reports.mjs",
+                     "harness/check_hygiene_report.mjs", "harness/check_canary_report.mjs",
                      "harness/pr-verification-policy.json", "harness/container/runtime-policy.json"]:
             try:
                 recorded = git(ROOT, "show", args.verifier_revision + ":" + file)
@@ -391,7 +411,8 @@ def main():
             evidence.chmod(0o777)  # pwuser writes only this disposable evidence directory.
             # Mark before create: even a timed-out Docker client may have created a container.
             created = True
-            run([docker, *docker_arguments(name, image, tests, evidence, seccomp, policy)])
+            run([docker, *docker_arguments(name, image, tests, evidence, seccomp, policy,
+                                           args.verifier_revision, args.candidate_revision)])
             inspection = json.loads(run([docker, "inspect", name]))[0]
             verify_inspection(inspection, policy, tests, evidence)
             execution_error = None
@@ -421,6 +442,14 @@ def main():
                      "--report", str(evidence / file)])
             run(["node", str(ROOT / "harness/check_pr_reports.mjs"), "--project", "chromium",
                  "--report", str(evidence / "e2e/discovery.json"), "--discovery"])
+            for project in ["chromium", "chromium-guard-meta", "chromium-webmcp-lifecycle"]:
+                run(["node", str(ROOT / "harness/check_hygiene_report.mjs"), "--root", str(evidence),
+                     "--project", project, "--verifier-revision", args.verifier_revision,
+                     "--candidate-revision", args.candidate_revision])
+            run(["node", str(ROOT / "harness/check_canary_report.mjs"), "--root", str(evidence),
+                 "--summary", str(evidence / "canary/summary.json"),
+                 "--verifier-revision", args.verifier_revision,
+                 "--candidate-revision", args.candidate_revision])
             report["result"] = "PASS"
     except (Blocked, ValueError, KeyError, OSError, subprocess.SubprocessError) as exc:
         report["reason"] = str(exc) if not isinstance(exc, subprocess.SubprocessError) else "unresolvable revision or local daemon"

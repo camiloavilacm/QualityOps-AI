@@ -8,6 +8,8 @@ RUN npm ci --ignore-scripts --no-audit --no-fund
 COPY frontend/ ./
 RUN npm run typecheck && npm run build
 COPY harness/container/ /opt/qualityops/runner/
+COPY harness/pr-verification-policy.json /opt/qualityops/harness/pr-verification-policy.json
+COPY .github/workflows/ci.yml /opt/qualityops/.github/workflows/ci.yml
 USER pwuser
 ENV HOME=/tmp/qualityops-home CI=1
 ENTRYPOINT ["node", "/opt/qualityops/runner/run-foundation.mjs"]

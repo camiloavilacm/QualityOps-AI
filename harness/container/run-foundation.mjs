@@ -8,7 +8,9 @@ const cwd = '/opt/qualityops/frontend'
 const records = []
 const env = { PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
   HOME: '/tmp/qualityops-home', TMPDIR: '/tmp', CI: '1', PLAYWRIGHT_BROWSERS_PATH: '/ms-playwright',
-  PW_OUTPUT_DIR: '/evidence/e2e/test-results', PLAYWRIGHT_HTML_OPEN: 'never' }
+  PW_OUTPUT_DIR: '/evidence/e2e/test-results', PLAYWRIGHT_HTML_OPEN: 'never',
+  PW_VERIFIER_REVISION: process.env.PW_VERIFIER_REVISION ?? '',
+  PW_CANDIDATE_REVISION: process.env.PW_CANDIDATE_REVISION ?? '' }
 const requireFrontend = createRequire(`${cwd}/package.json`)
 const write = (file, value) => {
   fs.mkdirSync(path.dirname(file), { recursive: true })
@@ -63,6 +65,13 @@ try {
       { env: { PLAYWRIGHT_JSON_OUTPUT_FILE: '/evidence/e2e/report.json' } }],
     ['guard', ['node', 'scripts/test_guard_fixture.mjs', '--report', '/evidence/guard/report.json']],
     ['lifecycle', ['node', 'scripts/test_webmcp_lifecycle.mjs', '--report', '/evidence/lifecycle/report.json']],
+    ['hygiene-chromium', ['node', 'scripts/check_test_hygiene.mjs', '--project=chromium', '--report', '/evidence/e2e/report.json'],
+      { env: { PW_HYGIENE_OUTPUT_DIR: '/evidence/hygiene/chromium' } }],
+    ['hygiene-chromium-guard-meta', ['node', 'scripts/check_test_hygiene.mjs', '--project=chromium-guard-meta', '--report', '/evidence/guard/report.json'],
+      { env: { PW_HYGIENE_OUTPUT_DIR: '/evidence/hygiene/chromium-guard-meta' } }],
+    ['hygiene-chromium-webmcp-lifecycle', ['node', 'scripts/check_test_hygiene.mjs', '--project=chromium-webmcp-lifecycle', '--report', '/evidence/lifecycle/report.json'],
+      { env: { PW_HYGIENE_OUTPUT_DIR: '/evidence/hygiene/chromium-webmcp-lifecycle' } }],
+    ['canary', ['node', 'scripts/check_canary_regression.mjs', '--output=/evidence/canary']],
   ]
   result = 'PASS'
   for (const [name, argv, options] of steps) {
