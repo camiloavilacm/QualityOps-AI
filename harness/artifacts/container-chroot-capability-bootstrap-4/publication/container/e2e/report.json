@@ -1,0 +1,545 @@
+{
+  "config": {
+    "argv": [
+      "/usr/bin/node",
+      "/opt/qualityops/frontend/node_modules/@playwright/test/cli.js",
+      "test",
+      "--project=chromium",
+      "--reporter=json"
+    ],
+    "configFile": "/opt/qualityops/frontend/playwright.config.ts",
+    "rootDir": "/opt/qualityops/frontend/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": true,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 240000,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/evidence/e2e/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/opt/qualityops/frontend/tests",
+        "testIgnore": [
+          "/meta\\//",
+          "/webmcp\\.spec\\.ts$/"
+        ],
+        "testMatch": [
+          "/(?:seed|mixed-campaign|dashboard-flows)\\.spec\\.ts$/"
+        ],
+        "timeout": 20000
+      },
+      {
+        "outputDir": "/evidence/e2e/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium-guard-meta",
+        "name": "chromium-guard-meta",
+        "testDir": "/opt/qualityops/frontend/tests",
+        "testIgnore": [
+          "/webmcp/"
+        ],
+        "testMatch": [
+          "/meta\\/guard-verification\\.spec\\.ts$/"
+        ],
+        "timeout": 20000
+      },
+      {
+        "outputDir": "/evidence/e2e/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium-webmcp",
+        "name": "chromium-webmcp",
+        "testDir": "/opt/qualityops/frontend/tests",
+        "testIgnore": [
+          "/meta\\//"
+        ],
+        "testMatch": [
+          "/tests\\/webmcp\\.spec\\.ts$/"
+        ],
+        "timeout": 20000
+      },
+      {
+        "outputDir": "/evidence/e2e/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium-webmcp-lifecycle",
+        "name": "chromium-webmcp-lifecycle",
+        "testDir": "/opt/qualityops/frontend/tests",
+        "testIgnore": [
+          "/guard-verification/"
+        ],
+        "testMatch": [
+          "/meta\\/webmcp-lifecycle\\.spec\\.ts$/"
+        ],
+        "timeout": 20000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/evidence/e2e/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "chromium",
+        "testDir": "/opt/qualityops/frontend/tests",
+        "snapshotDir": "/opt/qualityops/frontend/tests",
+        "testIgnore": [
+          {},
+          {}
+        ],
+        "testMatch": {},
+        "timeout": 20000,
+        "use": {
+          "baseURL": "http://127.0.0.1:4183",
+          "actionTimeout": 5000,
+          "trace": "retain-on-failure",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/159.0.8154.6 Safari/537.36",
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          },
+          "screen": {
+            "width": 1920,
+            "height": 1080
+          },
+          "deviceScaleFactor": 1,
+          "isMobile": false,
+          "hasTouch": false,
+          "defaultBrowserType": "chromium",
+          "channel": "chromium",
+          "launchOptions": {
+            "chromiumSandbox": true,
+            "args": [
+              "--enable-features=WebMCP"
+            ]
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "chromium"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.65.1",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run preview -- --port 4183",
+      "url": "http://127.0.0.1:4183",
+      "reuseExistingServer": false,
+      "timeout": 30000
+    }
+  },
+  "suites": [
+    {
+      "title": "dashboard-flows.spec.ts",
+      "file": "dashboard-flows.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Dashboard multi-view showcase flows",
+          "file": "dashboard-flows.spec.ts",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "passing campaign displays ELIGIBLE with complete evidence and absent investigation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 20000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3055,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-24T15:07:11.822Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "guard-diagnostics",
+                          "contentType": "application/json",
+                          "body": "eyJjb2RlcyI6W119"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9bbd47ee5dc5691b6ad3-6454cd1448777884b0c5",
+              "file": "dashboard-flows.spec.ts",
+              "line": 4,
+              "column": 3
+            },
+            {
+              "title": "partial campaign displays INCONCLUSIVE gate and INCONCLUSIVE investigation abstention",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 20000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1785,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-24T15:07:15.815Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "guard-diagnostics",
+                          "contentType": "application/json",
+                          "body": "eyJjb2RlcyI6W119"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9bbd47ee5dc5691b6ad3-c037e8d5c441ca9af4b1",
+              "file": "dashboard-flows.spec.ts",
+              "line": 19,
+              "column": 3
+            },
+            {
+              "title": "failing campaign keeps BLOCKED gate decision when investigator returns ERROR",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 20000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1748,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-24T15:07:17.611Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "guard-diagnostics",
+                          "contentType": "application/json",
+                          "body": "eyJjb2RlcyI6W119"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9bbd47ee5dc5691b6ad3-2859ef7ac9ec92aed2cc",
+              "file": "dashboard-flows.spec.ts",
+              "line": 29,
+              "column": 3
+            },
+            {
+              "title": "projected defect campaign displays DIAGNOSED finding with working evidence citation anchors",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 20000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1901,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-24T15:07:19.370Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "guard-diagnostics",
+                          "contentType": "application/json",
+                          "body": "eyJjb2RlcyI6W119"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9bbd47ee5dc5691b6ad3-6389d437ea2e40d2e479",
+              "file": "dashboard-flows.spec.ts",
+              "line": 38,
+              "column": 3
+            },
+            {
+              "title": "evaluation view displays 120-trial live benchmark (BLOCKED FAIL) and offline authored comparison",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 20000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2035,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-24T15:07:21.279Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "guard-diagnostics",
+                          "contentType": "application/json",
+                          "body": "eyJjb2RlcyI6W119"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9bbd47ee5dc5691b6ad3-dbaec53db2be2e4f85e7",
+              "file": "dashboard-flows.spec.ts",
+              "line": 55,
+              "column": 3
+            },
+            {
+              "title": "unknown campaign query displays unavailable fallback and navigates back",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 20000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1823,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-24T15:07:23.321Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "guard-diagnostics",
+                          "contentType": "application/json",
+                          "body": "eyJjb2RlcyI6W119"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9bbd47ee5dc5691b6ad3-b9a79364b156a64ce651",
+              "file": "dashboard-flows.spec.ts",
+              "line": 72,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "mixed-campaign.spec.ts",
+      "file": "mixed-campaign.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "mixed campaign displays BLOCKED with confirmed failure for x and missing evidence for y",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 20000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2077,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-24T15:07:25.175Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "guard-diagnostics",
+                      "contentType": "application/json",
+                      "body": "eyJjb2RlcyI6W119"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4be8b5defc0cc5f1a187-25edd439da4fa0e8b250",
+          "file": "mixed-campaign.spec.ts",
+          "line": 3,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "seed.spec.ts",
+      "file": "seed.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Test group",
+          "file": "seed.spec.ts",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "seed",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 20000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1731,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-24T15:07:27.294Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "guard-diagnostics",
+                          "contentType": "application/json",
+                          "body": "eyJjb2RlcyI6W119"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "11ceb7af692008938f3b-e93327a24cf4dbee4058",
+              "file": "seed.spec.ts",
+              "line": 4,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-24T15:07:08.976Z",
+    "duration": 20220.054,
+    "expected": 8,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

@@ -1,0 +1,350 @@
+{
+  "config": {
+    "argv": [
+      "/usr/bin/node",
+      "/opt/qualityops/frontend/node_modules/@playwright/test/cli.js",
+      "test",
+      "--project=chromium-webmcp-lifecycle",
+      "--reporter=json"
+    ],
+    "configFile": "/opt/qualityops/frontend/playwright.config.ts",
+    "rootDir": "/opt/qualityops/frontend/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": true,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 240000,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/evidence/lifecycle/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/opt/qualityops/frontend/tests",
+        "testIgnore": [
+          "/meta\\//",
+          "/webmcp\\.spec\\.ts$/"
+        ],
+        "testMatch": [
+          "/(?:seed|mixed-campaign|dashboard-flows)\\.spec\\.ts$/"
+        ],
+        "timeout": 20000
+      },
+      {
+        "outputDir": "/evidence/lifecycle/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium-guard-meta",
+        "name": "chromium-guard-meta",
+        "testDir": "/opt/qualityops/frontend/tests",
+        "testIgnore": [
+          "/webmcp/"
+        ],
+        "testMatch": [
+          "/meta\\/guard-verification\\.spec\\.ts$/"
+        ],
+        "timeout": 20000
+      },
+      {
+        "outputDir": "/evidence/lifecycle/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium-webmcp",
+        "name": "chromium-webmcp",
+        "testDir": "/opt/qualityops/frontend/tests",
+        "testIgnore": [
+          "/meta\\//"
+        ],
+        "testMatch": [
+          "/tests\\/webmcp\\.spec\\.ts$/"
+        ],
+        "timeout": 20000
+      },
+      {
+        "outputDir": "/evidence/lifecycle/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium-webmcp-lifecycle",
+        "name": "chromium-webmcp-lifecycle",
+        "testDir": "/opt/qualityops/frontend/tests",
+        "testIgnore": [
+          "/guard-verification/"
+        ],
+        "testMatch": [
+          "/meta\\/webmcp-lifecycle\\.spec\\.ts$/"
+        ],
+        "timeout": 20000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/evidence/lifecycle/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "chromium-webmcp-lifecycle",
+        "testDir": "/opt/qualityops/frontend/tests",
+        "snapshotDir": "/opt/qualityops/frontend/tests",
+        "testIgnore": [
+          {}
+        ],
+        "testMatch": {},
+        "timeout": 20000,
+        "use": {
+          "baseURL": "http://127.0.0.1:4183",
+          "actionTimeout": 5000,
+          "trace": "retain-on-failure",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/159.0.8154.6 Safari/537.36",
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          },
+          "screen": {
+            "width": 1920,
+            "height": 1080
+          },
+          "deviceScaleFactor": 1,
+          "isMobile": false,
+          "hasTouch": false,
+          "defaultBrowserType": "chromium",
+          "channel": "chromium",
+          "launchOptions": {
+            "chromiumSandbox": true,
+            "args": [
+              "--enable-features=WebMCP"
+            ]
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "chromium-webmcp-lifecycle"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.65.1",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run preview -- --port 4183",
+      "url": "http://127.0.0.1:4183",
+      "reuseExistingServer": false,
+      "timeout": 30000
+    }
+  },
+  "suites": [
+    {
+      "title": "meta/webmcp-lifecycle.spec.ts",
+      "file": "meta/webmcp-lifecycle.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "unsupported environment preserves dashboard",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 20000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-webmcp-lifecycle",
+              "projectName": "chromium-webmcp-lifecycle",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3040,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-24T15:08:14.052Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "guard-diagnostics",
+                      "contentType": "application/json",
+                      "body": "eyJjb2RlcyI6W119"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6bc25033e5c6250b9aea-dfd1aa051340e6e5b2e8",
+          "file": "meta/webmcp-lifecycle.spec.ts",
+          "line": 17,
+          "column": 1
+        },
+        {
+          "title": "duplicate initialization registers tools once",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 20000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-webmcp-lifecycle",
+              "projectName": "chromium-webmcp-lifecycle",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 64,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-24T15:08:18.109Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "guard-diagnostics",
+                      "contentType": "application/json",
+                      "body": "eyJjb2RlcyI6W119"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6bc25033e5c6250b9aea-73819d655f808fcfc001",
+          "file": "meta/webmcp-lifecycle.spec.ts",
+          "line": 24,
+          "column": 1
+        },
+        {
+          "title": "second-registration failure rolls back first",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 20000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-webmcp-lifecycle",
+              "projectName": "chromium-webmcp-lifecycle",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 25,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-24T15:08:18.188Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "guard-diagnostics",
+                      "contentType": "application/json",
+                      "body": "eyJjb2RlcyI6W119"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6bc25033e5c6250b9aea-20af65d488794417ab6b",
+          "file": "meta/webmcp-lifecycle.spec.ts",
+          "line": 34,
+          "column": 1
+        },
+        {
+          "title": "disposal unregisters tools and permits reinitialization",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 20000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-webmcp-lifecycle",
+              "projectName": "chromium-webmcp-lifecycle",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 15,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-24T15:08:18.226Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "guard-diagnostics",
+                      "contentType": "application/json",
+                      "body": "eyJjb2RlcyI6W119"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6bc25033e5c6250b9aea-a72d24d83c9a4b2bc340",
+          "file": "meta/webmcp-lifecycle.spec.ts",
+          "line": 44,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-24T15:08:11.132Z",
+    "duration": 7263.654,
+    "expected": 4,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "status": "PASS",
+  "environment": "container-or-linux-host",
+  "checks": {
+    "native": {
+      "surface": "document.modelContext",
+      "tools": [
+        {
+          "name": "foundation_probe",
+          "description": "Bounded fixture-only capability probe",
+          "inputSchema": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "annotations": {
+            "readOnlyHint": true,
+            "consequentialHint": false,
+            "untrustedContentHint": false
+          }
+        }
+      ],
+      "result": "{\"content\":[{\"type\":\"text\",\"text\":\"fixture-ok\"}],\"isError\":false}"
+    },
+    "adapter": {
+      "tools": [
+        {
+          "name": "foundation_probe",
+          "description": "Bounded fixture-only capability probe",
+          "inputSchema": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "annotations": {
+            "readOnly": true
+          }
+        }
+      ],
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "fixture-ok"
+          }
+        ],
+        "isError": false
+      }
+    },
+    "abort": 0,
+    "unsupported": {
+      "surface": "undefined",
+      "secure": false
+    }
+  },
+  "limitations": [
+    "Host probe does not establish container isolation or verifier acceptance."
+  ],
+  "browser": "159.0.8154.6"
+}

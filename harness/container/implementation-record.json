@@ -20,7 +20,7 @@
     "C_worktree": "/private/var/tmp/qualityops-container-continuation-c",
     "reviewer": "Read-only independent continuation review; persistent artifacts under harness/artifacts/continuation-review/"
   },
-  "status": "IMPLEMENTED FIRST SLICE; approved CAP_SYS_CHROOT policy update; fresh Stage 1 bootstrap pending",
+  "status": "IMPLEMENTED FIRST SLICE; Stage 1 bootstrap PASS; independent review and verifier acceptance pending",
   "host_runtime": {
     "node": "v26.13.1",
     "python": "Python 3.15.2",
@@ -155,21 +155,21 @@
     }
   ],
   "container": {
-    "result": "BLOCKED",
-    "preparation": "PASS: exact pinned image was freshly pulled; verifier image built successfully",
-    "execution": "BLOCKED at Chromium launch under the original zero-capability policy; isolation probe passed",
+    "result": "PASS",
+    "preparation": "PASS: fresh pinned image pull and immutable verifier image build",
+    "execution": "PASS: restricted container, Chromium sandbox, ordinary/guard/lifecycle checks and cleanup",
     "diagnostic_execution": "Two bounded, credential-free, read-only base diagnostic containers exited133 and were removed successfully",
-    "reason": "Docker Desktop storage reset cleared the bad extracted image; fresh linux/amd64 Node probe passed. Chromium sandbox then failed at chroot with EPERM under zero capabilities. User approved the least-capability policy update, granting only CAP_SYS_CHROOT. A restricted diagnostic verified sandboxed Chromium 159 starts with that capability. The follow-up bootstrap against the new immutable commit is pending.",
+    "reason": "Stage 1 bootstrap passed after the approved CAP_SYS_CHROOT bounding-set update. Isolation requires empty effective/permitted/ambient sets and only the SYS_CHROOT bit in CapBnd. Chromium sandbox remains enabled.",
     "image_build": "FAIL before a complete verifier image",
-    "isolation_enforcement": "NOT RUN",
-    "built_image_digest": null,
-    "latest_attempt_revision": "bd64dc3298143e9dc764500eff4eee6278826890",
-    "latest_report": "harness/artifacts/container-repair-bootstrap/publication/summary.json",
+    "isolation_enforcement": "PASS: pwuser, no effective/permitted/ambient capabilities, CAP_SYS_CHROOT bounding bit only, seccomp, no-new-privileges, read-only source, network none, bounded resources, loopback fixture and external denial",
+    "built_image_digest": "sha256:bfe771e4f42e74df62851ef6a3234bad962e6e50c634b583888488a4c47e0172",
+    "latest_attempt_revision": "06a50ab582e1e9b6c19254964603df534b4794cd",
+    "latest_report": "harness/artifacts/container-chroot-capability-bootstrap-4/summary.json",
     "base_artifact_verification": "harness/artifacts/image-preparation/full-archive-verification.json",
     "upstream_node_verification": "harness/artifacts/continuation-review/upstream-layer-a41.json",
     "local_filesystem_diagnostic": "harness/artifacts/base-runtime-probe-restored/diagnostic.json",
     "failed_build_container_cleanup": "harness/artifacts/continuation-checks/failed-preparation-cleanup.json",
-    "runtime_policy_sha256": "pending committed approved policy digest"
+    "runtime_policy_sha256": "0aad2f0527f9ae11f071479d8ac280a554a068cfc07328c0c1d2819acb78bef1"
   },
   "later_acceptance": {
     "hygiene_and_canary": "NOT RUN; Stage 2 follow-up, separate trusted positive/mutated image builds required",
@@ -327,6 +327,17 @@
       }
     ],
     "policy": "Drop ALL capabilities, add CAP_SYS_CHROOT only to the bounding set; probe requires effective, permitted, and ambient sets to be empty and bounding set exactly 0x40000.",
-    "follow_up_bootstrap": "BLOCKED at isolation probe because only CapBnd (not CapEff) carries SYS_CHROOT; probe is being corrected to enforce that least-privilege boundary."
+    "follow_up_bootstrap": "PASS at 06a50ab582e1e9b6c19254964603df534b4794cd; report harness/artifacts/container-chroot-capability-bootstrap-4/summary.json",
+    "independent_review": "PENDING"
+  },
+  "stage1_container_acceptance": {
+    "result": "PASS; independent review and exact-SHA human acceptance pending",
+    "command": "node harness/run_pr_verification.mjs --bootstrap --stage 1 --verifier-revision 06a50ab582e1e9b6c19254964603df534b4794cd --candidate-revision 06a50ab582e1e9b6c19254964603df534b4794cd --output harness/artifacts/container-chroot-capability-bootstrap-4",
+    "evidence": "harness/artifacts/container-chroot-capability-bootstrap-4/summary.json",
+    "ordinary": "8 pass; 0 skipped, unexpected or flaky",
+    "guard": "2 controls pass; 6 fixture failures correctly attributed; report validator PASS",
+    "lifecycle": "4 pass; 0 skipped, unexpected or flaky",
+    "all_launcher_commands": "10/10 PASS; cleanup PASS; artifact collection PASS",
+    "other_gates": "Stage 2 hygiene/canary, Stage 3 red-team, R12/R14 and Stage 4 NOT RUN"
   }
 }

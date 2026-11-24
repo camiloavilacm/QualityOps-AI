@@ -1,0 +1,20 @@
+{
+  "unshare_user_namespace": {
+    "result": "PASS",
+    "command": "docker run --rm --platform linux/amd64 --user pwuser --network none --read-only --cap-drop ALL --security-opt no-new-privileges --security-opt seccomp=<vendored-profile> --entrypoint /usr/bin/unshare <verifier-image> --user --map-root-user /usr/bin/id"
+  },
+  "chroot_without_capability": {
+    "result": "FAIL",
+    "error": "Operation not permitted"
+  },
+  "chromium_zero_capabilities": {
+    "result": "FAIL",
+    "error": "sys_chroot(\"/proc/self/fdinfo/\") == 0"
+  },
+  "chromium_sys_chroot_only": {
+    "result": "PASS",
+    "version": "159.0.8154.6",
+    "sandbox_enabled": true
+  },
+  "persistent_configuration_changed": false
+}

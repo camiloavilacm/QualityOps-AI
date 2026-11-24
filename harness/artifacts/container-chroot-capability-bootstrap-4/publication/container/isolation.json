@@ -1,0 +1,21 @@
+{
+  "result": "PASS",
+  "uid": 1001,
+  "user": "pwuser",
+  "limits": {
+    "memory": "4294967296",
+    "pids": "512",
+    "cpu": "200000 100000"
+  },
+  "checks": [
+    "temporary/evidence writes",
+    "loopback fixture",
+    "read-only sources/tests/bundle",
+    "no effective/permitted/ambient capabilities",
+    "CAP_SYS_CHROOT bounding set only",
+    "no new privileges",
+    "seccomp",
+    "credential/socket absence",
+    "external connection denied"
+  ]
+}
