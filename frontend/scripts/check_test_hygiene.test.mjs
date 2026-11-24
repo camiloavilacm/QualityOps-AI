@@ -32,6 +32,14 @@ test('AST counts expect.poll once without matching comments or strings', () => {
   const source = "import {test, expect} from './fixtures/dashboard'; test('poll', async ({page})=>{ /* expect(false) */ const text='expect(false)'; await expect.poll(async()=>page.getByRole('heading').innerText()).toBe('hello') })"
   assert.equal(checkOrdinarySource('poll.spec.ts', source)[0].minExpects, 1)
 })
+test('fixture callbacks require arrow syntax', () => {
+  const source = "import {test, expect} from './fixtures/dashboard'; test('function callback', function ({page}) { expect(page).toBeTruthy() })"
+  assert.throws(() => checkOrdinarySource('function-callback.spec.ts', source), /Only direct arrow callbacks are permitted/)
+})
+test('validated hook fixtures receive their own locator scope', () => {
+  const source = ordinary + "\ntest.beforeEach(async ({page}) => { await page.goto('/') })\n"
+  assert.equal(checkOrdinarySource('hook.spec.ts', source).length, 1)
+})
 for (const filename of ['extra.spec.ts', 'extra.test.ts', 'extra.test.js', 'extra.spec.js', 'extra.spec.mts', 'extra.tsx']) test(`filesystem rejects unapproved ${filename}`, async t => {
   const root = await workspace(t)
   await writeFile(join(root, 'tests', filename), "test('hidden',()=>{})")
@@ -67,6 +75,31 @@ for (const [label, change] of [
   ['fixture shadowed by object', source => source.replace('  await page.goto', '  { const page = { getByRole: ({}).constructor.constructor }; page.getByRole("return process.version")() }\n  await page.goto')],
   ['constructor based execution', source => source.replace('  await page.goto', '  await page.locator(".decision-value").constructor.constructor("return process.version")()\n  await page.goto')],
   ['prototype based execution', source => source.replace('  await page.goto', '  await page.locator(".decision-value").prototype.constructor("return process.version")()\n  await page.goto')],
+  ['reflective destructuring and locator shadowing', source => source.replace('  await page.goto', `  const control = page.getByRole('heading')
+  { const {constructor}=()=>{}; const control={click:constructor}; const generated=control.click('return process.version'); { const control={click:generated}; control.click(); } }
+  await page.goto`)],
+  ['namespace and cross-test locator names', source => source.replace('  await page.goto', `  const control = page.getByRole('heading')
+  await page.goto`) + `
+namespace control { export const getByRole=Object.getPrototypeOf; export const click=Object.getOwnPropertyDescriptor; export const press=control.click(control.getByRole(()=>{}),'constructor')!.value; export const fill=(control.press('return process.version')); }
+control.fill()`],
+  ['locator alias nested-block and outer-binding escape', source => source.replace('  await page.goto', `  { const control = page.getByRole('heading') }
+  control.click()
+  await page.goto`) + `
+const control = { getByRole: Object.getPrototypeOf, click: Object.getOwnPropertyDescriptor, filter: JSON.parse, press: Array.from }
+control.fill()`],
+  ['for-of property mutation', source => source.replace('  await page.goto', `  const control: any = page.getByRole('heading')
+  for (control.getByRole of [Object.getPrototypeOf]) {}
+  for (control.click of [Object.getOwnPropertyDescriptor]) {}
+  for (control.filter of [JSON.parse]) {}
+  for (control.press of [Array.from]) {}
+  await page.goto`)],
+  ['named class expression locator shadow', source => source.replace('  await page.goto', `  const control=page.getByRole('heading')
+  const unused=class control { static getByRole=Object.getPrototypeOf; static click=Object.getOwnPropertyDescriptor; static press=control.click(control.getByRole(()=>{}),'constructor')!.value; static fill=(control.press('return process.version')); static result=control.fill(); }
+  await page.goto`)],
+  ['nested polling callback cannot shadow page with a default', source => source.replace('  await page.goto', `  await expect.poll(async ({page} = {}) => { await page.goto('/'); return true }).toBeTruthy()
+  await page.goto`)],
+  ['named function expression cannot shadow page', source => source.replace('  await page.goto', `  await expect.poll(function page() { return page.goto('/') }).toBeTruthy()
+  await page.goto`)],
   ['returned function call', source => source.replace('  await page.goto', '  page.getByRole("link")()\n  await page.goto')],
   ['returned locator method call', source => source.replace('  await page.goto', '  page.getByRole("link").filter({hasText:"x"})()\n  await page.goto')],
   ['dynamic import', source => source + "\nimport('node:fs')"],

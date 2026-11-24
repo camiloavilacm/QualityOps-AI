@@ -76,11 +76,13 @@ const testMethods = new Set(['describe', 'step', 'beforeEach', 'afterEach', 'bef
 const reservedBindings = new Set(['page', 'test', 'expect'])
 
 function fixtureCallback(callback, { required = false } = {}) {
-  assert.ok(ts.isArrowFunction(callback) || ts.isFunctionExpression(callback), 'Test callback must be a direct function')
+  assert.ok(ts.isArrowFunction(callback), 'Only direct arrow callbacks are permitted')
   assert.ok(callback.body, 'Test callback body required')
   if (!callback.parameters.length) { assert.ok(!required, 'Playwright fixture callback required'); return }
   assert.equal(callback.parameters.length, 1, 'Only the reviewed Playwright fixture parameter is permitted')
-  const pattern = callback.parameters[0].name
+  const parameter = callback.parameters[0]
+  assert.ok(!parameter.initializer && !parameter.questionToken && !parameter.dotDotDotToken, 'Defaulted, optional, or rest fixture parameter forbidden')
+  const pattern = parameter.name
   assert.ok(ts.isObjectBindingPattern(pattern) && pattern.elements.length === 1, 'Exact { page } fixture binding required')
   const element = pattern.elements[0]
   assert.ok(ts.isIdentifier(element.name) && element.name.text === 'page' && !element.propertyName &&
@@ -89,17 +91,82 @@ function fixtureCallback(callback, { required = false } = {}) {
 
 export function checkOrdinarySource(file, source) {
   const tree = syntax(file, source)
-  const locators = new Set(['page'])
-  // Locator aliases are allowed only for statically recognized page/locator expressions.
-  let changed
-  do {
-    changed = false
-    visit(tree, node => {
-      if (!ts.isVariableDeclaration(node) || !ts.isIdentifier(node.name) || !node.initializer) return
-      const value = name(node.initializer), root = value.split('.')[0]
-      if (ts.isCallExpression(node.initializer) && locators.has(root) && value.split('.').slice(1).every(part => locatorMethods.has(part)) && !locators.has(node.name.text)) { locators.add(node.name.text); changed = true }
-    })
-  } while (changed)
+  const locatorScopes = new Map()
+  const approvedPageParameters = new WeakSet()
+  const approvedPageBindings = new WeakSet()
+  const hookCalls = new Set(['test.beforeEach', 'test.afterEach', 'test.beforeAll', 'test.afterAll'])
+  const isScopedTestCall = node => ts.isCallExpression(node) && (name(node.expression) === 'test' || hookCalls.has(name(node.expression)))
+  const testScope = node => {
+    let current = node
+    while (current && !isScopedTestCall(current)) current = current.parent
+    return current
+  }
+  visit(tree, node => {
+    if (!ts.isCallExpression(node)) return
+    const path = name(node.expression)
+    const callback = path === 'test' ? node.arguments[1] :
+      hookCalls.has(path) ? node.arguments.at(-1) : undefined
+    if (!callback) return
+    fixtureCallback(callback, { required: path === 'test' })
+    if (callback.parameters.length) {
+      const parameter = callback.parameters[0]
+      approvedPageParameters.add(parameter)
+      approvedPageBindings.add(parameter.name.elements[0])
+    }
+  })
+  visit(tree, node => {
+    if (!isScopedTestCall(node)) return
+    const callback = callbackOf(node)
+    if (!callback?.body) return
+    const locators = new Set(['page'])
+    // Discover aliases within this test callback only. Names in another test
+    // or at module scope cannot authorize Playwright-shaped calls here.
+    let changed
+    do {
+      changed = false
+      if (!ts.isBlock(callback.body)) continue
+      for (const statement of callback.body.statements) {
+        if (!ts.isVariableStatement(statement)) continue
+        for (const child of statement.declarationList.declarations) {
+          if (!ts.isIdentifier(child.name) || !child.initializer) continue
+          const value = name(child.initializer), root = value.split('.')[0]
+          if (ts.isCallExpression(child.initializer) && locators.has(root) && value.split('.').slice(1).every(part => locatorMethods.has(part)) && !locators.has(child.name.text)) { locators.add(child.name.text); changed = true }
+        }
+      }
+    } while (changed)
+    for (const locator of locators) {
+      if (locator === 'page') continue
+      const bindings = []
+      visit(callback.body, child => {
+        if (ts.isVariableDeclaration(child) && ts.isIdentifier(child.name) && child.name.text === locator) bindings.push(child)
+        else if (ts.isParameter(child) && ts.isIdentifier(child.name) && child.name.text === locator) bindings.push(child)
+        else if (ts.isFunctionDeclaration(child) && child.name?.text === locator) bindings.push(child)
+        else if (ts.isBindingElement(child) && ts.isIdentifier(child.name) && child.name.text === locator) bindings.push(child)
+      })
+      assert.equal(bindings.length, 1, `Locator alias must have one binding per test callback: ${locator}`)
+      const binding = bindings[0]
+      assert.ok(ts.isVariableDeclaration(binding) && ts.isIdentifier(binding.name) && binding.initializer &&
+        ts.isCallExpression(binding.initializer), `Locator alias binding must be a static locator: ${locator}`)
+    }
+    locatorScopes.set(node, locators)
+  })
+  // No same-named binding elsewhere may borrow an alias's allowlisted methods.
+  for (const [scope, locators] of locatorScopes) {
+    const callback = callbackOf(scope)
+    for (const locator of locators) {
+      if (locator === 'page') continue
+      visit(tree, node => {
+        const bindingName = ts.isVariableDeclaration(node) || ts.isParameter(node) || ts.isFunctionDeclaration(node)
+          ? node.name : ts.isBindingElement(node) ? node.name : undefined
+        if (!bindingName || !ts.isIdentifier(bindingName) || bindingName.text !== locator) return
+        assert.ok(ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer && ts.isCallExpression(node.initializer), `Untrusted locator-name binding: ${locator}`)
+        const owner = testScope(node)
+        const ownerCallback = owner && callbackOf(owner)
+        assert.ok(ownerCallback && ts.isBlock(ownerCallback.body) && node.parent.parent.parent === ownerCallback.body && locatorScopes.get(owner)?.has(locator), `Locator alias must be a direct test-body binding: ${locator}`)
+        if (owner === scope) assert.equal(callback, ownerCallback)
+      })
+    }
+  }
   let fixtureImports = 0
   visit(tree, node => {
     if (ts.isImportDeclaration(node)) {
@@ -110,27 +177,26 @@ export function checkOrdinarySource(file, source) {
       assert.ok(names.every(item => !item.propertyName && !item.isTypeOnly), 'Import aliases forbidden')
       fixtureImports++
     }
-    if (ts.isImportEqualsDeclaration(node) || ts.isExportDeclaration(node) || ts.isNewExpression(node) || ts.isTaggedTemplateExpression(node) || ts.isElementAccessExpression(node) || ts.isDeleteExpression(node) || ts.isClassDeclaration(node) || ts.isWithStatement(node)) throw new Error(`Execution escape: ${file}`)
+    if (ts.isImportEqualsDeclaration(node) || ts.isExportDeclaration(node) || ts.isNewExpression(node) || ts.isTaggedTemplateExpression(node) || ts.isElementAccessExpression(node) || ts.isDeleteExpression(node) || ts.isClassDeclaration(node) || ts.isClassExpression(node) || ts.isFunctionExpression(node) || ts.isWithStatement(node) || ts.isModuleDeclaration(node) || ts.isEnumDeclaration(node) || ts.isForInStatement(node) || ts.isForOfStatement(node)) throw new Error(`Execution escape: ${file}`)
     if (ts.isIdentifier(node) && ['eval', 'Function', 'process', 'require', 'globalThis', 'window', 'document', 'navigator', 'fetch', 'setTimeout', 'setInterval', 'WebSocket', 'Worker', 'Proxy', 'Reflect'].includes(node.text)) throw new Error(`Forbidden global ${node.text}: ${file}`)
+    if (ts.isIdentifier(node) && ['constructor', 'prototype', '__proto__'].includes(node.text)) throw new Error(`Forbidden reflective identifier ${node.text}: ${file}`)
     if (ts.isPropertyAccessExpression(node) && ['constructor', 'prototype', '__proto__'].includes(node.name.text)) throw new Error(`Forbidden reflective property ${node.name.text}: ${file}`)
     if (ts.isCatchClause(node)) throw new Error(`Error swallowing forbidden: ${file}`)
     if (ts.isBinaryExpression(node) && node.operatorToken.kind >= ts.SyntaxKind.FirstAssignment && node.operatorToken.kind <= ts.SyntaxKind.LastAssignment) throw new Error(`Assignment forbidden: ${file}`)
     if ((ts.isPrefixUnaryExpression(node) || ts.isPostfixUnaryExpression(node)) && [ts.SyntaxKind.PlusPlusToken, ts.SyntaxKind.MinusMinusToken].includes(node.operator)) throw new Error(`Mutation forbidden: ${file}`)
     if (ts.isVariableDeclaration(node) && node.initializer && (name(node.initializer).startsWith('expect') || name(node.initializer).startsWith('test'))) throw new Error(`API alias forbidden: ${file}`)
     if ((ts.isParameter(node) || ts.isVariableDeclaration(node) || ts.isFunctionDeclaration(node)) && ts.isIdentifier(node.name) && reservedBindings.has(node.name.text)) {
-      const allowedPage = node.name.text === 'page' && ts.isParameter(node) && ts.isObjectBindingPattern(node.parent.name) &&
-        node.parent.name.elements.length === 1 && node.parent.name.elements[0] === node
+      const allowedPage = node.name.text === 'page' && ts.isParameter(node) && approvedPageParameters.has(node)
       if (!allowedPage) throw new Error(`Fixture/API shadowing forbidden: ${file}`)
     }
     if (ts.isBindingElement(node) && ts.isIdentifier(node.name) && reservedBindings.has(node.name.text)) {
-      const allowedPage = node.name.text === 'page' && ts.isParameter(node.parent.parent) &&
-        ts.isObjectBindingPattern(node.parent.parent.name) && node.parent.parent.name.elements.length === 1 &&
-        node.parent.parent.name.elements[0] === node && !node.propertyName && !node.initializer
+      const allowedPage = node.name.text === 'page' && approvedPageBindings.has(node) && !node.propertyName && !node.initializer
       if (!allowedPage) throw new Error(`Fixture/API shadowing forbidden: ${file}`)
     }
     if (ts.isBindingElement(node) && node.propertyName) throw new Error(`Destructuring alias forbidden: ${file}`)
     if (ts.isCallExpression(node)) {
       const path = name(node.expression), parts = path.split('.'), root = parts[0]
+      const locators = locatorScopes.get(testScope(node))
       if (ts.isCallExpression(node.expression)) throw new Error(`Calling a value returned by another call is forbidden: ${file}`)
       if (path === 'test') fixtureCallback(node.arguments[1], { required: true })
       else if (path === 'test.describe') {
@@ -147,7 +213,7 @@ export function checkOrdinarySource(file, source) {
       if (path === 'test' || path === 'expect' || path === 'expect.poll') return
       if (root === 'test' && parts.length === 2 && testMethods.has(parts[1])) return
       if (root === 'expect' && parts.slice(1).every(part => part === 'poll' || part === 'not' || expectationMethods.has(part))) return
-      if (locators.has(root) && parts.length > 1 && parts.slice(1).every(part => locatorMethods.has(part))) {
+      if (locators?.has(root) && parts.length > 1 && parts.slice(1).every(part => locatorMethods.has(part))) {
         if (parts.at(-1) === 'goto') assert.ok(/^\/(?!\/)/.test(textLiteral(node.arguments[0]) ?? ''), 'Only static fixture-relative navigation permitted')
         return
       }
