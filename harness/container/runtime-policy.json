@@ -6,7 +6,7 @@
   "chromium": "159.0.8154.6",
   "node_major": 26,
   "user": "pwuser",
-  "capabilities": ["SYS_CHROOT"],
+  "capabilities": ["CAP_SYS_CHROOT"],
   "cpus": 2,
   "memory_bytes": 4294967296,
   "pids": 512,

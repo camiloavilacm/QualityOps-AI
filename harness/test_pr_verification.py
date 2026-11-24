@@ -24,7 +24,7 @@ def inspection(tests, evidence):
     return {"Config": {"User": "pwuser"}, "HostConfig": {
         "NetworkMode": "none", "ReadonlyRootfs": True, "Privileged": False, "Memory": 4294967296,
         "MemorySwap": 4294967296, "NanoCpus": 2000000000, "PidsLimit": 512, "ShmSize": 1073741824,
-        "IpcMode": "private", "CapAdd": ["SYS_CHROOT"], "CapDrop": ["ALL"],
+        "IpcMode": "private", "CapAdd": ["CAP_SYS_CHROOT"], "CapDrop": ["ALL"],
         "SecurityOpt": ["no-new-privileges=true", "seccomp={reviewed-profile}"]},
         "Mounts": [{"Type": "bind", "Source": str(tests), "Destination": "/opt/qualityops/frontend/tests", "RW": False},
                    {"Type": "bind", "Source": str(evidence), "Destination": "/evidence", "RW": True}]}
