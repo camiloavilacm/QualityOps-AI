@@ -14,8 +14,14 @@ export async function probe() {
   demand(process.platform === 'linux' && process.arch === 'x64', 'wrong platform')
   demand(process.getuid() > 0 && os.userInfo().username === 'pwuser', 'nonroot pwuser required')
   const status = fs.readFileSync('/proc/self/status', 'utf8')
-  const effectiveCaps = status.match(/^CapEff:\s+([0-9a-f]+)$/mi)?.[1]
-  demand(effectiveCaps && BigInt(`0x${effectiveCaps}`) === (1n << 18n), 'capability set differs from SYS_CHROOT only')
+  const capMask = field => {
+    const value = status.match(new RegExp(`^${field}:\\s+([0-9a-f]+)$`, 'mi'))?.[1]
+    demand(value, `${field} missing`)
+    return BigInt(`0x${value}`)
+  }
+  demand(capMask('CapEff') === 0n && capMask('CapPrm') === 0n && capMask('CapAmb') === 0n,
+    'effective, permitted, or ambient capabilities present')
+  demand(capMask('CapBnd') === (1n << 18n), 'capability bounding set differs from CAP_SYS_CHROOT only')
   demand(/^NoNewPrivs:\s+1$/m.test(status), 'no-new-privileges missing')
   demand(/^Seccomp:\s+2$/m.test(status), 'seccomp filter missing')
   deniedWrite('/opt/qualityops/frontend/.isolation-probe')
@@ -60,6 +66,7 @@ export async function probe() {
     })
   })
   return { result: 'PASS', uid: process.getuid(), user: os.userInfo().username, limits, checks: ['temporary/evidence writes', 'loopback fixture',
-    'read-only sources/tests/bundle', 'SYS_CHROOT only', 'no new privileges', 'seccomp',
+    'read-only sources/tests/bundle', 'no effective/permitted/ambient capabilities',
+    'CAP_SYS_CHROOT bounding set only', 'no new privileges', 'seccomp',
     'credential/socket absence', 'external connection denied'] }
 }

@@ -313,12 +313,12 @@
       {
         "command": "restricted unshare --user --map-root-user /usr/bin/id",
         "result": "PASS",
-        "detail": "Unprivileged user namespace creation works."
+        "detail": "Unprivileged user namespace creation works; resulting process reports CapEff=0, CapPrm=0, CapAmb=0, CapBnd=0x40000."
       },
       {
         "command": "restricted unshare --user --map-root-user chroot /tmp/qroot /usr/bin/id",
         "result": "FAIL",
-        "detail": "chroot returned EPERM, matching Chromium failure."
+        "detail": "Even in that user namespace, chroot returned EPERM without capability bounding-set allowance."
       },
       {
         "command": "Playwright chromium.launch({headless:true,chromiumSandbox:true}) with CAP_SYS_CHROOT only",
@@ -326,7 +326,7 @@
         "detail": "Chromium 159.0.8154.6 launched and closed under otherwise matching restrictions."
       }
     ],
-    "policy": "Drop ALL capabilities, then add SYS_CHROOT only. Isolation probe and Docker inspect validation require the exact capability.",
-    "follow_up_bootstrap": "NOT RUN yet; requires immutable commit of approved policy update."
+    "policy": "Drop ALL capabilities, add CAP_SYS_CHROOT only to the bounding set; probe requires effective, permitted, and ambient sets to be empty and bounding set exactly 0x40000.",
+    "follow_up_bootstrap": "BLOCKED at isolation probe because only CapBnd (not CapEff) carries SYS_CHROOT; probe is being corrected to enforce that least-privilege boundary."
   }
 }
