@@ -1,3 +1,5 @@
 /.DS_Store
 /QualityOps-AI/
 /.venv/
+__pycache__/
+*.pyc

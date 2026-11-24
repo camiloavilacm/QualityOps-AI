@@ -84,3 +84,8 @@ Use the same local campaign inspection for the interface comparison. Pin browser
 | WebMCP | Exercise a fixture-only campaign summary tool registered by the page. Verify discovery, valid and invalid inputs, and agreement with the displayed summary. Both browser interfaces can exercise the page capability. |
 
 Record completion and input/output tokens for matched CLI and MCP runs. Mark token use **unmeasured** when telemetry is unavailable. See the [CLI and MCP comparison](https://github.com/microsoft/playwright-mcp#playwright-mcp-vs-playwright-cli) and [Playwright v1.64 WebMCP release notes](https://playwright.dev/docs/release-notes#version-164).
+
+### Staged Release Plan v6 (PR Verification, Agent Harness, Guardrails & WebMCP)
+
+The frozen implementation specification for PR verification guardrails, context error guards, AST allowlisting, paired mutation canary, and native WebMCP is documented in [docs/pr-verification-webmcp-harness-plan.md](docs/pr-verification-webmcp-harness-plan.md).
+
