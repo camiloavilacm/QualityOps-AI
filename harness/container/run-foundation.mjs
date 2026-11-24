@@ -72,7 +72,7 @@ try {
     ['hygiene-chromium-webmcp-lifecycle', ['node', 'scripts/check_test_hygiene.mjs', '--project=chromium-webmcp-lifecycle', '--report', '/evidence/lifecycle/report.json'],
       { env: { PW_HYGIENE_OUTPUT_DIR: '/evidence/hygiene/chromium-webmcp-lifecycle' } }],
     ['canary', ['node', 'scripts/check_canary_regression.mjs', '--output', '/evidence/canary'],
-      { env: { TMPDIR: '/evidence' } }],
+      { env: { TMPDIR: '/canary-tmp' } }],
   ]
   result = 'PASS'
   for (const [name, argv, options] of steps) {

@@ -243,6 +243,7 @@ def docker_arguments(name, image, tests, evidence, seccomp, policy, verifier_rev
             "--cpus", "2", "--memory", "4294967296", "--memory-swap", "4294967296",
             "--pids-limit", "512", "--ipc", "private", "--shm-size", "1073741824",
             "--tmpfs", "/tmp:rw,nosuid,nodev,size=1073741824,mode=1777",
+            "--tmpfs", "/canary-tmp:rw,exec,nosuid,nodev,size=536870912,mode=1777",
             "--mount", f"type=bind,src={tests},dst=/opt/qualityops/frontend/tests,readonly",
             "--mount", f"type=bind,src={evidence},dst=/evidence",
             image]
@@ -258,6 +259,8 @@ def verify_inspection(info, policy, tests, evidence):
     if (config.get("User") != "pwuser" or host.get("CapAdd") != ["CAP_SYS_CHROOT"]
             or host.get("CapDrop") != ["ALL"]):
         raise Blocked("unexpected user or capabilities")
+    if host.get("Tmpfs", {}).get("/canary-tmp") != "rw,exec,nosuid,nodev,size=536870912,mode=1777":
+        raise Blocked("canary workspace must use its bounded executable tmpfs")
     security = host.get("SecurityOpt", [])
     if not any(value in {"no-new-privileges", "no-new-privileges=true"} for value in security) or not any(
             value.startswith("seccomp=") and value != "seccomp=unconfined" for value in security):

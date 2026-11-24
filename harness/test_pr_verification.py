@@ -26,6 +26,7 @@ def inspection(tests, evidence):
         "NetworkMode": "none", "ReadonlyRootfs": True, "Privileged": False, "Memory": 4294967296,
         "MemorySwap": 4294967296, "NanoCpus": 2000000000, "PidsLimit": 512, "ShmSize": 1073741824,
         "IpcMode": "private", "CapAdd": ["CAP_SYS_CHROOT"], "CapDrop": ["ALL"],
+        "Tmpfs": {"/canary-tmp": "rw,exec,nosuid,nodev,size=536870912,mode=1777"},
         "SecurityOpt": ["no-new-privileges=true", "seccomp={reviewed-profile}"]},
         "Mounts": [{"Type": "bind", "Source": str(tests), "Destination": "/opt/qualityops/frontend/tests", "RW": False},
                    {"Type": "bind", "Source": str(evidence), "Destination": "/evidence", "RW": True}]}
@@ -162,6 +163,7 @@ class IsolationConfigurationTests(unittest.TestCase):
         self.assertNotIn('--privileged', argv)
         self.assertFalse(any(value.startswith(('AWS_', 'GITHUB_', '--env-file')) for value in argv))
         self.assertIn('type=bind,src=/tmp/tests,dst=/opt/qualityops/frontend/tests,readonly', argv)
+        self.assertIn('/canary-tmp:rw,exec,nosuid,nodev,size=536870912,mode=1777', argv)
 
     def test_missing_report_and_symlink_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
