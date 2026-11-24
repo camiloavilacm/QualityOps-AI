@@ -71,7 +71,7 @@ try {
       { env: { PW_HYGIENE_OUTPUT_DIR: '/evidence/hygiene/chromium-guard-meta' } }],
     ['hygiene-chromium-webmcp-lifecycle', ['node', 'scripts/check_test_hygiene.mjs', '--project=chromium-webmcp-lifecycle', '--report', '/evidence/lifecycle/report.json'],
       { env: { PW_HYGIENE_OUTPUT_DIR: '/evidence/hygiene/chromium-webmcp-lifecycle' } }],
-    ['canary', ['node', 'scripts/check_canary_regression.mjs', '--output=/evidence/canary']],
+    ['canary', ['node', 'scripts/check_canary_regression.mjs', '--output', '/evidence/canary']],
   ]
   result = 'PASS'
   for (const [name, argv, options] of steps) {
@@ -82,6 +82,6 @@ try {
 } finally {
   write('/evidence/foundation.json', { result, commands: records,
     limitations: ['Bootstrap evidence requires independent review and SHA-bound human acceptance.',
-      'Stage 2 hygiene/canary, Stage 3 red-team, Stage 4 summaries are not implemented in this slice.'] })
+      'Stage 3 red-team and Stage 4 summaries are not implemented in this slice.'] })
 }
 process.exitCode = result === 'PASS' ? 0 : 1
