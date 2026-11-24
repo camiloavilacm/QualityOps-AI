@@ -53,23 +53,22 @@ argument support evidence under `/evidence`; internal preview uses IPv4 loopback
 and a strict port. Tests use one worker and zero retries. There is no Stage 2
 hygiene/canary or Stage 4 summary-tool acceptance in this foundation.
 
-Container acceptance remains **BLOCKED** on Docker's extracted-image storage.
-The user freed 21 GiB and Docker starts; the 10 GiB preparation prerequisite
-remains, while free disk capacity is no longer the observed blocker. The pinned
-`6802…` layer pull digest failure was resolved through an exact, verified OCI
-import. Stopped-container diagnostics still expose `/usr/bin/node` as zero bytes,
-including after reloading only the task-created image. The independently verified
-upstream `a41…` layer contains a 150,348,872-byte Node binary with SHA-256
-`d931c649850ffa7155b8ceffb400dc916ef325866e509cc52ae36e33e8fbb9a9`.
+The initial container attempts were blocked by corrupted extracted-image storage and
+then Chromium's sandbox failing at `chroot` with an empty capability bounding set.
+Docker was restarted from an empty image/container/volume store, and the pinned AMD64
+image was freshly pulled. Apple Virtualization Framework and Rosetta were already
+enabled. The approved runner now retains only `CAP_SYS_CHROOT` in the capability
+bounding set; effective, permitted, and ambient capabilities remain empty, and
+Chromium sandboxing stays enabled.
 
-No verification container has executed successfully. Docker storage repair or a
-clean local Linux daemon is needed before retrying; these observations do not
-establish an inherent Rosetta limitation. See the persistent [runtime summary](../harness/artifacts/container-continuation-004/publication/summary.json),
-[stopped-container diagnostic](../harness/artifacts/base-runtime-probe-restored/diagnostic.json),
-and [verified OCI archive record](../harness/artifacts/image-preparation/full-archive-verification.json).
-The [container runner instructions](../harness/container/README.md) retain the
-preparation and acceptance requirements.
-
+The approved Stage 1 container gate **PASS** at verifier SHA
+`06a50ab582e1e9b6c19254964603df534b4794cd`: 8 ordinary passes, two guard controls
+and six correctly attributed guard failures, and four lifecycle passes. The
+accepted rerun evidence is in [the runtime summary](../harness/artifacts/container-accepted-stage1/summary.json)
+and [published report](../harness/artifacts/container-accepted-stage1/publication/summary.json).
+Stages 2–4 and remote R12/R14 checks remain NOT RUN; this is not merge or deployment
+authorization. See the [container runner instructions](../harness/container/README.md)
+for the exact policy and reproduction command.
 The installed local package commands are `npm run pw -- <arguments>`,
 `npm run typecheck`, `npm run build`, and `npm run test:e2e -- --reporter=json`.
 The ordinary project retains the eight original dashboard test titles/assertions;

@@ -1,0 +1,162 @@
+{
+  "result": "PASS",
+  "commands": [
+    {
+      "name": "probe",
+      "command": [
+        "node",
+        "scripts/probe_webmcp.mjs",
+        "--output",
+        "/evidence/probe.json"
+      ],
+      "cwd": "/opt/qualityops/frontend",
+      "exit_code": 0,
+      "signal": null,
+      "timeout": false,
+      "environment": {
+        "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "HOME": "/tmp/qualityops-home",
+        "TMPDIR": "/tmp",
+        "CI": "1",
+        "PLAYWRIGHT_BROWSERS_PATH": "/ms-playwright",
+        "PW_OUTPUT_DIR": "/evidence/e2e/test-results",
+        "PLAYWRIGHT_HTML_OPEN": "never"
+      },
+      "output_limit": false,
+      "duration_ms": 6202,
+      "result": "PASS"
+    },
+    {
+      "name": "typecheck",
+      "command": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "cwd": "/opt/qualityops/frontend",
+      "exit_code": 0,
+      "signal": null,
+      "timeout": false,
+      "environment": {
+        "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "HOME": "/tmp/qualityops-home",
+        "TMPDIR": "/tmp",
+        "CI": "1",
+        "PLAYWRIGHT_BROWSERS_PATH": "/ms-playwright",
+        "PW_OUTPUT_DIR": "/evidence/e2e/test-results",
+        "PLAYWRIGHT_HTML_OPEN": "never"
+      },
+      "output_limit": false,
+      "duration_ms": 4590,
+      "result": "PASS"
+    },
+    {
+      "name": "discovery",
+      "command": [
+        "node",
+        "node_modules/@playwright/test/cli.js",
+        "test",
+        "--project=chromium",
+        "--list",
+        "--reporter=json"
+      ],
+      "cwd": "/opt/qualityops/frontend",
+      "exit_code": 0,
+      "signal": null,
+      "timeout": false,
+      "environment": {
+        "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "HOME": "/tmp/qualityops-home",
+        "TMPDIR": "/tmp",
+        "CI": "1",
+        "PLAYWRIGHT_BROWSERS_PATH": "/ms-playwright",
+        "PW_OUTPUT_DIR": "/evidence/e2e/test-results",
+        "PLAYWRIGHT_HTML_OPEN": "never"
+      },
+      "output_limit": false,
+      "duration_ms": 1249,
+      "result": "PASS"
+    },
+    {
+      "name": "e2e",
+      "command": [
+        "node",
+        "node_modules/@playwright/test/cli.js",
+        "test",
+        "--project=chromium",
+        "--reporter=json"
+      ],
+      "cwd": "/opt/qualityops/frontend",
+      "exit_code": 0,
+      "signal": null,
+      "timeout": false,
+      "environment": {
+        "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "HOME": "/tmp/qualityops-home",
+        "TMPDIR": "/tmp",
+        "CI": "1",
+        "PLAYWRIGHT_BROWSERS_PATH": "/ms-playwright",
+        "PW_OUTPUT_DIR": "/evidence/e2e/test-results",
+        "PLAYWRIGHT_HTML_OPEN": "never",
+        "PLAYWRIGHT_JSON_OUTPUT_FILE": "/evidence/e2e/report.json"
+      },
+      "output_limit": false,
+      "duration_ms": 23490,
+      "result": "PASS"
+    },
+    {
+      "name": "guard",
+      "command": [
+        "node",
+        "scripts/test_guard_fixture.mjs",
+        "--report",
+        "/evidence/guard/report.json"
+      ],
+      "cwd": "/opt/qualityops/frontend",
+      "exit_code": 0,
+      "signal": null,
+      "timeout": false,
+      "environment": {
+        "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "HOME": "/tmp/qualityops-home",
+        "TMPDIR": "/tmp",
+        "CI": "1",
+        "PLAYWRIGHT_BROWSERS_PATH": "/ms-playwright",
+        "PW_OUTPUT_DIR": "/evidence/e2e/test-results",
+        "PLAYWRIGHT_HTML_OPEN": "never"
+      },
+      "output_limit": false,
+      "duration_ms": 41192,
+      "result": "PASS"
+    },
+    {
+      "name": "lifecycle",
+      "command": [
+        "node",
+        "scripts/test_webmcp_lifecycle.mjs",
+        "--report",
+        "/evidence/lifecycle/report.json"
+      ],
+      "cwd": "/opt/qualityops/frontend",
+      "exit_code": 0,
+      "signal": null,
+      "timeout": false,
+      "environment": {
+        "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "HOME": "/tmp/qualityops-home",
+        "TMPDIR": "/tmp",
+        "CI": "1",
+        "PLAYWRIGHT_BROWSERS_PATH": "/ms-playwright",
+        "PW_OUTPUT_DIR": "/evidence/e2e/test-results",
+        "PLAYWRIGHT_HTML_OPEN": "never"
+      },
+      "output_limit": false,
+      "duration_ms": 9380,
+      "result": "PASS"
+    }
+  ],
+  "limitations": [
+    "Bootstrap evidence requires independent review and SHA-bound human acceptance.",
+    "Stage 2 hygiene/canary, Stage 3 red-team, Stage 4 summaries are not implemented in this slice."
+  ]
+}

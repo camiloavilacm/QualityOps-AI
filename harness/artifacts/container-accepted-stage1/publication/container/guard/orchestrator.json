@@ -1,0 +1,120 @@
+{
+  "status": "PASS",
+  "commands": [
+    {
+      "command": [
+        "node_modules/@playwright/test/cli.js",
+        "test",
+        "--project=chromium-guard-meta",
+        "--list",
+        "--reporter=json"
+      ],
+      "exit_code": 0,
+      "timedOut": false,
+      "output": "Listing tests:\n  [chromium-guard-meta] › meta/guard-verification.spec.ts:3:1 › clean-page\n  [chromium-guard-meta] › meta/guard-verification.spec.ts:7:1 › uncaught-js-error\n  [chromium-guard-meta] › meta/guard-verification.spec.ts:12:1 › console-error\n  [chromium-guard-meta] › meta/guard-verification.spec.ts:16:1 › same-origin-404\n  [chromium-guard-meta] › meta/guard-verification.spec.ts:20:1 › same-origin-500\n  [chromium-guard-meta] › meta/guard-verification.spec.ts:24:1 › request-failed\n  [chromium-guard-meta] › meta/guard-verification.spec.ts:28:1 › second-tab-error\n  [chromium-guard-meta] › meta/guard-verification.spec.ts:35:1 › navigation-abort\nTotal: 8 tests in 1 file\n"
+    },
+    {
+      "command": [
+        "node_modules/@playwright/test/cli.js",
+        "test",
+        "--project=chromium-guard-meta",
+        "--reporter=json"
+      ],
+      "exit_code": 1,
+      "timedOut": false,
+      "output": "\nRunning 8 tests using 1 worker\n\n[1/8] [chromium-guard-meta] › tests/meta/guard-verification.spec.ts:3:1 › clean-page\n[2/8] [chromium-guard-meta] › tests/meta/guard-verification.spec.ts:7:1 › uncaught-js-error\n  1) [chromium-guard-meta] › tests/meta/guard-verification.spec.ts:7:1 › uncaught-js-error ─────────\n\n    Error: DASHBOARD_GUARD UNCAUGHT_JS_ERROR\n\n    expect(received).toEqual(expected) // deep equality\n\n    - Expected  - 1\n    + Received  + 3\n\n    - Array []\n    + Array [\n    +   \"UNCAUGHT_JS_ERROR\",\n    + ]\n\n       at fixtures/dashboard.ts:46\n\n      44 |       if (overflow) codes.push('DIAGNOSTIC_LIMIT')\n      45 |       await testInfo.attach('guard-diagnostics', { body: JSON.stringify({ codes }), contentType: 'application/json' })\n    > 46 |       expect(codes, `DASHBOARD_GUARD ${codes.join(',')}`).toEqual([])\n         |                                                           ^\n      47 |     }\n      48 |   }, { auto: true }],\n      49 | })\n        at Object.base.extend.guardErrors.auto (/opt/qualityops/frontend/tests/fixtures/dashboard.ts:46:59)\n\n    Error Context: ../../../evidence/guard/test-results/meta-guard-verification-uncaught-js-error-chromium-guard-meta/error-context.md\n\n    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────\n    ../../../evidence/guard/test-results/meta-guard-verification-uncaught-js-error-chromium-guard-meta/trace.zip\n    Usage:\n\n        npx playwright show-trace ../../../evidence/guard/test-results/meta-guard-verification-uncaught-js-error-chromium-guard-meta/trace.zip\n\n    ────────────────────────────────────────────────────────────────────────────────────────────────\n\n\n[3/8] [chromium-guard-meta] › tests/meta/guard-verification.spec.ts:12:1 › console-error\n  2) [chromium-guard-meta] › tests/meta/guard-verification.spec.ts:12:1 › console-error ────────────\n\n    Error: DASHBOARD_GUARD CONSOLE_ERROR\n\n    expect(received).toEqual(expected) // deep equality\n\n    - Expected  - 1\n    + Received  + 3\n\n    - Array []\n    + Array [\n    +   \"CONSOLE_ERROR\",\n    + ]\n\n       at fixtures/dashboard.ts:46\n\n      44 |       if (overflow) codes.push('DIAGNOSTIC_LIMIT')\n      45 |       await testInfo.attach('guard-diagnostics', { body: JSON.stringify({ codes }), contentType: 'application/json' })\n    > 46 |       expect(codes, `DASHBOARD_GUARD ${codes.join(',')}`).toEqual([])\n         |                                                           ^\n      47 |     }\n      48 |   }, { auto: true }],\n      49 | })\n        at Object.base.extend.guardErrors.auto (/opt/qualityops/frontend/tests/fixtures/dashboard.ts:46:59)\n\n    Error Context: ../../../evidence/guard/test-results/meta-guard-verification-console-error-chromium-guard-meta/error-context.md\n\n    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────\n    ../../../evidence/guard/test-results/meta-guard-verification-console-error-chromium-guard-meta/trace.zip\n    Usage:\n\n        npx playwright show-trace ../../../evidence/guard/test-results/meta-guard-verification-console-error-chromium-guard-meta/trace.zip\n\n    ────────────────────────────────────────────────────────────────────────────────────────────────\n\n\n[4/8] [chromium-guard-meta] › tests/meta/guard-verification.spec.ts:16:1 › same-origin-404\n  3) [chromium-guard-meta] › tests/meta/guard-verification.spec.ts:16:1 › same-origin-404 ──────────\n\n    Error: DASHBOARD_GUARD HTTP_404,CONSOLE_ERROR\n\n    expect(received).toEqual(expected) // deep equality\n\n    - Expected  - 1\n    + Received  + 4\n\n    - Array []\n    + Array [\n    +   \"HTTP_404\",\n    +   \"CONSOLE_ERROR\",\n    + ]\n\n       at fixtures/dashboard.ts:46\n\n      44 |       if (overflow) codes.push('DIAGNOSTIC_LIMIT')\n      45 |       await testInfo.attach('guard-diagnostics', { body: JSON.stringify({ codes }), contentType: 'application/json' })\n    > 46 |       expect(codes, `DASHBOARD_GUARD ${codes.join(',')}`).toEqual([])\n         |                                                           ^\n      47 |     }\n      48 |   }, { auto: true }],\n      49 | })\n        at Object.base.extend.guardErrors.auto (/opt/qualityops/frontend/tests/fixtures/dashboard.ts:46:59)\n\n    Error Context: ../../../evidence/guard/test-results/meta-guard-verification-same-origin-404-chromium-guard-meta/error-context.md\n\n    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────\n    ../../../evidence/guard/test-results/meta-guard-verification-same-origin-404-chromium-guard-meta/trace.zip\n    Usage:\n\n        npx playwright show-trace ../../../evidence/guard/test-results/meta-guard-verification-same-origin-404-chromium-guard-meta/trace.zip\n\n    ────────────────────────────────────────────────────────────────────────────────────────────────\n\n\n[5/8] [chromium-guard-meta] › tests/meta/guard-verification.spec.ts:20:1 › same-origin-500\n  4) [chromium-guard-meta] › tests/meta/guard-verification.spec.ts:20:1 › same-origin-500 ──────────\n\n    Error: DASHBOARD_GUARD HTTP_500,CONSOLE_ERROR\n\n    expect(received).toEqual(expected) // deep equality\n\n    - Expected  - 1\n    + Received  + 4\n\n    - Array []\n    + Array [\n    +   \"HTTP_500\",\n    +   \"CONSOLE_ERROR\",\n    + ]\n\n       at fixtures/dashboard.ts:46\n\n      44 |       if (overflow) codes.push('DIAGNOSTIC_LIMIT')\n      45 |       await testInfo.attach('guard-diagnostics', { body: JSON.stringify({ codes }), contentType: 'application/json' })\n    > 46 |       expect(codes, `DASHBOARD_GUARD ${codes.join(',')}`).toEqual([])\n         |                                                           ^\n      47 |     }\n      48 |   }, { auto: true }],\n      49 | })\n        at Object.base.extend.guardErrors.auto (/opt/qualityops/frontend/tests/fixtures/dashboard.ts:46:59)\n\n    Error Context: ../../../evidence/guard/test-results/meta-guard-verification-same-origin-500-chromium-guard-meta/error-context.md\n\n    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────\n    ../../../evidence/guard/test-results/meta-guard-verification-same-origin-500-chromium-guard-meta/trace.zip\n    Usage:\n\n        npx playwright show-trace ../../../evidence/guard/test-results/meta-guard-verification-same-origin-500-chromium-guard-meta/trace.zip\n\n    ────────────────────────────────────────────────────────────────────────────────────────────────\n\n\n[6/8] [chromium-guard-meta] › tests/meta/guard-verification.spec.ts:24:1 › request-failed\n  5) [chromium-guard-meta] › tests/meta/guard-verification.spec.ts:24:1 › request-failed ───────────\n\n    Error: DASHBOARD_GUARD REQUEST_FAILED,CONSOLE_ERROR\n\n    expect(received).toEqual(expected) // deep equality\n\n    - Expected  - 1\n    + Received  + 4\n\n    - Array []\n    + Array [\n    +   \"REQUEST_FAILED\",\n    +   \"CONSOLE_ERROR\",\n    + ]\n\n       at fixtures/dashboard.ts:46\n\n      44 |       if (overflow) codes.push('DIAGNOSTIC_LIMIT')\n      45 |       await testInfo.attach('guard-diagnostics', { body: JSON.stringify({ codes }), contentType: 'application/json' })\n    > 46 |       expect(codes, `DASHBOARD_GUARD ${codes.join(',')}`).toEqual([])\n         |                                                           ^\n      47 |     }\n      48 |   }, { auto: true }],\n      49 | })\n        at Object.base.extend.guardErrors.auto (/opt/qualityops/frontend/tests/fixtures/dashboard.ts:46:59)\n\n    Error Context: ../../../evidence/guard/test-results/meta-guard-verification-request-failed-chromium-guard-meta/error-context.md\n\n    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────\n    ../../../evidence/guard/test-results/meta-guard-verification-request-failed-chromium-guard-meta/trace.zip\n    Usage:\n\n        npx playwright show-trace ../../../evidence/guard/test-results/meta-guard-verification-request-failed-chromium-guard-meta/trace.zip\n\n    ────────────────────────────────────────────────────────────────────────────────────────────────\n\n\n[7/8] [chromium-guard-meta] › tests/meta/guard-verification.spec.ts:28:1 › second-tab-error\n  6) [chromium-guard-meta] › tests/meta/guard-verification.spec.ts:28:1 › second-tab-error ─────────\n\n    Error: DASHBOARD_GUARD UNCAUGHT_JS_ERROR\n\n    expect(received).toEqual(expected) // deep equality\n\n    - Expected  - 1\n    + Received  + 3\n\n    - Array []\n    + Array [\n    +   \"UNCAUGHT_JS_ERROR\",\n    + ]\n\n       at fixtures/dashboard.ts:46\n\n      44 |       if (overflow) codes.push('DIAGNOSTIC_LIMIT')\n      45 |       await testInfo.attach('guard-diagnostics', { body: JSON.stringify({ codes }), contentType: 'application/json' })\n    > 46 |       expect(codes, `DASHBOARD_GUARD ${codes.join(',')}`).toEqual([])\n         |                                                           ^\n      47 |     }\n      48 |   }, { auto: true }],\n      49 | })\n        at Object.base.extend.guardErrors.auto (/opt/qualityops/frontend/tests/fixtures/dashboard.ts:46:59)\n\n    Error Context: ../../../evidence/guard/test-results/meta-guard-verification-second-tab-error-chromium-guard-meta/error-context.md\n\n    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────\n    ../../../evidence/guard/test-results/meta-guard-verification-second-tab-error-chromium-guard-meta/trace.zip\n    Usage:\n\n        npx playwright show-trace ../../../evidence/guard/test-results/meta-guard-verification-second-tab-error-chromium-guard-meta/trace.zip\n\n    ────────────────────────────────────────────────────────────────────────────────────────────────\n\n\n[8/8] [chromium-guard-meta] › tests/meta/guard-verification.spec.ts:35:1 › navigation-abort\n  6 failed\n    [chromium-guard-meta] › tests/meta/guard-verification.spec.ts:7:1 › uncaught-js-error ──────────\n    [chromium-guard-meta] › tests/meta/guard-verification.spec.ts:12:1 › console-error ─────────────\n    [chromium-guard-meta] › tests/meta/guard-verification.spec.ts:16:1 › same-origin-404 ───────────\n    [chromium-guard-meta] › tests/meta/guard-verification.spec.ts:20:1 › same-origin-500 ───────────\n    [chromium-guard-meta] › tests/meta/guard-verification.spec.ts:24:1 › request-failed ────────────\n    [chromium-guard-meta] › tests/meta/guard-verification.spec.ts:28:1 › second-tab-error ──────────\n  2 passed (38.5s)\n"
+    }
+  ],
+  "cases": {
+    "clean-page": null,
+    "uncaught-js-error": "UNCAUGHT_JS_ERROR",
+    "console-error": "CONSOLE_ERROR",
+    "same-origin-404": "HTTP_404",
+    "same-origin-500": "HTTP_500",
+    "request-failed": "REQUEST_FAILED",
+    "second-tab-error": "UNCAUGHT_JS_ERROR",
+    "navigation-abort": null
+  },
+  "inventory": [
+    {
+      "title": "clean-page",
+      "file": "meta/guard-verification.spec.ts",
+      "titlePath": [
+        "meta/guard-verification.spec.ts",
+        "clean-page"
+      ],
+      "projectName": "chromium-guard-meta",
+      "status": "expected"
+    },
+    {
+      "title": "uncaught-js-error",
+      "file": "meta/guard-verification.spec.ts",
+      "titlePath": [
+        "meta/guard-verification.spec.ts",
+        "uncaught-js-error"
+      ],
+      "projectName": "chromium-guard-meta",
+      "status": "unexpected"
+    },
+    {
+      "title": "console-error",
+      "file": "meta/guard-verification.spec.ts",
+      "titlePath": [
+        "meta/guard-verification.spec.ts",
+        "console-error"
+      ],
+      "projectName": "chromium-guard-meta",
+      "status": "unexpected"
+    },
+    {
+      "title": "same-origin-404",
+      "file": "meta/guard-verification.spec.ts",
+      "titlePath": [
+        "meta/guard-verification.spec.ts",
+        "same-origin-404"
+      ],
+      "projectName": "chromium-guard-meta",
+      "status": "unexpected"
+    },
+    {
+      "title": "same-origin-500",
+      "file": "meta/guard-verification.spec.ts",
+      "titlePath": [
+        "meta/guard-verification.spec.ts",
+        "same-origin-500"
+      ],
+      "projectName": "chromium-guard-meta",
+      "status": "unexpected"
+    },
+    {
+      "title": "request-failed",
+      "file": "meta/guard-verification.spec.ts",
+      "titlePath": [
+        "meta/guard-verification.spec.ts",
+        "request-failed"
+      ],
+      "projectName": "chromium-guard-meta",
+      "status": "unexpected"
+    },
+    {
+      "title": "second-tab-error",
+      "file": "meta/guard-verification.spec.ts",
+      "titlePath": [
+        "meta/guard-verification.spec.ts",
+        "second-tab-error"
+      ],
+      "projectName": "chromium-guard-meta",
+      "status": "unexpected"
+    },
+    {
+      "title": "navigation-abort",
+      "file": "meta/guard-verification.spec.ts",
+      "titlePath": [
+        "meta/guard-verification.spec.ts",
+        "navigation-abort"
+      ],
+      "projectName": "chromium-guard-meta",
+      "status": "expected"
+    }
+  ]
+}

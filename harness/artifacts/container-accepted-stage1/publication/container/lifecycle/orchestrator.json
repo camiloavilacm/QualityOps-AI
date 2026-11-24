@@ -1,0 +1,70 @@
+{
+  "status": "PASS",
+  "commands": [
+    {
+      "command": [
+        "node_modules/@playwright/test/cli.js",
+        "test",
+        "--project=chromium-webmcp-lifecycle",
+        "--list",
+        "--reporter=json"
+      ],
+      "exit_code": 0,
+      "timedOut": false,
+      "output": "Listing tests:\n  [chromium-webmcp-lifecycle] › meta/webmcp-lifecycle.spec.ts:17:1 › unsupported environment preserves dashboard\n  [chromium-webmcp-lifecycle] › meta/webmcp-lifecycle.spec.ts:24:1 › duplicate initialization registers tools once\n  [chromium-webmcp-lifecycle] › meta/webmcp-lifecycle.spec.ts:34:1 › second-registration failure rolls back first\n  [chromium-webmcp-lifecycle] › meta/webmcp-lifecycle.spec.ts:44:1 › disposal unregisters tools and permits reinitialization\nTotal: 4 tests in 1 file\n"
+    },
+    {
+      "command": [
+        "node_modules/@playwright/test/cli.js",
+        "test",
+        "--project=chromium-webmcp-lifecycle",
+        "--reporter=json"
+      ],
+      "exit_code": 0,
+      "timedOut": false,
+      "output": "\nRunning 4 tests using 1 worker\n\n[1/4] [chromium-webmcp-lifecycle] › tests/meta/webmcp-lifecycle.spec.ts:17:1 › unsupported environment preserves dashboard\n[2/4] [chromium-webmcp-lifecycle] › tests/meta/webmcp-lifecycle.spec.ts:24:1 › duplicate initialization registers tools once\n[3/4] [chromium-webmcp-lifecycle] › tests/meta/webmcp-lifecycle.spec.ts:34:1 › second-registration failure rolls back first\n[4/4] [chromium-webmcp-lifecycle] › tests/meta/webmcp-lifecycle.spec.ts:44:1 › disposal unregisters tools and permits reinitialization\n  4 passed (6.9s)\n"
+    }
+  ],
+  "inventory": [
+    {
+      "title": "unsupported environment preserves dashboard",
+      "file": "meta/webmcp-lifecycle.spec.ts",
+      "titlePath": [
+        "meta/webmcp-lifecycle.spec.ts",
+        "unsupported environment preserves dashboard"
+      ],
+      "projectName": "chromium-webmcp-lifecycle",
+      "status": "expected"
+    },
+    {
+      "title": "duplicate initialization registers tools once",
+      "file": "meta/webmcp-lifecycle.spec.ts",
+      "titlePath": [
+        "meta/webmcp-lifecycle.spec.ts",
+        "duplicate initialization registers tools once"
+      ],
+      "projectName": "chromium-webmcp-lifecycle",
+      "status": "expected"
+    },
+    {
+      "title": "second-registration failure rolls back first",
+      "file": "meta/webmcp-lifecycle.spec.ts",
+      "titlePath": [
+        "meta/webmcp-lifecycle.spec.ts",
+        "second-registration failure rolls back first"
+      ],
+      "projectName": "chromium-webmcp-lifecycle",
+      "status": "expected"
+    },
+    {
+      "title": "disposal unregisters tools and permits reinitialization",
+      "file": "meta/webmcp-lifecycle.spec.ts",
+      "titlePath": [
+        "meta/webmcp-lifecycle.spec.ts",
+        "disposal unregisters tools and permits reinitialization"
+      ],
+      "projectName": "chromium-webmcp-lifecycle",
+      "status": "expected"
+    }
+  ]
+}

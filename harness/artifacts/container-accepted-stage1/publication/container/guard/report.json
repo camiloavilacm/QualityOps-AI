@@ -1,0 +1,709 @@
+{
+  "config": {
+    "argv": [
+      "/usr/bin/node",
+      "/opt/qualityops/frontend/node_modules/@playwright/test/cli.js",
+      "test",
+      "--project=chromium-guard-meta",
+      "--reporter=json"
+    ],
+    "configFile": "/opt/qualityops/frontend/playwright.config.ts",
+    "rootDir": "/opt/qualityops/frontend/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": true,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 240000,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/evidence/guard/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/opt/qualityops/frontend/tests",
+        "testIgnore": [
+          "/meta\\//",
+          "/webmcp\\.spec\\.ts$/"
+        ],
+        "testMatch": [
+          "/(?:seed|mixed-campaign|dashboard-flows)\\.spec\\.ts$/"
+        ],
+        "timeout": 20000
+      },
+      {
+        "outputDir": "/evidence/guard/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium-guard-meta",
+        "name": "chromium-guard-meta",
+        "testDir": "/opt/qualityops/frontend/tests",
+        "testIgnore": [
+          "/webmcp/"
+        ],
+        "testMatch": [
+          "/meta\\/guard-verification\\.spec\\.ts$/"
+        ],
+        "timeout": 20000
+      },
+      {
+        "outputDir": "/evidence/guard/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium-webmcp",
+        "name": "chromium-webmcp",
+        "testDir": "/opt/qualityops/frontend/tests",
+        "testIgnore": [
+          "/meta\\//"
+        ],
+        "testMatch": [
+          "/tests\\/webmcp\\.spec\\.ts$/"
+        ],
+        "timeout": 20000
+      },
+      {
+        "outputDir": "/evidence/guard/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium-webmcp-lifecycle",
+        "name": "chromium-webmcp-lifecycle",
+        "testDir": "/opt/qualityops/frontend/tests",
+        "testIgnore": [
+          "/guard-verification/"
+        ],
+        "testMatch": [
+          "/meta\\/webmcp-lifecycle\\.spec\\.ts$/"
+        ],
+        "timeout": 20000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/evidence/guard/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "chromium-guard-meta",
+        "testDir": "/opt/qualityops/frontend/tests",
+        "snapshotDir": "/opt/qualityops/frontend/tests",
+        "testIgnore": [
+          {}
+        ],
+        "testMatch": {},
+        "timeout": 20000,
+        "use": {
+          "baseURL": "http://127.0.0.1:43833",
+          "actionTimeout": 5000,
+          "trace": "retain-on-failure",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/159.0.8154.6 Safari/537.36",
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          },
+          "screen": {
+            "width": 1920,
+            "height": 1080
+          },
+          "deviceScaleFactor": 1,
+          "isMobile": false,
+          "hasTouch": false,
+          "defaultBrowserType": "chromium",
+          "channel": "chromium",
+          "launchOptions": {
+            "chromiumSandbox": true,
+            "args": [
+              "--enable-features=WebMCP"
+            ]
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "chromium-guard-meta"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.65.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "meta/guard-verification.spec.ts",
+      "file": "meta/guard-verification.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "clean-page",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 20000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-guard-meta",
+              "projectName": "chromium-guard-meta",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2473,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-24T15:13:36.710Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "guard-diagnostics",
+                      "contentType": "application/json",
+                      "body": "eyJjb2RlcyI6W119"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "97f9fe7bb3dfb8355838-d60e7805c507d9cc8f8b",
+          "file": "meta/guard-verification.spec.ts",
+          "line": 3,
+          "column": 1
+        },
+        {
+          "title": "uncaught-js-error",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 20000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-guard-meta",
+              "projectName": "chromium-guard-meta",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 1689,
+                  "error": {
+                    "message": "Error: DASHBOARD_GUARD UNCAUGHT_JS_ERROR\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"UNCAUGHT_JS_ERROR\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+                    "stack": "Error: DASHBOARD_GUARD UNCAUGHT_JS_ERROR\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"UNCAUGHT_JS_ERROR\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at Object.base.extend.guardErrors.auto (/opt/qualityops/frontend/tests/fixtures/dashboard.ts:46:59)",
+                    "location": {
+                      "file": "/opt/qualityops/frontend/tests/fixtures/dashboard.ts",
+                      "column": 59,
+                      "line": 46
+                    },
+                    "snippet": "   at fixtures/dashboard.ts:46\n\n  44 |       if (overflow) codes.push('DIAGNOSTIC_LIMIT')\n  45 |       await testInfo.attach('guard-diagnostics', { body: JSON.stringify({ codes }), contentType: 'application/json' })\n> 46 |       expect(codes, `DASHBOARD_GUARD ${codes.join(',')}`).toEqual([])\n     |                                                           ^\n  47 |     }\n  48 |   }, { auto: true }],\n  49 | })"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/opt/qualityops/frontend/tests/fixtures/dashboard.ts",
+                        "column": 59,
+                        "line": 46
+                      },
+                      "message": "Error: DASHBOARD_GUARD UNCAUGHT_JS_ERROR\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"UNCAUGHT_JS_ERROR\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\n   at fixtures/dashboard.ts:46\n\n  44 |       if (overflow) codes.push('DIAGNOSTIC_LIMIT')\n  45 |       await testInfo.attach('guard-diagnostics', { body: JSON.stringify({ codes }), contentType: 'application/json' })\n> 46 |       expect(codes, `DASHBOARD_GUARD ${codes.join(',')}`).toEqual([])\n     |                                                           ^\n  47 |     }\n  48 |   }, { auto: true }],\n  49 | })\n    at Object.base.extend.guardErrors.auto (/opt/qualityops/frontend/tests/fixtures/dashboard.ts:46:59)"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-24T15:13:40.384Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "guard-diagnostics",
+                      "contentType": "application/json",
+                      "body": "eyJjb2RlcyI6WyJVTkNBVUdIVF9KU19FUlJPUiJdfQ=="
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/evidence/guard/test-results/meta-guard-verification-uncaught-js-error-chromium-guard-meta/error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/evidence/guard/test-results/meta-guard-verification-uncaught-js-error-chromium-guard-meta/trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/opt/qualityops/frontend/tests/fixtures/dashboard.ts",
+                    "column": 59,
+                    "line": 46
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "97f9fe7bb3dfb8355838-e5e248072ea1afe5d5e6",
+          "file": "meta/guard-verification.spec.ts",
+          "line": 7,
+          "column": 1
+        },
+        {
+          "title": "console-error",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 20000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-guard-meta",
+              "projectName": "chromium-guard-meta",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 2393,
+                  "error": {
+                    "message": "Error: DASHBOARD_GUARD CONSOLE_ERROR\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"CONSOLE_ERROR\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+                    "stack": "Error: DASHBOARD_GUARD CONSOLE_ERROR\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"CONSOLE_ERROR\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at Object.base.extend.guardErrors.auto (/opt/qualityops/frontend/tests/fixtures/dashboard.ts:46:59)",
+                    "location": {
+                      "file": "/opt/qualityops/frontend/tests/fixtures/dashboard.ts",
+                      "column": 59,
+                      "line": 46
+                    },
+                    "snippet": "   at fixtures/dashboard.ts:46\n\n  44 |       if (overflow) codes.push('DIAGNOSTIC_LIMIT')\n  45 |       await testInfo.attach('guard-diagnostics', { body: JSON.stringify({ codes }), contentType: 'application/json' })\n> 46 |       expect(codes, `DASHBOARD_GUARD ${codes.join(',')}`).toEqual([])\n     |                                                           ^\n  47 |     }\n  48 |   }, { auto: true }],\n  49 | })"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/opt/qualityops/frontend/tests/fixtures/dashboard.ts",
+                        "column": 59,
+                        "line": 46
+                      },
+                      "message": "Error: DASHBOARD_GUARD CONSOLE_ERROR\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"CONSOLE_ERROR\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\n   at fixtures/dashboard.ts:46\n\n  44 |       if (overflow) codes.push('DIAGNOSTIC_LIMIT')\n  45 |       await testInfo.attach('guard-diagnostics', { body: JSON.stringify({ codes }), contentType: 'application/json' })\n> 46 |       expect(codes, `DASHBOARD_GUARD ${codes.join(',')}`).toEqual([])\n     |                                                           ^\n  47 |     }\n  48 |   }, { auto: true }],\n  49 | })\n    at Object.base.extend.guardErrors.auto (/opt/qualityops/frontend/tests/fixtures/dashboard.ts:46:59)"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-24T15:13:43.152Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "guard-diagnostics",
+                      "contentType": "application/json",
+                      "body": "eyJjb2RlcyI6WyJDT05TT0xFX0VSUk9SIl19"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/evidence/guard/test-results/meta-guard-verification-console-error-chromium-guard-meta/error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/evidence/guard/test-results/meta-guard-verification-console-error-chromium-guard-meta/trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/opt/qualityops/frontend/tests/fixtures/dashboard.ts",
+                    "column": 59,
+                    "line": 46
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "97f9fe7bb3dfb8355838-0182030a8824804fe563",
+          "file": "meta/guard-verification.spec.ts",
+          "line": 12,
+          "column": 1
+        },
+        {
+          "title": "same-origin-404",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 20000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-guard-meta",
+              "projectName": "chromium-guard-meta",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 3531,
+                  "error": {
+                    "message": "Error: DASHBOARD_GUARD HTTP_404,CONSOLE_ERROR\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 4\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"HTTP_404\",\u001b[39m\n\u001b[31m+   \"CONSOLE_ERROR\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+                    "stack": "Error: DASHBOARD_GUARD HTTP_404,CONSOLE_ERROR\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 4\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"HTTP_404\",\u001b[39m\n\u001b[31m+   \"CONSOLE_ERROR\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at Object.base.extend.guardErrors.auto (/opt/qualityops/frontend/tests/fixtures/dashboard.ts:46:59)",
+                    "location": {
+                      "file": "/opt/qualityops/frontend/tests/fixtures/dashboard.ts",
+                      "column": 59,
+                      "line": 46
+                    },
+                    "snippet": "   at fixtures/dashboard.ts:46\n\n  44 |       if (overflow) codes.push('DIAGNOSTIC_LIMIT')\n  45 |       await testInfo.attach('guard-diagnostics', { body: JSON.stringify({ codes }), contentType: 'application/json' })\n> 46 |       expect(codes, `DASHBOARD_GUARD ${codes.join(',')}`).toEqual([])\n     |                                                           ^\n  47 |     }\n  48 |   }, { auto: true }],\n  49 | })"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/opt/qualityops/frontend/tests/fixtures/dashboard.ts",
+                        "column": 59,
+                        "line": 46
+                      },
+                      "message": "Error: DASHBOARD_GUARD HTTP_404,CONSOLE_ERROR\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 4\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"HTTP_404\",\u001b[39m\n\u001b[31m+   \"CONSOLE_ERROR\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\n   at fixtures/dashboard.ts:46\n\n  44 |       if (overflow) codes.push('DIAGNOSTIC_LIMIT')\n  45 |       await testInfo.attach('guard-diagnostics', { body: JSON.stringify({ codes }), contentType: 'application/json' })\n> 46 |       expect(codes, `DASHBOARD_GUARD ${codes.join(',')}`).toEqual([])\n     |                                                           ^\n  47 |     }\n  48 |   }, { auto: true }],\n  49 | })\n    at Object.base.extend.guardErrors.auto (/opt/qualityops/frontend/tests/fixtures/dashboard.ts:46:59)"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-24T15:13:47.642Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "guard-diagnostics",
+                      "contentType": "application/json",
+                      "body": "eyJjb2RlcyI6WyJIVFRQXzQwNCIsIkNPTlNPTEVfRVJST1IiXX0="
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/evidence/guard/test-results/meta-guard-verification-same-origin-404-chromium-guard-meta/error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/evidence/guard/test-results/meta-guard-verification-same-origin-404-chromium-guard-meta/trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/opt/qualityops/frontend/tests/fixtures/dashboard.ts",
+                    "column": 59,
+                    "line": 46
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "97f9fe7bb3dfb8355838-5a692846ec114ee7f67d",
+          "file": "meta/guard-verification.spec.ts",
+          "line": 16,
+          "column": 1
+        },
+        {
+          "title": "same-origin-500",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 20000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-guard-meta",
+              "projectName": "chromium-guard-meta",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 2911,
+                  "error": {
+                    "message": "Error: DASHBOARD_GUARD HTTP_500,CONSOLE_ERROR\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 4\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"HTTP_500\",\u001b[39m\n\u001b[31m+   \"CONSOLE_ERROR\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+                    "stack": "Error: DASHBOARD_GUARD HTTP_500,CONSOLE_ERROR\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 4\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"HTTP_500\",\u001b[39m\n\u001b[31m+   \"CONSOLE_ERROR\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at Object.base.extend.guardErrors.auto (/opt/qualityops/frontend/tests/fixtures/dashboard.ts:46:59)",
+                    "location": {
+                      "file": "/opt/qualityops/frontend/tests/fixtures/dashboard.ts",
+                      "column": 59,
+                      "line": 46
+                    },
+                    "snippet": "   at fixtures/dashboard.ts:46\n\n  44 |       if (overflow) codes.push('DIAGNOSTIC_LIMIT')\n  45 |       await testInfo.attach('guard-diagnostics', { body: JSON.stringify({ codes }), contentType: 'application/json' })\n> 46 |       expect(codes, `DASHBOARD_GUARD ${codes.join(',')}`).toEqual([])\n     |                                                           ^\n  47 |     }\n  48 |   }, { auto: true }],\n  49 | })"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/opt/qualityops/frontend/tests/fixtures/dashboard.ts",
+                        "column": 59,
+                        "line": 46
+                      },
+                      "message": "Error: DASHBOARD_GUARD HTTP_500,CONSOLE_ERROR\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 4\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"HTTP_500\",\u001b[39m\n\u001b[31m+   \"CONSOLE_ERROR\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\n   at fixtures/dashboard.ts:46\n\n  44 |       if (overflow) codes.push('DIAGNOSTIC_LIMIT')\n  45 |       await testInfo.attach('guard-diagnostics', { body: JSON.stringify({ codes }), contentType: 'application/json' })\n> 46 |       expect(codes, `DASHBOARD_GUARD ${codes.join(',')}`).toEqual([])\n     |                                                           ^\n  47 |     }\n  48 |   }, { auto: true }],\n  49 | })\n    at Object.base.extend.guardErrors.auto (/opt/qualityops/frontend/tests/fixtures/dashboard.ts:46:59)"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-24T15:13:53.406Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "guard-diagnostics",
+                      "contentType": "application/json",
+                      "body": "eyJjb2RlcyI6WyJIVFRQXzUwMCIsIkNPTlNPTEVfRVJST1IiXX0="
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/evidence/guard/test-results/meta-guard-verification-same-origin-500-chromium-guard-meta/error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/evidence/guard/test-results/meta-guard-verification-same-origin-500-chromium-guard-meta/trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/opt/qualityops/frontend/tests/fixtures/dashboard.ts",
+                    "column": 59,
+                    "line": 46
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "97f9fe7bb3dfb8355838-fae2aac0f86af7838a2f",
+          "file": "meta/guard-verification.spec.ts",
+          "line": 20,
+          "column": 1
+        },
+        {
+          "title": "request-failed",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 20000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-guard-meta",
+              "projectName": "chromium-guard-meta",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 3539,
+                  "error": {
+                    "message": "Error: DASHBOARD_GUARD REQUEST_FAILED,CONSOLE_ERROR\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 4\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"REQUEST_FAILED\",\u001b[39m\n\u001b[31m+   \"CONSOLE_ERROR\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+                    "stack": "Error: DASHBOARD_GUARD REQUEST_FAILED,CONSOLE_ERROR\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 4\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"REQUEST_FAILED\",\u001b[39m\n\u001b[31m+   \"CONSOLE_ERROR\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at Object.base.extend.guardErrors.auto (/opt/qualityops/frontend/tests/fixtures/dashboard.ts:46:59)",
+                    "location": {
+                      "file": "/opt/qualityops/frontend/tests/fixtures/dashboard.ts",
+                      "column": 59,
+                      "line": 46
+                    },
+                    "snippet": "   at fixtures/dashboard.ts:46\n\n  44 |       if (overflow) codes.push('DIAGNOSTIC_LIMIT')\n  45 |       await testInfo.attach('guard-diagnostics', { body: JSON.stringify({ codes }), contentType: 'application/json' })\n> 46 |       expect(codes, `DASHBOARD_GUARD ${codes.join(',')}`).toEqual([])\n     |                                                           ^\n  47 |     }\n  48 |   }, { auto: true }],\n  49 | })"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/opt/qualityops/frontend/tests/fixtures/dashboard.ts",
+                        "column": 59,
+                        "line": 46
+                      },
+                      "message": "Error: DASHBOARD_GUARD REQUEST_FAILED,CONSOLE_ERROR\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 4\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"REQUEST_FAILED\",\u001b[39m\n\u001b[31m+   \"CONSOLE_ERROR\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\n   at fixtures/dashboard.ts:46\n\n  44 |       if (overflow) codes.push('DIAGNOSTIC_LIMIT')\n  45 |       await testInfo.attach('guard-diagnostics', { body: JSON.stringify({ codes }), contentType: 'application/json' })\n> 46 |       expect(codes, `DASHBOARD_GUARD ${codes.join(',')}`).toEqual([])\n     |                                                           ^\n  47 |     }\n  48 |   }, { auto: true }],\n  49 | })\n    at Object.base.extend.guardErrors.auto (/opt/qualityops/frontend/tests/fixtures/dashboard.ts:46:59)"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-24T15:13:58.692Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "guard-diagnostics",
+                      "contentType": "application/json",
+                      "body": "eyJjb2RlcyI6WyJSRVFVRVNUX0ZBSUxFRCIsIkNPTlNPTEVfRVJST1IiXX0="
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/evidence/guard/test-results/meta-guard-verification-request-failed-chromium-guard-meta/error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/evidence/guard/test-results/meta-guard-verification-request-failed-chromium-guard-meta/trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/opt/qualityops/frontend/tests/fixtures/dashboard.ts",
+                    "column": 59,
+                    "line": 46
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "97f9fe7bb3dfb8355838-30ba53ef713d9a69e894",
+          "file": "meta/guard-verification.spec.ts",
+          "line": 24,
+          "column": 1
+        },
+        {
+          "title": "second-tab-error",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 20000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-guard-meta",
+              "projectName": "chromium-guard-meta",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 3736,
+                  "error": {
+                    "message": "Error: DASHBOARD_GUARD UNCAUGHT_JS_ERROR\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"UNCAUGHT_JS_ERROR\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+                    "stack": "Error: DASHBOARD_GUARD UNCAUGHT_JS_ERROR\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"UNCAUGHT_JS_ERROR\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at Object.base.extend.guardErrors.auto (/opt/qualityops/frontend/tests/fixtures/dashboard.ts:46:59)",
+                    "location": {
+                      "file": "/opt/qualityops/frontend/tests/fixtures/dashboard.ts",
+                      "column": 59,
+                      "line": 46
+                    },
+                    "snippet": "   at fixtures/dashboard.ts:46\n\n  44 |       if (overflow) codes.push('DIAGNOSTIC_LIMIT')\n  45 |       await testInfo.attach('guard-diagnostics', { body: JSON.stringify({ codes }), contentType: 'application/json' })\n> 46 |       expect(codes, `DASHBOARD_GUARD ${codes.join(',')}`).toEqual([])\n     |                                                           ^\n  47 |     }\n  48 |   }, { auto: true }],\n  49 | })"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/opt/qualityops/frontend/tests/fixtures/dashboard.ts",
+                        "column": 59,
+                        "line": 46
+                      },
+                      "message": "Error: DASHBOARD_GUARD UNCAUGHT_JS_ERROR\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"UNCAUGHT_JS_ERROR\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\n   at fixtures/dashboard.ts:46\n\n  44 |       if (overflow) codes.push('DIAGNOSTIC_LIMIT')\n  45 |       await testInfo.attach('guard-diagnostics', { body: JSON.stringify({ codes }), contentType: 'application/json' })\n> 46 |       expect(codes, `DASHBOARD_GUARD ${codes.join(',')}`).toEqual([])\n     |                                                           ^\n  47 |     }\n  48 |   }, { auto: true }],\n  49 | })\n    at Object.base.extend.guardErrors.auto (/opt/qualityops/frontend/tests/fixtures/dashboard.ts:46:59)"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-24T15:14:04.592Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "guard-diagnostics",
+                      "contentType": "application/json",
+                      "body": "eyJjb2RlcyI6WyJVTkNBVUdIVF9KU19FUlJPUiJdfQ=="
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/evidence/guard/test-results/meta-guard-verification-second-tab-error-chromium-guard-meta/error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/evidence/guard/test-results/meta-guard-verification-second-tab-error-chromium-guard-meta/trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/opt/qualityops/frontend/tests/fixtures/dashboard.ts",
+                    "column": 59,
+                    "line": 46
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "97f9fe7bb3dfb8355838-300a8b7b5d8900c0e4bd",
+          "file": "meta/guard-verification.spec.ts",
+          "line": 28,
+          "column": 1
+        },
+        {
+          "title": "navigation-abort",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 20000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-guard-meta",
+              "projectName": "chromium-guard-meta",
+              "results": [
+                {
+                  "workerIndex": 6,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2421,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-24T15:14:10.658Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "guard-diagnostics",
+                      "contentType": "application/json",
+                      "body": "eyJjb2RlcyI6W119"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "97f9fe7bb3dfb8355838-369406566d38012dc99a",
+          "file": "meta/guard-verification.spec.ts",
+          "line": 35,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-24T15:13:35.755Z",
+    "duration": 38479.712999999996,
+    "expected": 2,
+    "skipped": 0,
+    "unexpected": 6,
+    "flaky": 0
+  }
+}

@@ -1,0 +1,254 @@
+{
+  "result": "PASS",
+  "stage": 1,
+  "verifier_revision": "06a50ab582e1e9b6c19254964603df534b4794cd",
+  "candidate_revision": "06a50ab582e1e9b6c19254964603df534b4794cd",
+  "commands": [
+    {
+      "command": [
+        "/usr/local/bin/docker",
+        "version",
+        "--format",
+        "{{.Server.Version}}"
+      ],
+      "cwd": "/Users/camiloavila/Documents/qualityops-ai",
+      "log": "command-00.log",
+      "result": "PASS",
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "/usr/local/bin/docker",
+        "build",
+        "--force-rm",
+        "--platform",
+        "linux/amd64",
+        "--iidfile",
+        "/var/folders/_3/10m7xtq97r916_mrqdcv241h0000gn/T/qualityops-container-cnio7m1j/image-id",
+        "-f",
+        "/var/folders/_3/10m7xtq97r916_mrqdcv241h0000gn/T/qualityops-container-cnio7m1j/context/harness/container/Dockerfile",
+        "/var/folders/_3/10m7xtq97r916_mrqdcv241h0000gn/T/qualityops-container-cnio7m1j/context"
+      ],
+      "cwd": "/Users/camiloavila/Documents/qualityops-ai",
+      "log": "command-01.log",
+      "result": "PASS",
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "/usr/local/bin/docker",
+        "create",
+        "--name",
+        "qualityops-verify-515262dd9498414cb3ff2590678d8ed8",
+        "--platform",
+        "linux/amd64",
+        "--user",
+        "pwuser",
+        "--network",
+        "none",
+        "--read-only",
+        "--cap-drop",
+        "ALL",
+        "--cap-add",
+        "CAP_SYS_CHROOT",
+        "--security-opt",
+        "no-new-privileges",
+        "--security-opt",
+        "seccomp=/var/folders/_3/10m7xtq97r916_mrqdcv241h0000gn/T/qualityops-container-cnio7m1j/context/harness/container/seccomp_profile.json",
+        "--cpus",
+        "2",
+        "--memory",
+        "4294967296",
+        "--memory-swap",
+        "4294967296",
+        "--pids-limit",
+        "512",
+        "--ipc",
+        "private",
+        "--shm-size",
+        "1073741824",
+        "--tmpfs",
+        "/tmp:rw,nosuid,nodev,size=1073741824,mode=1777",
+        "--mount",
+        "type=bind,src=/var/folders/_3/10m7xtq97r916_mrqdcv241h0000gn/T/qualityops-container-cnio7m1j/context/frontend/tests,dst=/opt/qualityops/frontend/tests,readonly",
+        "--mount",
+        "type=bind,src=/Users/camiloavila/Documents/qualityops-ai/harness/artifacts/container-accepted-stage1/container,dst=/evidence",
+        "sha256:bfe771e4f42e74df62851ef6a3234bad962e6e50c634b583888488a4c47e0172"
+      ],
+      "cwd": "/Users/camiloavila/Documents/qualityops-ai",
+      "log": "command-02.log",
+      "result": "PASS",
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "/usr/local/bin/docker",
+        "inspect",
+        "qualityops-verify-515262dd9498414cb3ff2590678d8ed8"
+      ],
+      "cwd": "/Users/camiloavila/Documents/qualityops-ai",
+      "log": "command-03.log",
+      "result": "PASS",
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "/usr/local/bin/docker",
+        "start",
+        "--attach",
+        "qualityops-verify-515262dd9498414cb3ff2590678d8ed8"
+      ],
+      "cwd": "/Users/camiloavila/Documents/qualityops-ai",
+      "log": "command-04.log",
+      "result": "PASS",
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "/usr/local/bin/docker",
+        "inspect",
+        "--format",
+        "{{json .State}}",
+        "qualityops-verify-515262dd9498414cb3ff2590678d8ed8"
+      ],
+      "cwd": "/Users/camiloavila/Documents/qualityops-ai",
+      "log": "command-05.log",
+      "result": "PASS",
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "node",
+        "/Users/camiloavila/Documents/qualityops-ai/harness/check_pr_reports.mjs",
+        "--project",
+        "chromium",
+        "--report",
+        "/Users/camiloavila/Documents/qualityops-ai/harness/artifacts/container-accepted-stage1/container/e2e/report.json"
+      ],
+      "cwd": "/Users/camiloavila/Documents/qualityops-ai",
+      "log": "command-06.log",
+      "result": "PASS",
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "node",
+        "/Users/camiloavila/Documents/qualityops-ai/harness/check_pr_reports.mjs",
+        "--project",
+        "chromium-guard-meta",
+        "--report",
+        "/Users/camiloavila/Documents/qualityops-ai/harness/artifacts/container-accepted-stage1/container/guard/report.json"
+      ],
+      "cwd": "/Users/camiloavila/Documents/qualityops-ai",
+      "log": "command-07.log",
+      "result": "PASS",
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "node",
+        "/Users/camiloavila/Documents/qualityops-ai/harness/check_pr_reports.mjs",
+        "--project",
+        "chromium-webmcp-lifecycle",
+        "--report",
+        "/Users/camiloavila/Documents/qualityops-ai/harness/artifacts/container-accepted-stage1/container/lifecycle/report.json"
+      ],
+      "cwd": "/Users/camiloavila/Documents/qualityops-ai",
+      "log": "command-08.log",
+      "result": "PASS",
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "node",
+        "/Users/camiloavila/Documents/qualityops-ai/harness/check_pr_reports.mjs",
+        "--project",
+        "chromium",
+        "--report",
+        "/Users/camiloavila/Documents/qualityops-ai/harness/artifacts/container-accepted-stage1/container/e2e/discovery.json",
+        "--discovery"
+      ],
+      "cwd": "/Users/camiloavila/Documents/qualityops-ai",
+      "log": "command-09.log",
+      "result": "PASS",
+      "exit_code": 0
+    }
+  ],
+  "remote": {
+    "R12": "NOT RUN",
+    "R14": "NOT RUN"
+  },
+  "trust": "No candidate result authorizes verifier acceptance or merge.",
+  "runtime_policy_sha256": "0aad2f0527f9ae11f071479d8ac280a554a068cfc07328c0c1d2819acb78bef1",
+  "base_image_digest": "mcr.microsoft.com/playwright@sha256:766137e2d9caad4744187e53cdc89320ba6f2eb57cff097374020944b44dd0a9",
+  "scope": {
+    "result": "PASS",
+    "verifier_revision": "06a50ab582e1e9b6c19254964603df534b4794cd",
+    "candidate_revision": "06a50ab582e1e9b6c19254964603df534b4794cd",
+    "changes": [],
+    "working_tree": "excluded; only immutable commit objects are inputs"
+  },
+  "acceptance_record_sha256": "c82db6b8ef55a101759b4e5b87ab16b0f058c0d76f0c4273581abfcdcb859e71",
+  "source_sha256": {
+    "frontend/AGENTS.md": "76d694e71dd24254181a15a1a3f6c17ef9bc9030cb9031751a6fe291a48bf44e",
+    "frontend/CLAUDE.md": "336cc4fbf19beaada7ccf9986414fa91851a8d7a07dfb3ccbe800a69eed0ab49",
+    "frontend/README.md": "4f441baf6b0248457c9bf8f351a784c88304492eb2fc670fe32e0303f5631c48",
+    "frontend/index.html": "9c6ed036d35cb41fe9ce081a4175811baf07da8fb42e71875a317d70a0bd7fa0",
+    "frontend/package-lock.json": "e4d54d2d6f07de39643b509bfbc952b0922619dce424a5107946a8a4498cf04b",
+    "frontend/package.json": "86f42db0a302258a3c91ad4bf4078b8e867db38b9cb566a9d78efdca3db54472",
+    "frontend/playwright.config.ts": "c5dfb1f27f3291da980b2a9a2e7e5e4b31d417e63f514df10220230259d258ef",
+    "frontend/scripts/export_mixed.py": "2d0435e1b1581e44687b1997511164dee3c646127f5ef1de8c3ca2187e40902f",
+    "frontend/scripts/export_showcase.py": "390a6c2a5b7828c285233e167380f59b9da8b11d1cf847ebe5730eba1634cc3f",
+    "frontend/scripts/foundation_report.mjs": "d41f80adde682e9f38912a3c61edfeee15a46bc17cea884d516fb459df8f0d00",
+    "frontend/scripts/probe_webmcp.mjs": "28ebd1b3ecd89e53b57a5e6ab61da8f9e6472edce2e930781526bb9d3714fdf1",
+    "frontend/scripts/test_guard_fixture.mjs": "171092935207c26e4769f9ea760e70a0dae7b77e2c922297dfe0e45a8506d695",
+    "frontend/scripts/test_webmcp_lifecycle.mjs": "a8b751b1712f1ff5386ff0fbb57004b54267e2647b63272549b3d2d5c8b8fbc2",
+    "frontend/specs/dashboard-plan.md": "9986881262fd099bd528cd8651f93e64723b3ec77957759dde162699c0dc5a29",
+    "frontend/src/live-evaluation.json": "e53d92f36ee701334a7583305e381845df65e2b66b8fe9caf906a124aff01975",
+    "frontend/src/main.tsx": "37db4ef6baf8b467a98675850b0c7a4776a850d4f3b36e7260ea2bbe5b1699a8",
+    "frontend/src/mixed-campaign.json": "1bdda5cadd7c835f08123d29af8c56eb51c7356cdd9153bd34c865c0c84f0662",
+    "frontend/src/showcase-export.json": "98f266bcc81ebfe35989d90a626ff71b396990b28f761c59b66829610cafe739",
+    "frontend/src/styles.css": "ee09b202dd94932478b8771dd93c987f5946633f777865a73dcc332dd63882f2",
+    "frontend/src/webmcp.ts": "394337a09bb4886a2b6dbe622bf67b9a7bc690d34de1c4edf4e11e413ccaa057",
+    "frontend/tests/dashboard-flows.spec.ts": "70676306a51abff07c9ccf41bb6776f23554a1779f625758c5461f0cfb44cad9",
+    "frontend/tests/fixtures/dashboard.ts": "7fa6431eef8ba73f51799c527a70dff33ee6707b841e2c640abad9be8c3fef2d",
+    "frontend/tests/meta/guard-verification.spec.ts": "545ab7554758adc4be0b41381414dbe696db825fcf29f33503f6c82abc42a5c9",
+    "frontend/tests/meta/webmcp-lifecycle.spec.ts": "4329198e602e0a7735db750b9f860016e094be6e7ca021f69e1c524e320559ba",
+    "frontend/tests/mixed-campaign.spec.ts": "480b627b2f15783b37a75176ea57717049373f6a5700b305992da4ac92fd20fa",
+    "frontend/tests/seed.spec.ts": "fe6490f940465436d048154c127da0b704af0863b9db8ddfc3d2bc42005a56a6",
+    "frontend/tsconfig.json": "e32d1b1e5d652c82450855f5502a74603a9d7f4f0e3bf9d0b21ce67f05f23fec",
+    "frontend/types/webmcp.d.ts": "1dd7e9c7fd57e1995f722fdcd1cd09ae87fe60e8548972c77dbd6f33d587ccfb",
+    "harness/container/Dockerfile": "88ca041dda538e78657a77c12f02d8688b79f364b453af2623473e06cf143acc",
+    "harness/container/README.md": "87133e2122913910a5323eb7fbd7d255b85942e8cf5e87f166632d7bbeea2599",
+    "harness/container/implementation-record.json": "1a7f561141177ad6138dc1925d7a08387f25b938ed5f1c5e084f9a5094b6c03e",
+    "harness/container/isolation-probe.mjs": "3e98257230d0c1f29a0f823ca8815c8462661b63e719de588b08a917f9130bb5",
+    "harness/container/run-foundation.mjs": "a66b4d9a6856517df81fe2ab040363a12bdb9664e22f011323dd03a5be422814",
+    "harness/container/runtime-policy.json": "0aad2f0527f9ae11f071479d8ac280a554a068cfc07328c0c1d2819acb78bef1",
+    "harness/container/seccomp_profile.json": "cc3e61cabda6bbc1e53e54d27ba4d55a9d3be829b6dd1a596f4a7b31b1cc7849"
+  },
+  "lockfile_sha256": "e4d54d2d6f07de39643b509bfbc952b0922619dce424a5107946a8a4498cf04b",
+  "built_image_digest": "sha256:bfe771e4f42e74df62851ef6a3234bad962e6e50c634b583888488a4c47e0172",
+  "executed_spec_sha256": {
+    "frontend/tests/dashboard-flows.spec.ts": "70676306a51abff07c9ccf41bb6776f23554a1779f625758c5461f0cfb44cad9",
+    "frontend/tests/meta/guard-verification.spec.ts": "545ab7554758adc4be0b41381414dbe696db825fcf29f33503f6c82abc42a5c9",
+    "frontend/tests/meta/webmcp-lifecycle.spec.ts": "4329198e602e0a7735db750b9f860016e094be6e7ca021f69e1c524e320559ba",
+    "frontend/tests/mixed-campaign.spec.ts": "480b627b2f15783b37a75176ea57717049373f6a5700b305992da4ac92fd20fa",
+    "frontend/tests/seed.spec.ts": "fe6490f940465436d048154c127da0b704af0863b9db8ddfc3d2bc42005a56a6"
+  },
+  "container_state": {
+    "Status": "exited",
+    "Running": false,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 0,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "2026-11-24T15:12:55.382931801Z",
+    "FinishedAt": "2026-11-24T15:14:23.713807801Z"
+  },
+  "cleanup": "PASS",
+  "duration_seconds": 91.576,
+  "artifact_collection": "PASS"
+}
