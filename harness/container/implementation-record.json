@@ -20,7 +20,7 @@
     "C_worktree": "/private/var/tmp/qualityops-container-continuation-c",
     "reviewer": "Read-only independent continuation review; persistent artifacts under harness/artifacts/continuation-review/"
   },
-  "status": "IMPLEMENTED FIRST SLICE; runtime acceptance BLOCKED by inconsistent local Docker extracted-image storage",
+  "status": "IMPLEMENTED FIRST SLICE; approved CAP_SYS_CHROOT policy update; fresh Stage 1 bootstrap pending",
   "host_runtime": {
     "node": "v26.13.1",
     "python": "Python 3.15.2",
@@ -156,19 +156,20 @@
   ],
   "container": {
     "result": "BLOCKED",
-    "preparation": "FAIL: pinned base artifact recovered, but trusted npm preparation exits133; a diagnostic sees empty executables in local image filesystem",
-    "execution": "NOT RUN: verification foundation/browser/isolation container has not executed",
+    "preparation": "PASS: exact pinned image was freshly pulled; verifier image built successfully",
+    "execution": "BLOCKED at Chromium launch under the original zero-capability policy; isolation probe passed",
     "diagnostic_execution": "Two bounded, credential-free, read-only base diagnostic containers exited133 and were removed successfully",
-    "reason": "Host now has sufficient free space and Docker is available. Independent downloads/OCI export verify original manifest, config and all7layer hashes; local extracted /usr/bin/node remains0bytes even after scoped removal/reload. The published Node file is150348872bytes with SHA d931c649850ffa7155b8ceffb400dc916ef325866e509cc52ae36e33e8fbb9a9. Docker storage repair or a clean local Linux daemon is required. No privileged/cache-wide repair or runtime-policy change performed.",
+    "reason": "Docker Desktop storage reset cleared the bad extracted image; fresh linux/amd64 Node probe passed. Chromium sandbox then failed at chroot with EPERM under zero capabilities. User approved the least-capability policy update, granting only CAP_SYS_CHROOT. A restricted diagnostic verified sandboxed Chromium 159 starts with that capability. The follow-up bootstrap against the new immutable commit is pending.",
     "image_build": "FAIL before a complete verifier image",
     "isolation_enforcement": "NOT RUN",
     "built_image_digest": null,
-    "latest_attempt_revision": "abfd2bbd189ef947744d79136670b5b1318b8744",
-    "latest_report": "harness/artifacts/container-continuation-004/publication/summary.json",
+    "latest_attempt_revision": "bd64dc3298143e9dc764500eff4eee6278826890",
+    "latest_report": "harness/artifacts/container-repair-bootstrap/publication/summary.json",
     "base_artifact_verification": "harness/artifacts/image-preparation/full-archive-verification.json",
     "upstream_node_verification": "harness/artifacts/continuation-review/upstream-layer-a41.json",
     "local_filesystem_diagnostic": "harness/artifacts/base-runtime-probe-restored/diagnostic.json",
-    "failed_build_container_cleanup": "harness/artifacts/continuation-checks/failed-preparation-cleanup.json"
+    "failed_build_container_cleanup": "harness/artifacts/continuation-checks/failed-preparation-cleanup.json",
+    "runtime_policy_sha256": "pending committed approved policy digest"
   },
   "later_acceptance": {
     "hygiene_and_canary": "NOT RUN; Stage 2 follow-up, separate trusted positive/mutated image builds required",
@@ -305,5 +306,27 @@
     "independent_review": "harness/artifacts/continuation-review/review-abfd2bbd.json",
     "historical_evidence": "Prior-turn /tmp artifacts were externally removed; historical checks above remain labeled as prior-run results. Current Python/export/component results and Docker diagnostics were captured anew under harness/artifacts/. Host browser8/8/4 results have not been rerun or relabeled as container results.",
     "required_next_step": "Repair Docker extracted-image storage or supply a clean local Linux daemon; rerun same pinned bootstrap; independent runtime review and exact-SHA human acceptance remain required."
+  },
+  "capability_followup": {
+    "approval": "Human approved CAP_SYS_CHROOT as the only added container capability.",
+    "diagnostics": [
+      {
+        "command": "restricted unshare --user --map-root-user /usr/bin/id",
+        "result": "PASS",
+        "detail": "Unprivileged user namespace creation works."
+      },
+      {
+        "command": "restricted unshare --user --map-root-user chroot /tmp/qroot /usr/bin/id",
+        "result": "FAIL",
+        "detail": "chroot returned EPERM, matching Chromium failure."
+      },
+      {
+        "command": "Playwright chromium.launch({headless:true,chromiumSandbox:true}) with CAP_SYS_CHROOT only",
+        "result": "PASS",
+        "detail": "Chromium 159.0.8154.6 launched and closed under otherwise matching restrictions."
+      }
+    ],
+    "policy": "Drop ALL capabilities, then add SYS_CHROOT only. Isolation probe and Docker inspect validation require the exact capability.",
+    "follow_up_bootstrap": "NOT RUN yet; requires immutable commit of approved policy update."
   }
 }

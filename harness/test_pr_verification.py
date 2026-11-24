@@ -24,7 +24,7 @@ def inspection(tests, evidence):
     return {"Config": {"User": "pwuser"}, "HostConfig": {
         "NetworkMode": "none", "ReadonlyRootfs": True, "Privileged": False, "Memory": 4294967296,
         "MemorySwap": 4294967296, "NanoCpus": 2000000000, "PidsLimit": 512, "ShmSize": 1073741824,
-        "IpcMode": "private", "CapAdd": None, "CapDrop": ["ALL"],
+        "IpcMode": "private", "CapAdd": ["SYS_CHROOT"], "CapDrop": ["ALL"],
         "SecurityOpt": ["no-new-privileges=true", "seccomp={reviewed-profile}"]},
         "Mounts": [{"Type": "bind", "Source": str(tests), "Destination": "/opt/qualityops/frontend/tests", "RW": False},
                    {"Type": "bind", "Source": str(evidence), "Destination": "/evidence", "RW": True}]}
@@ -137,7 +137,7 @@ class IsolationConfigurationTests(unittest.TestCase):
         verify_inspection(info, POLICY, tests, evidence)
         for key, value in [("NetworkMode", "host"), ("ReadonlyRootfs", False), ("Privileged", True),
                            ("Memory", 0), ("MemorySwap", -1), ("NanoCpus", 0), ("PidsLimit", 0),
-                           ("ShmSize", 0), ("IpcMode", "host"), ("CapAdd", ["SYS_ADMIN"]),
+                           ("ShmSize", 0), ("IpcMode", "host"), ("CapAdd", ["SYS_ADMIN"]), ("CapAdd", []),
                            ("CapDrop", []), ("SecurityOpt", ["seccomp=unconfined"])]:
             with self.subTest(key=key):
                 altered = copy.deepcopy(info); altered["HostConfig"][key] = value

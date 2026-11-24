@@ -14,7 +14,8 @@ export async function probe() {
   demand(process.platform === 'linux' && process.arch === 'x64', 'wrong platform')
   demand(process.getuid() > 0 && os.userInfo().username === 'pwuser', 'nonroot pwuser required')
   const status = fs.readFileSync('/proc/self/status', 'utf8')
-  demand(/^CapEff:\s+0+$/m.test(status), 'effective capabilities present')
+  const effectiveCaps = status.match(/^CapEff:\s+([0-9a-f]+)$/mi)?.[1]
+  demand(effectiveCaps && BigInt(`0x${effectiveCaps}`) === (1n << 18n), 'capability set differs from SYS_CHROOT only')
   demand(/^NoNewPrivs:\s+1$/m.test(status), 'no-new-privileges missing')
   demand(/^Seccomp:\s+2$/m.test(status), 'seccomp filter missing')
   deniedWrite('/opt/qualityops/frontend/.isolation-probe')
@@ -59,6 +60,6 @@ export async function probe() {
     })
   })
   return { result: 'PASS', uid: process.getuid(), user: os.userInfo().username, limits, checks: ['temporary/evidence writes', 'loopback fixture',
-    'read-only sources/tests/bundle', 'no capabilities', 'no new privileges', 'seccomp',
+    'read-only sources/tests/bundle', 'SYS_CHROOT only', 'no new privileges', 'seccomp',
     'credential/socket absence', 'external connection denied'] }
 }

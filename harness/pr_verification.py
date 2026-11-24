@@ -219,6 +219,7 @@ def docker_arguments(name, image, tests, evidence, seccomp, policy):
     # No candidate/environment-controlled flags, mounts, host networking or secrets.
     return ["create", "--name", name, "--platform", policy["platform"],
             "--user", "pwuser", "--network", "none", "--read-only", "--cap-drop", "ALL",
+            "--cap-add", "SYS_CHROOT",
             "--security-opt", "no-new-privileges", "--security-opt", "seccomp=" + str(seccomp),
             "--cpus", "2", "--memory", "4294967296", "--memory-swap", "4294967296",
             "--pids-limit", "512", "--ipc", "private", "--shm-size", "1073741824",
@@ -235,7 +236,8 @@ def verify_inspection(info, policy, tests, evidence):
                 "NanoCpus": 2000000000, "PidsLimit": 512, "ShmSize": 1073741824, "IpcMode": "private"}
     if any(host.get(key) != value for key, value in expected.items()):
         raise Blocked("Docker did not establish required isolation/resource configuration")
-    if config.get("User") != "pwuser" or host.get("CapAdd") or host.get("CapDrop") != ["ALL"]:
+    if (config.get("User") != "pwuser" or host.get("CapAdd") != ["SYS_CHROOT"]
+            or host.get("CapDrop") != ["ALL"]):
         raise Blocked("unexpected user or capabilities")
     security = host.get("SecurityOpt", [])
     if not any(value in {"no-new-privileges", "no-new-privileges=true"} for value in security) or not any(
