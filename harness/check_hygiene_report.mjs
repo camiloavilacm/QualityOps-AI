@@ -8,6 +8,7 @@ import { validateReport, readJson } from './check_pr_reports.mjs'
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const digest = bytes => crypto.createHash('sha256').update(bytes).digest('hex')
+const ordinarySpecs = new Set(['tests/seed.spec.ts', 'tests/mixed-campaign.spec.ts', 'tests/dashboard-flows.spec.ts'])
 function blob(revision, file) {
   if (!/^[0-9a-f]{40}$/.test(revision)) throw new Error('full immutable revision required')
   const resolved = execFileSync('git', ['rev-parse', '--verify', `${revision}^{commit}`], { cwd: repo, encoding: 'utf8' }).trim()
@@ -38,6 +39,12 @@ function expectedInventory(policy) {
     rows[project] = { state: 'pending-stage4', status: pending.status, count: pending.count, tests: [] }
   }
   return rows
+}
+
+export function sourceRevisionFor(project, file, verifierRevision, candidateRevision) {
+  if (!['chromium', 'chromium-guard-meta', 'chromium-webmcp-lifecycle'].includes(project))
+    throw new Error('source hash requested for a non-active project')
+  return ordinarySpecs.has(file) ? candidateRevision : verifierRevision
 }
 
 export function validateHygiene({ root, project, verifierRevision, candidateRevision, policy }) {
@@ -75,8 +82,7 @@ export function validateHygiene({ root, project, verifierRevision, candidateRevi
     throw new Error('observed source digest set mismatch')
   for (const file of expectedFiles) {
     const repositoryPath = `frontend/${file}`
-    const sourceRevision = project === 'chromium' && ['tests/seed.spec.ts','tests/mixed-campaign.spec.ts','tests/dashboard-flows.spec.ts'].includes(file)
-      ? candidateRevision : verifierRevision
+    const sourceRevision = sourceRevisionFor(project, file, verifierRevision, candidateRevision)
     if (hashes[file] !== digest(blob(sourceRevision, repositoryPath))) throw new Error(`observed source digest mismatch: ${file}`)
   }
   const discovery = load(root, `hygiene/${project}/${record.discovery}`)

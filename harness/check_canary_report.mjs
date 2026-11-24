@@ -72,6 +72,7 @@ export function validateCanary({ root, summaryPath, verifierRevision, candidateR
   const inputs = summary.inputs || {}
   if (inputs.source_revision !== verifierRevision || inputs.inventory_sha256 !== sha(commitBlob(verifierRevision, 'frontend/tests/expected-tests.json')) ||
       inputs.lockfile_sha256 !== sha(commitBlob(verifierRevision, 'frontend/package-lock.json')) ||
+      inputs.prepared_spec_sha256 !== sha(commitBlob(verifierRevision, `frontend/${expected.file}`)) ||
       inputs.spec_sha256 !== sha(commitBlob(candidateRevision, `frontend/${expected.file}`)))
     throw new Error('canary inputs do not match immutable verifier/candidate blobs')
 
@@ -127,6 +128,11 @@ export function validateCanary({ root, summaryPath, verifierRevision, candidateR
     const hashes = variant.bundle_sha256
     if (!hashes || !Object.keys(hashes).length || Object.values(hashes).some(x => !/^[0-9a-f]{64}$/.test(x)))
       throw new Error(`${name} bundle digest set missing or invalid`)
+    const builds = (variant.commands || []).slice(0, 2)
+    if (builds.length !== 2 || builds[0].command?.[1] !== 'node_modules/typescript/bin/tsc' ||
+        builds[1].command?.[1] !== 'node_modules/vite/bin/vite.js' ||
+        builds.some(item => item.exit_code !== 0 || item.timedOut !== false))
+      throw new Error(`${name} trusted positive/mutated build commands are missing or failed`)
   }
   if (equal(summary.variants.positive.bundle_sha256, summary.variants.mutated.bundle_sha256))
     throw new Error('canary bundle did not change after mutation')

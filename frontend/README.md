@@ -126,16 +126,16 @@ outside that directory are copied into it for durable publication. Without an
 output override, evidence uses a fresh temporary directory. Parent workflows and
 harness policy are read-only inputs, supplied by the trusted runner.
 
-Use `node scripts/check_canary_regression.mjs --output <fresh-directory>` for a
-custom canary output location. The default `npm run test:canary` uses
-`artifacts/canary`. It copies trusted prepared dependencies without installation,
-builds separate positive/mutated workspaces, requires free strict ports 4184 and
-4185, checks the rendered states independently, and executes exactly `DASH-003`
-once against each. Only the designated missing-evidence step can kill the mutant.
-`summary.json` records `PASS`/`KILLED` only for an attributed pair with successful
-cleanup; the mutated export snapshot and each discovery/execution report remain
-in that output directory. Set `PW_VERIFIER_REVISION` from the trusted launcher to
-bind the record to its verifier revision. Cleanup terminates only owned preview
-processes and removes only the two temporary copies. A single presentation mutant
-and static checks do not establish universal assertion correctness or authorize
-merge. Host diagnostic passes remain distinct from accepted container runs.
+The trusted Stage 2 image build prepares the positive and mutated bundles from
+verifier-owned sources, removes its temporary build copies, and stores both bundles
+read-only in the image. `npm run test:canary` serves those prepared bundles on free
+strict loopback ports 4184 and 4185, checks the rendered states independently, and
+executes exactly `DASH-003` once from the read-only approved test mount against
+each bundle. Runtime candidate code cannot rebuild or modify the bundles. Only the
+designated missing-evidence step can kill the mutant. Set
+`PW_CANARY_OUTPUT_DIR` to the trusted evidence mount; `summary.json` records
+`PASS`/`KILLED` only for an attributed pair with successful cleanup. The mutated
+export snapshot and each discovery/execution report remain in that output
+directory. A single presentation mutant and static checks do not establish
+universal assertion correctness or authorize merge. Host diagnostic passes remain
+distinct from accepted container runs.

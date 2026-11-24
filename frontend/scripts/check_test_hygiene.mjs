@@ -73,6 +73,19 @@ export function declarations(file, source) {
 const locatorMethods = new Set(['goto', 'getByRole', 'getByText', 'getByLabel', 'getByTestId', 'getByPlaceholder', 'getByTitle', 'getByAltText', 'locator', 'filter', 'nth', 'first', 'last', 'click', 'fill', 'press', 'check', 'uncheck', 'selectOption', 'isVisible', 'textContent', 'innerText', 'count', 'getAttribute', 'url'])
 const expectationMethods = new Set(['toHaveURL', 'toHaveText', 'toContainText', 'toHaveCount', 'toHaveAttribute', 'toBeVisible', 'toBeHidden', 'toBe', 'toEqual', 'toContain', 'toBeTruthy', 'toBeFalsy', 'toBeDefined', 'toBeUndefined', 'toMatch', 'toBeGreaterThan', 'toBeLessThan'])
 const testMethods = new Set(['describe', 'step', 'beforeEach', 'afterEach', 'beforeAll', 'afterAll'])
+const reservedBindings = new Set(['page', 'test', 'expect'])
+
+function fixtureCallback(callback, { required = false } = {}) {
+  assert.ok(ts.isArrowFunction(callback) || ts.isFunctionExpression(callback), 'Test callback must be a direct function')
+  assert.ok(callback.body, 'Test callback body required')
+  if (!callback.parameters.length) { assert.ok(!required, 'Playwright fixture callback required'); return }
+  assert.equal(callback.parameters.length, 1, 'Only the reviewed Playwright fixture parameter is permitted')
+  const pattern = callback.parameters[0].name
+  assert.ok(ts.isObjectBindingPattern(pattern) && pattern.elements.length === 1, 'Exact { page } fixture binding required')
+  const element = pattern.elements[0]
+  assert.ok(ts.isIdentifier(element.name) && element.name.text === 'page' && !element.propertyName &&
+    !element.dotDotDotToken && !element.initializer && !element.questionToken, 'Aliased or defaulted fixture binding forbidden')
+}
 
 export function checkOrdinarySource(file, source) {
   const tree = syntax(file, source)
@@ -99,14 +112,38 @@ export function checkOrdinarySource(file, source) {
     }
     if (ts.isImportEqualsDeclaration(node) || ts.isExportDeclaration(node) || ts.isNewExpression(node) || ts.isTaggedTemplateExpression(node) || ts.isElementAccessExpression(node) || ts.isDeleteExpression(node) || ts.isClassDeclaration(node) || ts.isWithStatement(node)) throw new Error(`Execution escape: ${file}`)
     if (ts.isIdentifier(node) && ['eval', 'Function', 'process', 'require', 'globalThis', 'window', 'document', 'navigator', 'fetch', 'setTimeout', 'setInterval', 'WebSocket', 'Worker', 'Proxy', 'Reflect'].includes(node.text)) throw new Error(`Forbidden global ${node.text}: ${file}`)
+    if (ts.isPropertyAccessExpression(node) && ['constructor', 'prototype', '__proto__'].includes(node.name.text)) throw new Error(`Forbidden reflective property ${node.name.text}: ${file}`)
     if (ts.isCatchClause(node)) throw new Error(`Error swallowing forbidden: ${file}`)
     if (ts.isBinaryExpression(node) && node.operatorToken.kind >= ts.SyntaxKind.FirstAssignment && node.operatorToken.kind <= ts.SyntaxKind.LastAssignment) throw new Error(`Assignment forbidden: ${file}`)
     if ((ts.isPrefixUnaryExpression(node) || ts.isPostfixUnaryExpression(node)) && [ts.SyntaxKind.PlusPlusToken, ts.SyntaxKind.MinusMinusToken].includes(node.operator)) throw new Error(`Mutation forbidden: ${file}`)
     if (ts.isVariableDeclaration(node) && node.initializer && (name(node.initializer).startsWith('expect') || name(node.initializer).startsWith('test'))) throw new Error(`API alias forbidden: ${file}`)
-    if ((ts.isParameter(node) || ts.isVariableDeclaration(node) || ts.isFunctionDeclaration(node)) && ts.isIdentifier(node.name) && ['test', 'expect'].includes(node.name.text)) throw new Error(`API shadowing forbidden: ${file}`)
+    if ((ts.isParameter(node) || ts.isVariableDeclaration(node) || ts.isFunctionDeclaration(node)) && ts.isIdentifier(node.name) && reservedBindings.has(node.name.text)) {
+      const allowedPage = node.name.text === 'page' && ts.isParameter(node) && ts.isObjectBindingPattern(node.parent.name) &&
+        node.parent.name.elements.length === 1 && node.parent.name.elements[0] === node
+      if (!allowedPage) throw new Error(`Fixture/API shadowing forbidden: ${file}`)
+    }
+    if (ts.isBindingElement(node) && ts.isIdentifier(node.name) && reservedBindings.has(node.name.text)) {
+      const allowedPage = node.name.text === 'page' && ts.isParameter(node.parent.parent) &&
+        ts.isObjectBindingPattern(node.parent.parent.name) && node.parent.parent.name.elements.length === 1 &&
+        node.parent.parent.name.elements[0] === node && !node.propertyName && !node.initializer
+      if (!allowedPage) throw new Error(`Fixture/API shadowing forbidden: ${file}`)
+    }
     if (ts.isBindingElement(node) && node.propertyName) throw new Error(`Destructuring alias forbidden: ${file}`)
     if (ts.isCallExpression(node)) {
       const path = name(node.expression), parts = path.split('.'), root = parts[0]
+      if (ts.isCallExpression(node.expression)) throw new Error(`Calling a value returned by another call is forbidden: ${file}`)
+      if (path === 'test') fixtureCallback(node.arguments[1], { required: true })
+      else if (path === 'test.describe') {
+        assert.equal(node.arguments.length, 2, 'Exact describe signature required')
+        fixtureCallback(node.arguments[1])
+        assert.equal(node.arguments[1].parameters.length, 0, 'Describe callback must not bind fixtures')
+      } else if (path === 'test.step') {
+        assert.equal(node.arguments.length, 2, 'Exact step signature required')
+        fixtureCallback(node.arguments[1])
+        assert.equal(node.arguments[1].parameters.length, 0, 'Step callback must not shadow fixtures')
+      } else if (['test.beforeEach', 'test.afterEach', 'test.beforeAll', 'test.afterAll'].includes(path)) {
+        fixtureCallback(node.arguments.at(-1))
+      }
       if (path === 'test' || path === 'expect' || path === 'expect.poll') return
       if (root === 'test' && parts.length === 2 && testMethods.has(parts[1])) return
       if (root === 'expect' && parts.slice(1).every(part => part === 'poll' || part === 'not' || expectationMethods.has(part))) return
@@ -185,7 +222,7 @@ export function checkConfiguration(source, packageValue, workflow) {
     else if (line.trim() && !/^ {10}/.test(line)) inRun = false
   }
   for (const command of ['backend.ingestion.test_importer backend.gate.test_gate', 'backend.investigator.test_investigator backend.investigator.test_retrieval', 'unittest discover -s evaluators -p test_evaluate.py', 'tests/test_vertical_slice.py', 'frontend/scripts/export_mixed.py --check', 'frontend/scripts/export_showcase.py --check', 'harness/run_pr_verification.mjs']) assert.ok(runLines.some(line => /^(?:python|node)\s/.test(line) && line.includes(command)), `Missing workflow command ${command}`)
-  for (const [key, expected] of Object.entries({ pw: 'playwright', typecheck: 'tsc --noEmit', 'test:e2e': 'playwright test --project=chromium', 'test:guard': 'node scripts/test_guard_fixture.mjs --report artifacts/guard/report.json', 'test:webmcp-lifecycle': 'node scripts/test_webmcp_lifecycle.mjs --report artifacts/webmcp-lifecycle/report.json', build: 'tsc --noEmit && vite build --base=./', 'check:hygiene': 'node scripts/check_test_hygiene.mjs', 'test:hygiene': 'node --test scripts/check_test_hygiene.test.mjs', 'test:canary': 'node scripts/check_canary_regression.mjs --output artifacts/canary' })) assert.equal(packageValue.scripts[key], expected, `Changed required script ${key}`)
+  for (const [key, expected] of Object.entries({ pw: 'playwright', typecheck: 'tsc --noEmit', 'test:e2e': 'playwright test --project=chromium', 'test:guard': 'node scripts/test_guard_fixture.mjs --report artifacts/guard/report.json', 'test:webmcp-lifecycle': 'node scripts/test_webmcp_lifecycle.mjs --report artifacts/webmcp-lifecycle/report.json', build: 'tsc --noEmit && vite build --base=./', 'check:hygiene': 'node scripts/check_test_hygiene.mjs', 'test:hygiene': 'node --test scripts/check_test_hygiene.test.mjs', 'test:canary': 'node scripts/check_canary_regression.mjs' })) assert.equal(packageValue.scripts[key], expected, `Changed required script ${key}`)
   assert.ok(!/(?:\|\|\s*(?:true|echo)|--pass-with-no-tests|--retries[= ]+[1-9])/.test(JSON.stringify(packageValue.scripts)), 'Package bypass')
   return true
 }

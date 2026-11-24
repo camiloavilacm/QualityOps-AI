@@ -21,12 +21,11 @@ POLICY = json.loads((Path(__file__).parent / "container/runtime-policy.json").re
 REPORT_POLICY = json.loads((Path(__file__).parent / "pr-verification-policy.json").read_bytes())
 
 
-def inspection(tests, evidence):
-    return {"Config": {"User": "pwuser"}, "HostConfig": {
+def inspection(tests, evidence, stage=2):
+    return {"Config": {"User": "pwuser", "Env": [f"PW_STAGE={stage}"]}, "HostConfig": {
         "NetworkMode": "none", "ReadonlyRootfs": True, "Privileged": False, "Memory": 4294967296,
         "MemorySwap": 4294967296, "NanoCpus": 2000000000, "PidsLimit": 512, "ShmSize": 1073741824,
         "IpcMode": "private", "CapAdd": ["CAP_SYS_CHROOT"], "CapDrop": ["ALL"],
-        "Tmpfs": {"/canary-tmp": "rw,exec,nosuid,nodev,size=536870912,mode=1777"},
         "SecurityOpt": ["no-new-privileges=true", "seccomp={reviewed-profile}"]},
         "Mounts": [{"Type": "bind", "Source": str(tests), "Destination": "/opt/qualityops/frontend/tests", "RW": False},
                    {"Type": "bind", "Source": str(evidence), "Destination": "/evidence", "RW": True}]}
@@ -136,7 +135,10 @@ class IsolationConfigurationTests(unittest.TestCase):
     def test_declared_configuration_and_mutations(self):
         tests, evidence = Path('/tmp/prepared-tests'), Path('/tmp/output')
         info = inspection(tests, evidence)
-        verify_inspection(info, POLICY, tests, evidence)
+        verify_inspection(info, POLICY, tests, evidence, 2)
+        wrong_stage = copy.deepcopy(info); wrong_stage['Config']['Env'] = ['PW_STAGE=1']
+        with self.assertRaisesRegex(Blocked, 'stage does not match'):
+            verify_inspection(wrong_stage, POLICY, tests, evidence, 2)
         for key, value in [("NetworkMode", "host"), ("ReadonlyRootfs", False), ("Privileged", True),
                            ("Memory", 0), ("MemorySwap", -1), ("NanoCpus", 0), ("PidsLimit", 0),
                            ("ShmSize", 0), ("IpcMode", "host"), ("CapAdd", ["SYS_ADMIN"]), ("CapAdd", []),
@@ -144,26 +146,26 @@ class IsolationConfigurationTests(unittest.TestCase):
             with self.subTest(key=key):
                 altered = copy.deepcopy(info); altered["HostConfig"][key] = value
                 with self.assertRaises(Blocked):
-                    verify_inspection(altered, POLICY, tests, evidence)
+                    verify_inspection(altered, POLICY, tests, evidence, 2)
         for change in ("writeable-source", "socket", "root"):
             altered = copy.deepcopy(info)
             if change == "writeable-source": altered["Mounts"][0]["RW"] = True
             if change == "socket": altered["Mounts"].append({"Type": "bind", "Destination": "/var/run/docker.sock"})
             if change == "root": altered["Config"]["User"] = "root"
             with self.subTest(change=change), self.assertRaises(Blocked):
-                verify_inspection(altered, POLICY, tests, evidence)
+                verify_inspection(altered, POLICY, tests, evidence, 2)
 
     def test_launcher_flags_do_not_forward_credentials_or_host_access(self):
         argv = docker_arguments('fixture', 'sha256:' + 'a' * 64, Path('/tmp/tests'), Path('/tmp/evidence'),
-                                Path('/tmp/seccomp'), POLICY, '1' * 40, '2' * 40)
+                                Path('/tmp/seccomp'), POLICY, '1' * 40, '2' * 40, 2)
         self.assertIn('none', argv)
         self.assertIn('--read-only', argv)
         self.assertIn('PW_VERIFIER_REVISION=' + '1' * 40, argv)
         self.assertIn('PW_CANDIDATE_REVISION=' + '2' * 40, argv)
+        self.assertIn('PW_STAGE=2', argv)
         self.assertNotIn('--privileged', argv)
         self.assertFalse(any(value.startswith(('AWS_', 'GITHUB_', '--env-file')) for value in argv))
         self.assertIn('type=bind,src=/tmp/tests,dst=/opt/qualityops/frontend/tests,readonly', argv)
-        self.assertIn('/canary-tmp:rw,exec,nosuid,nodev,size=536870912,mode=1777', argv)
 
     def test_missing_report_and_symlink_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:

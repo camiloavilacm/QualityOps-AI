@@ -102,6 +102,7 @@ def allowed_evidence(name):
     if relative in {'foundation.json', 'commands.json', 'versions.json', 'isolation.json',
                     'blocker.json', 'probe.json', 'probe.log', 'typecheck.log',
                     'e2e.log', 'guard.log', 'lifecycle.log', 'canary.log',
+                    'hygiene-unit.log',
                     'hygiene-chromium.log', 'hygiene-chromium-guard-meta.log',
                     'hygiene-chromium-webmcp-lifecycle.log'}:
         return True
@@ -232,7 +233,7 @@ def export_files(root, commit, target):
         output.write_bytes(payload)
 
 
-def docker_arguments(name, image, tests, evidence, seccomp, policy, verifier_revision, candidate_revision):
+def docker_arguments(name, image, tests, evidence, seccomp, policy, verifier_revision, candidate_revision, stage):
     # No candidate/environment-controlled flags, mounts, host networking or secrets.
     return ["create", "--name", name, "--platform", policy["platform"],
             "--user", "pwuser", "--network", "none", "--read-only", "--cap-drop", "ALL",
@@ -240,16 +241,16 @@ def docker_arguments(name, image, tests, evidence, seccomp, policy, verifier_rev
             "--security-opt", "no-new-privileges", "--security-opt", "seccomp=" + str(seccomp),
             "--env", "PW_VERIFIER_REVISION=" + verifier_revision,
             "--env", "PW_CANDIDATE_REVISION=" + candidate_revision,
+            "--env", "PW_STAGE=" + str(stage),
             "--cpus", "2", "--memory", "4294967296", "--memory-swap", "4294967296",
             "--pids-limit", "512", "--ipc", "private", "--shm-size", "1073741824",
             "--tmpfs", "/tmp:rw,nosuid,nodev,size=1073741824,mode=1777",
-            "--tmpfs", "/canary-tmp:rw,exec,nosuid,nodev,size=536870912,mode=1777",
             "--mount", f"type=bind,src={tests},dst=/opt/qualityops/frontend/tests,readonly",
             "--mount", f"type=bind,src={evidence},dst=/evidence",
             image]
 
 
-def verify_inspection(info, policy, tests, evidence):
+def verify_inspection(info, policy, tests, evidence, stage):
     host, config = info["HostConfig"], info["Config"]
     expected = {"NetworkMode": "none", "ReadonlyRootfs": True, "Privileged": False,
                 "Memory": policy["memory_bytes"], "MemorySwap": policy["memory_bytes"],
@@ -259,8 +260,9 @@ def verify_inspection(info, policy, tests, evidence):
     if (config.get("User") != "pwuser" or host.get("CapAdd") != ["CAP_SYS_CHROOT"]
             or host.get("CapDrop") != ["ALL"]):
         raise Blocked("unexpected user or capabilities")
-    if host.get("Tmpfs", {}).get("/canary-tmp") != "rw,exec,nosuid,nodev,size=536870912,mode=1777":
-        raise Blocked("canary workspace must use its bounded executable tmpfs")
+    configured = dict(item.split("=", 1) for item in config.get("Env", []) if "=" in item)
+    if configured.get("PW_STAGE") != str(stage):
+        raise Blocked("container stage does not match requested cumulative gate")
     security = host.get("SecurityOpt", [])
     if not any(value in {"no-new-privileges", "no-new-privileges=true"} for value in security) or not any(
             value.startswith("seccomp=") and value != "seccomp=unconfined" for value in security):
@@ -315,7 +317,8 @@ def main():
     docker = shutil.which("docker")
     created = False
     scratch_manager = None
-    env = {"PATH": os.environ.get("PATH", os.defpath), "LANG": "C.UTF-8"}
+    env = {"PATH": os.environ.get("PATH", os.defpath), "LANG": "C.UTF-8",
+           "PW_VERIFIER_REVISION": args.verifier_revision, "PW_CANDIDATE_REVISION": args.candidate_revision}
 
     def run(argv, *, timeout=300, cwd=ROOT, monitor=None):
         remaining = 1800 - (time.monotonic() - started)
@@ -346,6 +349,8 @@ def main():
         for file in ["harness/pr_verification.py", "harness/run_pr_verification.mjs",
                      "harness/check_healer_scope.py", "harness/check_pr_reports.mjs",
                      "harness/check_hygiene_report.mjs", "harness/check_canary_report.mjs",
+                     "harness/test_pr_verification.py", "harness/test_pr_reports.mjs",
+                     "harness/test_stage2_report_validation.mjs",
                      "harness/pr-verification-policy.json", "harness/container/runtime-policy.json"]:
             try:
                 recorded = git(ROOT, "show", args.verifier_revision + ":" + file)
@@ -355,6 +360,10 @@ def main():
                 raise Blocked("launcher or policy differs from requested verifier revision")
         scope = check_scope(ROOT, args.verifier_revision, args.candidate_revision)
         report["scope"] = scope
+        if args.stage >= 2:
+            run(["python3", "-B", "-m", "unittest", "harness.test_pr_verification", "-q"])
+            run(["node", "--test", str(ROOT / "harness/test_pr_reports.mjs")])
+            run(["node", "--test", str(ROOT / "harness/test_stage2_report_validation.mjs")])
         # External maintainer record is never loaded from candidate inputs or mounted into Docker.
         if args.bootstrap:
             if args.candidate_revision != args.verifier_revision:
@@ -398,7 +407,9 @@ def main():
             report["lockfile_sha256"] = sha(lock.read_bytes())
             # Builds use verifier sources only. Positive/mutated bundle preparation at Gate 2 must be separate builds.
             iid = scratch / "image-id"
-            run([docker, "build", "--force-rm", "--platform", policy["platform"], "--iidfile", str(iid),
+            run([docker, "build", "--force-rm", "--platform", policy["platform"],
+                 "--build-arg", f"QUALITYOPS_STAGE={args.stage}",
+                 "--build-arg", f"PW_VERIFIER_REVISION={args.verifier_revision}", "--iidfile", str(iid),
                  "-f", str(context / "harness/container/Dockerfile"), str(context)])
             image = iid.read_text().strip()
             if not image.startswith("sha256:") or len(image) != 71:
@@ -415,9 +426,9 @@ def main():
             # Mark before create: even a timed-out Docker client may have created a container.
             created = True
             run([docker, *docker_arguments(name, image, tests, evidence, seccomp, policy,
-                                           args.verifier_revision, args.candidate_revision)])
+                                           args.verifier_revision, args.candidate_revision, args.stage)])
             inspection = json.loads(run([docker, "inspect", name]))[0]
-            verify_inspection(inspection, policy, tests, evidence)
+            verify_inspection(inspection, policy, tests, evidence, args.stage)
             execution_error = None
             try:
                 run([docker, "start", "--attach", name], timeout=1800,
@@ -445,14 +456,15 @@ def main():
                      "--report", str(evidence / file)])
             run(["node", str(ROOT / "harness/check_pr_reports.mjs"), "--project", "chromium",
                  "--report", str(evidence / "e2e/discovery.json"), "--discovery"])
-            for project in ["chromium", "chromium-guard-meta", "chromium-webmcp-lifecycle"]:
-                run(["node", str(ROOT / "harness/check_hygiene_report.mjs"), "--root", str(evidence),
-                     "--project", project, "--verifier-revision", args.verifier_revision,
+            if args.stage >= 2:
+                for project in ["chromium", "chromium-guard-meta", "chromium-webmcp-lifecycle"]:
+                    run(["node", str(ROOT / "harness/check_hygiene_report.mjs"), "--root", str(evidence),
+                         "--project", project, "--verifier-revision", args.verifier_revision,
+                         "--candidate-revision", args.candidate_revision])
+                run(["node", str(ROOT / "harness/check_canary_report.mjs"), "--root", str(evidence),
+                     "--summary", str(evidence / "canary/summary.json"),
+                     "--verifier-revision", args.verifier_revision,
                      "--candidate-revision", args.candidate_revision])
-            run(["node", str(ROOT / "harness/check_canary_report.mjs"), "--root", str(evidence),
-                 "--summary", str(evidence / "canary/summary.json"),
-                 "--verifier-revision", args.verifier_revision,
-                 "--candidate-revision", args.candidate_revision])
             report["result"] = "PASS"
     except (Blocked, ValueError, KeyError, OSError, subprocess.SubprocessError) as exc:
         report["reason"] = str(exc) if not isinstance(exc, subprocess.SubprocessError) else "unresolvable revision or local daemon"
