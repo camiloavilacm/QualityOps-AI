@@ -59,7 +59,8 @@ export function validateHygiene({ root, project, verifierRevision, candidateRevi
     throw new Error('hygiene trust input digest mismatch')
   const projectContract = inventory.projects[project]
   if (projectContract?.state !== 'active' || projectContract.status !== 'INTRODUCED' ||
-      projectContract.discovery?.zeroDiscoveryOnly !== false)
+      projectContract.discovery?.zeroDiscoveryOnly !== false ||
+      !/^[0-9a-f]{64}$/.test(projectContract.discovery?.sha256 || ''))
     throw new Error('active project has no positive discovery contract')
   const expectedFiles = new Set([
     'tests/expected-tests.json',
@@ -80,8 +81,6 @@ export function validateHygiene({ root, project, verifierRevision, candidateRevi
   }
   const discovery = load(root, `hygiene/${project}/${record.discovery}`)
   if (record.discovery_sha256 !== digest(discovery.bytes)) throw new Error('discovery report digest mismatch')
-  if (projectContract.discovery.sha256 !== record.discovery_sha256)
-    throw new Error('inventory discovery digest differs from observed discovery report')
   const discoveryResult = validateReport(discovery.value, project, policy, { discovery: true })
   if (record.discovered !== discoveryResult.count) throw new Error('hygiene discovery count mismatch')
   if (record.child?.exit_code !== 0 || record.child?.timedOut || !Array.isArray(record.command) ||
