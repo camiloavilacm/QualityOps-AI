@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures/dashboard'
 
 test('mixed campaign displays BLOCKED with confirmed failure for x and missing evidence for y', async ({ page }) => {
   await page.goto('/')

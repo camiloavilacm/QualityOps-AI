@@ -1,0 +1,29 @@
+{
+  "version": "container-foundation-1",
+  "platform": "linux/amd64",
+  "base_image": "mcr.microsoft.com/playwright@sha256:766137e2d9caad4744187e53cdc89320ba6f2eb57cff097374020944b44dd0a9",
+  "playwright": "1.65.1",
+  "chromium": "159.0.8154.6",
+  "node_major": 26,
+  "user": "pwuser",
+  "cpus": 2,
+  "memory_bytes": 4294967296,
+  "pids": 512,
+  "shm_bytes": 1073741824,
+  "command_timeout_seconds": 300,
+  "gate_timeout_seconds": 1800,
+  "workers": 1,
+  "implemented_stages": [1],
+  "seccomp_sha256": "cc3e61cabda6bbc1e53e54d27ba4d55a9d3be829b6dd1a596f4a7b31b1cc7849",
+  "upstream": {
+    "repository": "https://github.com/microsoft/playwright",
+    "revision": "bbd948344ea9a60bf1e6f125c02ca99b2b51593b",
+    "paths": ["utils/docker/Dockerfile.noble", "utils/docker/seccomp_profile.json"],
+    "adapter": "Pinned image; vendored unmodified upstream seccomp profile"
+  },
+  "ordinary_specs": [
+    "frontend/tests/seed.spec.ts",
+    "frontend/tests/mixed-campaign.spec.ts",
+    "frontend/tests/dashboard-flows.spec.ts"
+  ]
+}

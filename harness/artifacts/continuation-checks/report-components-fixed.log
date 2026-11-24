@@ -1,0 +1,21 @@
+✔ single reviewed passing identity and discovery are accepted separately (0.782458ms)
+✔ rejects missing execution (0.071166ms)
+✔ rejects extra execution (0.093709ms)
+✔ rejects changed title (0.054667ms)
+✔ rejects wrong project (0.090083ms)
+✔ rejects skipped (0.046625ms)
+✔ rejects retried (0.054917ms)
+✔ rejects retry counter (0.057ms)
+✔ rejects timeout (0.135458ms)
+✔ rejects fatal runner error (0.104458ms)
+✔ guard requires real teardown attribution, never just nonzero exit (0.191959ms)
+✔ unimplemented project and duplicate policy identities fail closed (0.073417ms)
+✔ missing and symlink report are rejected (0.929667ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 64.855167

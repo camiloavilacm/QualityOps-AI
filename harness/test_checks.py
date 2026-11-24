@@ -77,6 +77,17 @@ class DraftOutputTests(unittest.TestCase):
                     check.validate(example)
 
 
+class ContainerPolicyTests(unittest.TestCase):
+    def test_vendored_seccomp_digest_and_fail_closed_default(self):
+        import hashlib
+        policy = load(ROOT / 'harness/container/runtime-policy.json')
+        profile = (ROOT / 'harness/container/seccomp_profile.json').read_bytes()
+        self.assertEqual(hashlib.sha256(profile).hexdigest(), policy['seccomp_sha256'])
+        self.assertEqual(json.loads(profile)['defaultAction'], 'SCMP_ACT_ERRNO')
+        tampered = profile.replace(b'SCMP_ACT_ERRNO', b'SCMP_ACT_ALLOW')
+        self.assertNotEqual(hashlib.sha256(tampered).hexdigest(), policy['seccomp_sha256'])
+
+
 class ExecutionTests(unittest.TestCase):
     def test_local_network_bind_denied(self):
         with socket.socket() as sock, self.assertRaises(PermissionError):

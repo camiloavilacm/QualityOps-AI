@@ -6,7 +6,15 @@
     "jsx": "react-jsx",
     "resolveJsonModule": true,
     "strict": true,
-    "noEmit": true
+    "noEmit": true,
+    "types": [
+      "node"
+    ]
   },
-  "include": ["src"]
+  "include": [
+    "src",
+    "tests",
+    "types",
+    "playwright.config.ts"
+  ]
 }

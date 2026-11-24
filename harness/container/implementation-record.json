@@ -1,0 +1,309 @@
+{
+  "task": "Shared Container Runner \u2014 first implementation slice V7-L1, V7-C1/C2 foundation, V7-L2 bootstrap CI",
+  "starting_revision": "63bd7b88f97a4196453b728c508f9f6e32d65d7c",
+  "contract_baseline": "a33bc9dba103e321b4513ccf6b57ccf0b61c5106",
+  "approved_plan_sha256": "6676c090363616ac34e6deca5d8a10b14e40c3640f2f76d95b1cc939ef185d42",
+  "preserved_initial_edits": {
+    "PLAN.md": "f3b12daa5758e4d988956e5ea47dc82b2c0355917307a41dbad747f834841937",
+    "docs/pr-verification-webmcp-harness-plan.md": "de03097886488296d81cce5aef7662d3073e83c53f65c321e1d118157bd64ca0"
+  },
+  "ownership": {
+    "lead": [
+      "harness/",
+      ".github/",
+      "PLAN.md",
+      "docs/pr-verification-webmcp-harness-plan.md (approved plan assignment)"
+    ],
+    "C": [
+      "frontend/"
+    ],
+    "C_worktree": "/private/var/tmp/qualityops-container-continuation-c",
+    "reviewer": "Read-only independent continuation review; persistent artifacts under harness/artifacts/continuation-review/"
+  },
+  "status": "IMPLEMENTED FIRST SLICE; runtime acceptance BLOCKED by inconsistent local Docker extracted-image storage",
+  "host_runtime": {
+    "node": "v26.13.1",
+    "python": "Python 3.15.2",
+    "platform": "macOS-15.7.1-arm64-i386-64bit-Mach-O"
+  },
+  "checks": [
+    {
+      "command": ".venv/bin/python -B -m unittest -v backend.ingestion.test_importer backend.gate.test_gate",
+      "result": "PASS",
+      "evidence": "/tmp/qualityops-a1-gate.log",
+      "detail": "32 tests; total existing suite 63 tests"
+    },
+    {
+      "command": ".venv/bin/python -B -m unittest -v backend.investigator.test_investigator backend.investigator.test_retrieval",
+      "result": "PASS",
+      "evidence": "/tmp/qualityops-b2.log",
+      "detail": "12 tests; total existing suite 63 tests"
+    },
+    {
+      "command": ".venv/bin/python -B -m unittest discover -s evaluators -p test_evaluate.py -v",
+      "result": "PASS",
+      "evidence": "/tmp/qualityops-b1.log",
+      "detail": "15 tests; total existing suite 63 tests"
+    },
+    {
+      "command": ".venv/bin/python -B -m unittest -v tests/test_vertical_slice.py",
+      "result": "PASS",
+      "evidence": "/tmp/qualityops-integration.log",
+      "detail": "4 tests; total existing suite 63 tests"
+    },
+    {
+      "command": ".venv/bin/python -B frontend/scripts/export_mixed.py --check",
+      "result": "PASS",
+      "evidence": null,
+      "detail": "digest 1bdda5cadd7c835f08123d29af8c56eb51c7356cdd9153bd34c865c0c84f0662"
+    },
+    {
+      "command": ".venv/bin/python -B frontend/scripts/export_showcase.py --check",
+      "result": "PASS",
+      "evidence": "/tmp/qualityops-exports.log",
+      "detail": "digest 98f266bcc81ebfe35989d90a626ff71b396990b28f761c59b66829610cafe739"
+    },
+    {
+      "command": ".venv/bin/python -B harness/checks.py contracts",
+      "result": "PASS",
+      "evidence": "/tmp/qualityops-contracts.log",
+      "detail": "three schemas and requirements bundle"
+    },
+    {
+      "command": "python3 -B -m unittest -v harness.test_pr_verification",
+      "result": "PASS",
+      "evidence": "/tmp/qualityops-container-components.log",
+      "detail": "15 offline component tests; timeout/output/cleanup, scope, isolation, artifact attacks and resource-report reserve regressions"
+    },
+    {
+      "command": "node --test harness/test_pr_reports.mjs",
+      "result": "PASS",
+      "evidence": "/tmp/qualityops-report-components.log",
+      "detail": "13 report validation component tests"
+    },
+    {
+      "command": ".venv/bin/python -B harness/verify.py",
+      "result": "PASS",
+      "evidence": "/tmp/qualityops-stage0-verification.json",
+      "detail": "macOS sandbox contracts/tests; original harness/verification.json preserved"
+    },
+    {
+      "command": "npm --prefix frontend ci --ignore-scripts --no-audit --no-fund && npm --prefix frontend run typecheck && npm --prefix frontend run build",
+      "result": "PASS",
+      "evidence": "/tmp/qualityops-frontend-preparation.log",
+      "detail": "trusted host preparation; not candidate container execution"
+    },
+    {
+      "command": "node scripts/probe_webmcp.mjs --output /tmp/qualityops-c-probe.json",
+      "result": "PASS",
+      "evidence": "/tmp/qualityops-c-probe.json",
+      "detail": "C worktree; host Chromium 159.0.8154.6 capability check before lifecycle implementation"
+    },
+    {
+      "command": "PLAYWRIGHT_JSON_OUTPUT_FILE=/tmp/qualityops-c-e2e/report.json PW_OUTPUT_DIR=/tmp/qualityops-c-e2e/test-results npm run test:e2e -- --reporter=json",
+      "result": "PASS",
+      "evidence": "/tmp/qualityops-c-e2e/report.json",
+      "detail": "C worktree; original 8 tests"
+    },
+    {
+      "command": "node scripts/test_guard_fixture.mjs --report /tmp/qualityops-c-guard-final/report.json",
+      "result": "PASS",
+      "evidence": "/tmp/qualityops-c-guard-final/orchestrator.json",
+      "detail": "C worktree; 8 executions, 2 controls pass and 6 guard-attributed failures"
+    },
+    {
+      "command": "node scripts/test_webmcp_lifecycle.mjs --report /tmp/qualityops-c-lifecycle-final/report.json",
+      "result": "PASS",
+      "evidence": "/tmp/qualityops-c-lifecycle-final/orchestrator.json",
+      "detail": "C worktree; 4 pass"
+    },
+    {
+      "command": "initial overlapping lifecycle/E2E diagnostic",
+      "result": "FAIL",
+      "evidence": "/tmp/qualityops-c-lifecycle/orchestrator.json",
+      "detail": "Strict-port contention detected; corrected sequential reruns pass. Original failure retained."
+    },
+    {
+      "command": "node harness/check_pr_reports.mjs --project chromium --report /tmp/qualityops-c-e2e/report.json",
+      "result": "PASS",
+      "evidence": "/tmp/qualityops-c-e2e/report.json",
+      "detail": "Independent lead-owned exact identity/outcome/guard validation of host report"
+    },
+    {
+      "command": "node harness/check_pr_reports.mjs --project chromium-guard-meta --report /tmp/qualityops-c-guard-final/report.json",
+      "result": "PASS",
+      "evidence": "/tmp/qualityops-c-guard-final/report.json",
+      "detail": "Independent lead-owned exact identity/outcome/guard validation of host report"
+    },
+    {
+      "command": "node harness/check_pr_reports.mjs --project chromium-webmcp-lifecycle --report /tmp/qualityops-c-lifecycle-final/report.json",
+      "result": "PASS",
+      "evidence": "/tmp/qualityops-c-lifecycle-final/report.json",
+      "detail": "Independent lead-owned exact identity/outcome/guard validation of host report"
+    },
+    {
+      "command": "node harness/run_pr_verification.mjs --bootstrap --stage 1 --verifier-revision d1cbf1995a9986920cfeb42a987b938faa78384d --candidate-revision d1cbf1995a9986920cfeb42a987b938faa78384d --output /tmp/qualityops-container-bootstrap-live",
+      "result": "BLOCKED",
+      "evidence": "/tmp/qualityops-container-bootstrap-live/command-01.log",
+      "detail": "Image preparation FAIL due disk exhaustion; no container execution; old summary writer failed ENOSPC, preserved as observed failure rather than a completed gate."
+    },
+    {
+      "command": "ruby -e 'require \"yaml\"; Dir[\".github/**/*.yml\"].each { |p| YAML.parse_file(p) }'",
+      "result": "PASS",
+      "evidence": null,
+      "detail": "Workflow/dependabot YAML syntax; GitHub execution NOT RUN"
+    }
+  ],
+  "container": {
+    "result": "BLOCKED",
+    "preparation": "FAIL: pinned base artifact recovered, but trusted npm preparation exits133; a diagnostic sees empty executables in local image filesystem",
+    "execution": "NOT RUN: verification foundation/browser/isolation container has not executed",
+    "diagnostic_execution": "Two bounded, credential-free, read-only base diagnostic containers exited133 and were removed successfully",
+    "reason": "Host now has sufficient free space and Docker is available. Independent downloads/OCI export verify original manifest, config and all7layer hashes; local extracted /usr/bin/node remains0bytes even after scoped removal/reload. The published Node file is150348872bytes with SHA d931c649850ffa7155b8ceffb400dc916ef325866e509cc52ae36e33e8fbb9a9. Docker storage repair or a clean local Linux daemon is required. No privileged/cache-wide repair or runtime-policy change performed.",
+    "image_build": "FAIL before a complete verifier image",
+    "isolation_enforcement": "NOT RUN",
+    "built_image_digest": null,
+    "latest_attempt_revision": "abfd2bbd189ef947744d79136670b5b1318b8744",
+    "latest_report": "harness/artifacts/container-continuation-004/publication/summary.json",
+    "base_artifact_verification": "harness/artifacts/image-preparation/full-archive-verification.json",
+    "upstream_node_verification": "harness/artifacts/continuation-review/upstream-layer-a41.json",
+    "local_filesystem_diagnostic": "harness/artifacts/base-runtime-probe-restored/diagnostic.json",
+    "failed_build_container_cleanup": "harness/artifacts/continuation-checks/failed-preparation-cleanup.json"
+  },
+  "later_acceptance": {
+    "hygiene_and_canary": "NOT RUN; Stage 2 follow-up, separate trusted positive/mutated image builds required",
+    "local_red_team": "NOT RUN; thirteen cases retained for Stage 3",
+    "R12": "NOT RUN; separate remote authorization",
+    "R14": "NOT RUN; separate remote authorization",
+    "Stage4_summary_tools": "NOT RUN; foundation lifecycle only",
+    "python3.12_and_CI": "NOT RUN locally; CI preserves Python 3.12 suite",
+    "verifier_acceptance": "NOT RUN; independent review and exact-SHA human acceptance required",
+    "publication": "HELD in Pages workflow; no deployment performed"
+  },
+  "limitations": [
+    "Host browser results establish development behavior only, not Linux container isolation.",
+    "Independent executors were not operating-system restricted to owner paths; no claim of an enforced per-agent sandbox.",
+    "Scope and reviewed spec blob approval do not prove semantic correctness; Gate 2 AST/canary remains required.",
+    "External acceptance JSON is a maintainer operational attestation, not cryptographic authentication.",
+    "No paid model, AWS change, PR, merge or deployment performed. Stage 1 code-review branch publication does not represent verifier acceptance."
+  ],
+  "ci_action_sources": {
+    "inspected": "immutable action.yml at each revision; upstream refs/tags resolved read-only",
+    "actions/checkout": "11d5960a326750d5838078e36cf38b85af677262",
+    "actions/setup-python": "a26af69be951a213d495a4c3e4e4022e16d87065",
+    "actions/setup-node": "49933ea5288caeca8642d1e84afbd3f7d6820020",
+    "actions/upload-artifact": "ea165f8d65b6e75b540449e92b4886f43607fa02"
+  },
+  "review_fixes": [
+    "P1 candidate artifact symlink traversal: stopped-container strict scan, bounded allowlist and separate host publication, no raw output upload.",
+    "P2 ordinary failure traces preserved under /evidence/e2e/test-results.",
+    "Live monitor tolerates vanished temporary files only before stop; directory FD traversal never follows symlinks.",
+    "Resource failure discovered in attempted image pull: 10 GiB preflight and 256 KiB report reserve; no destructive disk cleanup.",
+    "Reviewer caught reserve conflicting with strict root scan: prevalidation now scans candidate container evidence only; dedicated regression added.",
+    "Continuation: reap macOS just-exited children when group signaling returns EPERM; live group cleanup denial still fails closed.",
+    "Continuation: --force-rm removes failed trusted build containers; exercised on the observed preparation failure."
+  ],
+  "prior_container_attempt": {
+    "result": "BLOCKED",
+    "preparation": "FAIL; pinned base pull failed on host disk exhaustion",
+    "execution": "NOT RUN; no verification container created",
+    "reason": "Daemon initially unavailable; Docker Desktop started successfully. Pinned image pull exhausted host storage (119 MiB free, layer-commit I/O error), and old launcher summary write hit ENOSPC. Docker stopped, only task-created C worktree generated directories removed; 2.2 GiB free restored. No user images/containers pruned. Final launcher requires >=10 GiB before preparation and reserves 256 KiB for reports.",
+    "image_build": "FAIL during base-image pull; no completed image",
+    "isolation_enforcement": "NOT RUN",
+    "built_image_digest": null,
+    "attempt_revision": "d1cbf1995a9986920cfeb42a987b938faa78384d",
+    "raw_preparation_log": "/tmp/qualityops-container-bootstrap-live/command-01.log",
+    "initial_blocked_report": "/tmp/qualityops-container-bootstrap/summary.json",
+    "recovered_failure_record": "/tmp/qualityops-container-bootstrap-live/recovered-summary.json"
+  },
+  "continuation": {
+    "scope": "Resume approved first slice; local runtime preparation and bounded cleanup fixes only",
+    "checks": [
+      {
+        "command": ".venv/bin/python -B -m unittest -v backend.ingestion.test_importer backend.gate.test_gate backend.investigator.test_investigator backend.investigator.test_retrieval tests/test_vertical_slice.py",
+        "result": "PASS",
+        "evidence": "harness/artifacts/continuation-checks/core-python.log",
+        "detail": "48 tests; pinned qa-features e7c566ff831139889195643a1b906b7edab76f48 verified read-only"
+      },
+      {
+        "command": ".venv/bin/python -B -m unittest discover -s evaluators -p test_evaluate.py -v",
+        "result": "PASS",
+        "evidence": "harness/artifacts/continuation-checks/evaluation-python.log",
+        "detail": "15 tests; current total63 existing Python tests"
+      },
+      {
+        "command": "python3 -B -m unittest -v harness.test_pr_verification (initial continuation)",
+        "result": "FAIL",
+        "evidence": "harness/artifacts/continuation-checks/launcher-components.log",
+        "detail": "Observed macOS process-group PermissionError after output-limit child exit; preserved original failure"
+      },
+      {
+        "command": "python3 -B -m unittest -v harness.test_pr_verification (after fix)",
+        "result": "PASS",
+        "evidence": "harness/artifacts/continuation-checks/launcher-components-fixed.log",
+        "detail": "16 tests; exited-child signal denial is reaped, unproven live-child group cleanup remains BLOCKED"
+      },
+      {
+        "command": "node --test harness/test_pr_reports.mjs",
+        "result": "PASS",
+        "evidence": "harness/artifacts/continuation-checks/report-components-fixed.log",
+        "detail": "13 report-validator tests"
+      },
+      {
+        "command": ".venv/bin/python -B harness/checks.py contracts && .venv/bin/python -B frontend/scripts/export_mixed.py --check && .venv/bin/python -B frontend/scripts/export_showcase.py --check",
+        "result": "PASS",
+        "evidence": "harness/artifacts/continuation-checks/exports-contracts.log",
+        "detail": "Three schemas, requirements bundle, and both export digests verified"
+      },
+      {
+        "command": ".venv/bin/python -B harness/verify.py",
+        "result": "PASS",
+        "evidence": "harness/artifacts/continuation-checks/stage0-verification.json",
+        "detail": "macOS sandbox harness; original harness/verification.json preserved"
+      },
+      {
+        "command": "node harness/run_pr_verification.mjs --bootstrap --stage 1 --verifier-revision 3995775d9c09b01c84a0410fde43ba04a3c5090b --candidate-revision 3995775d9c09b01c84a0410fde43ba04a3c5090b --output harness/artifacts/container-continuation-001",
+        "result": "BLOCKED",
+        "evidence": "harness/artifacts/container-continuation-001/publication/summary.json",
+        "detail": "Image preparation rejects failed-layer digest mismatch; no container"
+      },
+      {
+        "command": "node harness/run_pr_verification.mjs --bootstrap --stage 1 --verifier-revision 7a60f8edeb212b3ae572ada14f2708c2f63ba291 --candidate-revision 7a60f8edeb212b3ae572ada14f2708c2f63ba291 --output harness/artifacts/container-continuation-002",
+        "result": "BLOCKED",
+        "evidence": "harness/artifacts/container-continuation-002/publication/summary.json",
+        "detail": "One retry repeats identical failed-layer digest mismatch; no container"
+      },
+      {
+        "command": "node harness/run_pr_verification.mjs --bootstrap --stage 1 --verifier-revision 7a60f8edeb212b3ae572ada14f2708c2f63ba291 --candidate-revision 7a60f8edeb212b3ae572ada14f2708c2f63ba291 --output harness/artifacts/container-continuation-003",
+        "result": "BLOCKED",
+        "evidence": "harness/artifacts/container-continuation-003/publication/summary.json",
+        "detail": "After verified OCI recovery, npm preparation exits133; local extracted Node is empty"
+      },
+      {
+        "command": "node harness/run_pr_verification.mjs --bootstrap --stage 1 --verifier-revision abfd2bbd189ef947744d79136670b5b1318b8744 --candidate-revision abfd2bbd189ef947744d79136670b5b1318b8744 --output harness/artifacts/container-continuation-004",
+        "result": "BLOCKED",
+        "evidence": "harness/artifacts/container-continuation-004/publication/summary.json",
+        "detail": "Failure retained; --force-rm removes failed preparation container; preexisting container identities preserved"
+      }
+    ],
+    "source_snapshots": {
+      "original_offline_review": "3995775d9c09b01c84a0410fde43ba04a3c5090b",
+      "process_reaping_fix": "7a60f8edeb212b3ae572ada14f2708c2f63ba291",
+      "failed_preparation_cleanup_fix": "abfd2bbd189ef947744d79136670b5b1318b8744"
+    },
+    "recovery": {
+      "pinned_digest_unchanged": true,
+      "new_dependencies": false,
+      "global_prune": false,
+      "privileged_operations": false,
+      "runtime_policy_changes": false,
+      "existing_container_identities_preserved": true,
+      "task_objects_only": "harness/artifacts/image-preparation/targeted-recovery-removal.json",
+      "removed_base_reference": "harness/artifacts/image-preparation/remove-task-base.json",
+      "note": "Docker removed the3 recorded dangling parent images automatically with the recorded task child; subsequent missing-parent lookup stopped that cleanup loop. Exact task base was removed separately. Existing images/volumes were preserved."
+    },
+    "independent_review": "harness/artifacts/continuation-review/review-abfd2bbd.json",
+    "historical_evidence": "Prior-turn /tmp artifacts were externally removed; historical checks above remain labeled as prior-run results. Current Python/export/component results and Docker diagnostics were captured anew under harness/artifacts/. Host browser8/8/4 results have not been rerun or relabeled as container results.",
+    "required_next_step": "Repair Docker extracted-image storage or supply a clean local Linux daemon; rerun same pinned bootstrap; independent runtime review and exact-SHA human acceptance remain required."
+  }
+}

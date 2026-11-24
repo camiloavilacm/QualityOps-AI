@@ -1,0 +1,6 @@
+{
+  "result": "PASS",
+  "new_containers": [],
+  "missing_preexisting_containers": [],
+  "detail": "Failed trusted preparation with --force-rm leaves no intermediate containers; existing container identities preserved."
+}

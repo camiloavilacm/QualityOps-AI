@@ -1,455 +1,347 @@
-# Staged Release Plan (v6) — Trustworthy PR Verification, Agent Harness, Guardrails & WebMCP
+# Staged PR Verification Plan (v7) — Agent Harness, Guardrails & WebMCP
 
-**Central objective:** Demonstrate not just that an AI agent can generate or repair a Playwright test, but that deterministic verification, non-bypassable CI boundaries, and human review prove whether a proposed change preserves the original requirement, catches regressions, and is eligible for release.
+**Status:** v7 design with the approved shared-container first slice implemented locally. Independent review and human acceptance of an exact verifier SHA remain required. Container execution is BLOCKED by inconsistent local Docker extracted-image storage after the disk-space blocker was resolved. Acceptance boxes remain unchecked; host diagnostics do not establish container acceptance.
 
----
+**Objective:** Establish reproducible evidence that a proposed test change preserves a reviewed requirement and detects its declared regression, then submit that evidence and the final commit SHA for human review. PR verification does not compute or override the product's deterministic campaign gate. Neither successful CI nor agent output authorizes release, merge, model promotion, or deployment.
 
-## 1. Technical Audit Reconciliation (Findings F01–F12)
+## 1. Source, Scope, Ownership, and Trust Boundary
 
-Every finding from the specification-level audit of v5 has been resolved in v6:
+This revision applies the approved v7 corrections to the existing v6 plan in place. The review's product source revision is `d1645d9d4389c28803c1d0de316ab3746867f539`; the frozen contract baseline is `a33bc9dba103e321b4513ccf6b57ccf0b61c5106` (wire version `2.0.0-draft.1`). The v6 document was added at `63bd7b88f97a4196453b728c508f9f6e32d65d7c`, which changes documentation and `.gitignore` relative to the reviewed product revision. Record the actual candidate revision at implementation time; neither revision is an accepted trusted verifier by implication.
 
-| Audit Finding | Severity | Resolution in v6 Specification |
+The user-supplied source is `/Users/camiloavila/.gemini/antigravity-cli/brain/f333a104-dda6-4e89-923b-bb72988fb7d9/pr_verification_webmcp_harness_plan.md`. Its SHA-256, identical to the repository's v6 copy before this edit, is `495c7150adf9696232e94bfabb0d26079a7d15b1d977d7bc0e57597738097e67`. Preserve that external source as provenance. The repository document is the revision target; no second harness plan is needed.
+
+The approved shared-container plan authorizes the first implementation slice: lead-owned documentation, `harness/` and `.github/`, and C-owned Stage 1 foundation under `frontend/`. The following work packages retain their ownership; `harness/ownership.json` remains unchanged. Stages 2–4 remain follow-up work, with no passing empty gates.
+
+| Work package | Owner and allowed paths | Inputs, acceptance, and handoff |
 |---|---|---|
-| **F01: Solo-maintainer PR approval deadlock** | **Critical** | • Configure GitHub Ruleset on `main`: `Require pull request: YES`, **`Required approving reviews: 0`**, `Require status checks to pass before merging: YES` (`python-contracts-and-eval`, `frontend-e2e`, `frontend-webmcp`), `Do not allow bypassing: YES`, `Require branches to be up to date: YES`.<br>• Human review is operationally enforced by the **credential boundary** (agents hold zero push/merge credentials; maintainer documents review and merges), not by GitHub's PR approval count. |
-| **F02: Guard meta-test layer mismatch** | **Critical** | • `test_guard_fixture.mjs` is an **orchestrator** invoking `playwright test` on `frontend/tests/meta/guard-verification.spec.ts`.<br>• Directly imports and exercises the **production fixture** `frontend/tests/fixtures/dashboard.ts` with `{ auto: true }` enabled under the real Playwright Test runner, testing clean pages and injected failures with strict reason attribution. |
-| **F03: AST rules contradict fixture & helpers** | **Critical** | • Define **narrow, categorized AST policies**:<br>  1. *Ordinary specs (`frontend/tests/**/*.spec.ts`)*: Strict allowlist for `test()` and `expect()`; mandatory `./fixtures/dashboard` import; all browser escapes banned.<br>  2. *Production fixture (`tests/fixtures/dashboard.ts`)*: Allowed base extension and event listeners (`context.on('console')`, `weberror`, `response`, `requestfailed`).<br>  3. *Helpers (`tests/helpers/**/*.ts`)*: Recursively scanned; browser escapes banned.<br>  4. *Meta-tests (`tests/meta/**/*.ts`)*: Permitted intentional error trigger injection.<br>  5. *WebMCP spec (`tests/webmcp.spec.ts`)*: Permitted `page.evaluate()` exclusively for `document.modelContext`. |
-| **F04: `.test.ts` escapes discovery** | **High** | • Add an **independent filesystem policy scanner** in `check_test_hygiene.mjs` that scans `frontend/tests/` for any test-like files (`*.test.ts`, `*.test.js`, `*.spec.js`, `*.spec.mts`, `*.tsx`) outside approved `*.spec.ts` files.<br>• Rejects any `test(...)` declaration outside approved spec files.<br>• Separates Red-Team scenarios: **R1a** (unapproved `.spec.ts` → inventory failure) vs **R1b** (unapproved `.test.ts` → filesystem policy failure). |
-| **F05: WebMCP inventory unverified** | **High** | • `check_test_hygiene.mjs` is **project-aware** (`--project=<name>`).<br>• `frontend-e2e` runs `check:hygiene --project=chromium` (verifies 8 tests).<br>• `frontend-webmcp` runs `check:hygiene --project=chromium-webmcp` (verifies 3 tests).<br>• Both CI jobs independently verify AST hygiene, exact discovery, and execution report for their project. |
-| **F06: Canary server selection & mutation isolation** | **High** | • `playwright.config.ts` uses `baseURL: process.env.PW_BASE_URL ?? 'http://127.0.0.1:4173'`. Skips internal webServer launch when `PW_BASE_URL` is set.<br>• Orchestrator checks port availability (4184, 4185) before launch; fails if occupied.<br>• Verifies mutation by querying the HTTP endpoint directly before browser execution.<br>• Positive run: `PW_BASE_URL=http://127.0.0.1:4184 PW_OUTPUT_DIR=artifacts/canary-positive`.<br>• Mutated run: `PW_BASE_URL=http://127.0.0.1:4185 PW_OUTPUT_DIR=artifacts/canary-mutated`.<br>• Attribution matches **test ID + step identifier** (`DASH-003-REASON-01`), returning `KILLED`. Missing report or timeout returns `INCONCLUSIVE`/`FAIL`. |
-| **F07: `minExpects` assertion integrity limits** | **High** | • `minExpects` is explicitly defined as an **advisory regression ratchet** (detecting deleted assertions), NOT semantic proof of assertion correctness.<br>• AST counts `expect(...)` and `expect.poll(...)` calls.<br>• Semantic assertion validity is guaranteed by the **paired mutation canary + mandatory human review**. |
-| **F08: Workflow & checker self-modification** | **High** | • **Scope review rule:** Healer PR changed-file scope is strictly limited to approved `*.spec.ts` files.<br>• Modifying `.github/workflows/`, `check_test_hygiene.mjs`, or `expected-tests.json` triggers immediate CI scope-check failure, requiring maintainer review.<br>• AST checker bans dangerous operations in ordinary specs: `page.evaluate`, `context.removeAllListeners`, `browser.newContext`, `routeFromHAR`, dynamic imports. |
-| **F09: WebMCP native annotations & capability probe** | **High** | • Native Chromium WebMCP API uses `Hint` suffixes: `readOnlyHint: true`, `consequentialHint: false`, `untrustedContentHint: false`. Spec asserts `tool.annotations?.readOnlyHint === true`, `consequentialHint === false`, `untrustedContentHint === false`.<br>• Added mandatory pre-implementation runtime probe (`frontend/scripts/probe_webmcp.mjs`) to verify `document.modelContext`, `registerTool`, `getTools`, `executeTool`, annotations, and cleanup before implementing `webmcp.ts`. |
-| **F10: WebMCP transactional lifecycle & read-only purity** | **High** | • `webmcp.ts` implements `AbortController` unwinding to abort prior registrations if a subsequent tool registration fails.<br>• Lifecycle meta-test verifies partial failure rolls back cleanly without leaving orphaned tools.<br>• Read-only purity: tools are pure projections over fixture data. Tests verify repeated execution leaves DOM, URL, localStorage, and sessionStorage completely unchanged. |
-| **F11: Exact inventory execution contract** | **Medium** | • Test identity schema in `expected-tests.json` includes `id`, `project`, `file`, `titlePath`, `stepId`, `minExpects`. Rejects duplicate IDs.<br>• Execution check requires `discovered_set === expected_set`, and for every executed test: `expectedStatus === 'passed'`, `status === 'passed'`, `outcome === 'expected'`, and `executionCount === 1`. |
-| **F12: Cumulative release gates & clean reproducibility** | **Medium** | • Gates 1 through 4 are **strictly cumulative**.<br>• Clean-checkout reproducibility: `npm ci`, pinned versions, explicit type checking (`tsc --noEmit`), and deterministic dependency resolution. |
+| V7-C1 — Dashboard test foundation | C; `frontend/` | Existing eight tests, v2 sanitized fixtures; automatic production guard, migrated specs, type checking, project selection, hygiene/inventory checks, isolated canary. Hand off exact revision and local evidence. |
+| V7-L1 — Trusted verification | Lead; `harness/` | Reviewed baseline, scope policy, independent expectations; scope checker, report validator, cumulative launcher, red-team runner, authored-evaluation oracle, and evidence records. No frontend or workflow ownership exception. |
+| V7-L2 — CI and governance | Lead; `.github/` | C1/L1 interfaces; complete offline jobs, SHA-pinned actions, artifacts, review routing, and PR template. Remote ruleset changes remain H1. |
+| V7-C2 — WebMCP presentation | C; `frontend/` | Sanitized showcase, successful capability probe; lifecycle core and meta-tests, two bounded summary tools, native/adapter tests, read-only observations. Coordinate lifecycle foundation in Stage 1 and summary integration in Stage 4. |
+| V7-R1 — Independent review | Read-only reviewer | Exact final revisions, commands, results, isolation, scope, oracle derivation, and limitations. Report verdict without self-approval by the implementing owner. |
+| V7-H1 — Remote protection verification | Human maintainer | Separate authorization for ruleset configuration and disposable remote tests R12/R14; record revisions, identities, settings, and observed enforcement. |
 
----
+Use isolated worktrees for write-heavy implementation owners, with lead integration and no concurrent edits to shared files. A task handoff names its work package, allowlist, accepted schemas/fixtures, tests, definition of done, and stop conditions. No inference spend, infrastructure changes, remote writes, pushes, PR creation, merges, or deployments are authorized by this planning revision. Frozen schemas, gate semantics, evaluator thresholds, and recorded results stay unchanged.
 
-## 2. Release Architecture Overview
+### Approved shared container runtime
 
-```mermaid
-flowchart TD
-  subgraph Step1["Step 1: Governance, Context Fixture & Runner Meta-Tests"]
-    G1["CODEOWNERS + PR Template"]
-    G2["frontend/AGENTS.md & CLAUDE.md"]
-    G3["guardErrors context fixture (weberror/console/response)"]
-    G4["test_guard_fixture.mjs running real specs in tests/meta/"]
-  end
-  subgraph Step2["Step 2: AST Allowlist, Exact Inventory, Paired Canary & CI Integration"]
-    H1["Narrow AST Allowlist & Filesystem Policy Scanner"]
-    H2["Exact Inventory (discovered_set === expected_set & execution pass)"]
-    H3["Isolated Paired Canary (baseURL 4184/4185, stepId attribution)"]
-    H4["Immediate CI wiring in ci.yml"]
-  end
-  subgraph Step3["Step 3: Parallel PR CI, Ruleset Hardening & 14-Scenario Red-Team Gate"]
-    P1["Parallel SHA-pinned CI jobs with minimal permissions"]
-    P2["GitHub Ruleset (0 reviews required, non-bypassable status checks)"]
-    P3["Agent Credential Boundary (local worktrees, push rejected)"]
-    P4["14-Scenario Red-Team Matrix (R1a through R14)"]
-  end
-  subgraph Step4["Step 4: WebMCP Native Contract, Independent Oracle & Cumulative Gate"]
-    W0["Pre-implementation Capability Probe (probe_webmcp.mjs)"]
-    W1["Transactional WebMCP (AbortController rollback, pure projections)"]
-    W2["Native Hint annotations (readOnlyHint, consequentialHint)"]
-    W3["Independent contract oracle against expectations.json"]
-    W4["Isolated frontend-webmcp CI job"]
-  end
+The approved implementation source is the attached `approved-plan.md` (SHA-256 recorded in `harness/container/implementation-record.json`). Starting HEAD is `63bd7b88f97a4196453b728c508f9f6e32d65d7c`; pre-existing uncommitted v7 document and roadmap edits were preserved. This is an infrastructure bootstrap, not an accepted verifier revision.
 
-  Step1 --> Step2 --> Step3 --> Step4
-```
+Use `harness/container/runtime-policy.json` and `harness/container/Dockerfile` for local and CI browser verification. Base image: `mcr.microsoft.com/playwright@sha256:766137e2d9caad4744187e53cdc89320ba6f2eb57cff097374020944b44dd0a9`, platform `linux/amd64`, image-provided Node 26, Playwright 1.65.1 and exact Chromium 159.0.8154.6. Upstream Dockerfile and unmodified seccomp profile are pinned to Playwright commit `bbd948344ea9a60bf1e6f125c02ca99b2b51593b`; profile SHA-256 is `cc3e61cabda6bbc1e53e54d27ba4d55a9d3be829b6dd1a596f4a7b31b1cc7849`.
 
----
+Locked dependency installation and dashboard build occur during trusted preparation from the verifier export only. Candidate execution installs nothing. Prepared sources/bundles are read-only; only approved ordinary specs are overlaid through a read-only tests mount. Future Gate 2 positive and mutated bundles must be built separately during trusted preparation; no runtime rebuild or candidate-selected mutation is permitted.
 
-## 3. Detailed Implementation Plan by Step
+Execution uses `pwuser`, a read-only root, dropped capabilities, `no-new-privileges`, the pinned seccomp profile, `--network none`, IPv4 loopback fixture servers, two CPUs, 4 GiB memory with no extra swap, 512 processes, private 1 GiB shared memory, one worker, five-minute child commands and a thirty-minute overall gate. Only `/tmp` and disposable evidence output are writable. No host home, credentials, private evidence, Docker socket, privileged mode or host networking are mounted. Inspect Docker settings and run in-container denial/resource/loopback probes before any candidate code. Missing Docker, failed isolation, missing reports and cleanup failures fail closed; no unrestricted fallback.
 
-### Release Step 1 — Trustworthy Test Foundation
+The four-argument launcher interface remains unchanged. `--bootstrap` is an explicit infrastructure-evidence mode requiring identical verifier/candidate SHAs; it cannot accept itself or execute overlays. Trusted overlays additionally require an external maintainer acceptance record binding verifier SHA, runtime policy digest, independent review, human acceptance, candidate SHA and exact approved spec blob digests. This record is an operational approval boundary, not cryptographic authentication. See [container instructions](../harness/container/README.md).
 
-**Goal:** Establish ownership boundaries, agent capability contracts, context-level error observation across all specs, and prove negatively that the production error fixture catches injected failures with strict reason attribution under the real Playwright Test runner.
+Gate 1 runs foundation checks only. Gate 2 introduces hygiene, inventory and the paired canary; Gate 3 retains thirteen local red-team cases and R12/R14 `NOT RUN`; Gate 4 retains WebMCP summary acceptance. The current launcher explicitly blocks unimplemented stages. CI browser feedback uses the same runner in bootstrap mode, the existing Python 3.12 offline suite remains separate, and Pages publication is held pending separately authorized integration and deployment.
 
-#### 1. Governance & Agent Instructions
-- **[NEW] [.github/CODEOWNERS](file:///Users/camiloavila/Documents/qualityops-ai/.github/CODEOWNERS)** — Review routing for all critical subsystems:
-  ```text
-  /.github/ @camiloavilacm
-  /.agents/ @camiloavilacm
-  /AGENTS.md @camiloavilacm
-  /contracts/ @camiloavilacm
-  /backend/gate/ @camiloavilacm
-  /backend/ingestion/ @camiloavilacm
-  /evaluators/ground_truth/ @camiloavilacm
-  /harness/ @camiloavilacm
-  /samples/ @camiloavilacm
-  /frontend/.codex/ @camiloavilacm
-  /frontend/AGENTS.md @camiloavilacm
-  /frontend/CLAUDE.md @camiloavilacm
-  /frontend/package.json @camiloavilacm
-  /frontend/package-lock.json @camiloavilacm
-  /frontend/playwright.config.ts @camiloavilacm
-  /frontend/scripts/ @camiloavilacm
-  /frontend/src/mixed-campaign.json @camiloavilacm
-  /frontend/src/showcase-export.json @camiloavilacm
-  /frontend/src/live-evaluation.json @camiloavilacm
-  /frontend/tests/ @camiloavilacm
-  ```
-- **[NEW] [.github/PULL_REQUEST_TEMPLATE.md](file:///Users/camiloavila/Documents/qualityops-ai/.github/PULL_REQUEST_TEMPLATE.md)** — Pull request checklist with mandatory sections for Agent role, changed test IDs, reason for changes, and maintainer verification.
-- **[NEW] [frontend/AGENTS.md](file:///Users/camiloavila/Documents/qualityops-ai/frontend/AGENTS.md)** — Agent steering rules referencing existing `frontend/.codex/agents/playwright_test_{planner,generator,healer}.toml`, capability matrix, mandatory `./fixtures/dashboard` import, Healer JSON schema, and CI validation boundaries. Clarifies that CI mechanically verifies execution, inventory, AST allowlist, and regression kills, while semantic diff review remains the responsibility of the human maintainer.
-- **[NEW] [frontend/CLAUDE.md](file:///Users/camiloavila/Documents/qualityops-ai/frontend/CLAUDE.md)** — Single-line `@AGENTS.md` import.
+### Trusted Healer verification
 
-#### 2. Test Infrastructure & Error Guard
-- **[MODIFY] [frontend/index.html](file:///Users/camiloavila/Documents/qualityops-ai/frontend/index.html)** — Add inline SVG data-URI favicon to eliminate browser `/favicon.ico` 404s.
-- **[NEW] [frontend/tests/fixtures/dashboard.ts](file:///Users/camiloavila/Documents/qualityops-ai/frontend/tests/fixtures/dashboard.ts)** —
-  - `guardErrors` (`{ auto: true }`): Attaches **context-level** listeners (`weberror`, `console`, `response`, `requestfailed`), accumulates diagnostics (never throwing inside async handlers), attaches them via `testInfo.attach`, and fails during teardown if any uncaught JS error, `console.error`, same-origin `status >= 400`, or unexpected network failure occurred during the test window.
-  - Documented cancellation policy: ignores only `net::ERR_ABORTED` requests that are legitimate client navigation cancellations.
-  - `dashboard`: Navigation helpers (`openHome`, `openCampaign`, `openEvaluation`); assertions remain explicit in specs.
-- **[MODIFY] [seed.spec.ts](file:///Users/camiloavila/Documents/qualityops-ai/frontend/tests/seed.spec.ts), [mixed-campaign.spec.ts](file:///Users/camiloavila/Documents/qualityops-ai/frontend/tests/mixed-campaign.spec.ts), [dashboard-flows.spec.ts](file:///Users/camiloavila/Documents/qualityops-ai/frontend/tests/dashboard-flows.spec.ts)** — Migrate all 3 specs to import `{ test, expect }` exclusively from `./fixtures/dashboard`.
+Obtain the launcher, scope policy, fixture, helpers, exact inventory, Playwright configuration, report validators, and reporters from a human-reviewed verifier revision outside candidate control. The lead's `harness/run_pr_verification.mjs` must resolve and record immutable verifier and candidate revisions, prepare a disposable workspace from the verifier, check the complete diff, and overlay only explicitly approved ordinary spec files. Preserve the original reviewed product/build inputs. Do not import candidate configuration, package scripts, dependencies, helpers, fixture, workflow, inventory, oracle, or reporter code into that verification run.
 
-#### 3. Runner-Managed Guard Meta-Tests (F02 Fix)
-- **[NEW] [frontend/tests/meta/guard-verification.spec.ts](file:///Users/camiloavila/Documents/qualityops-ai/frontend/tests/meta/guard-verification.spec.ts)** — Real Playwright Test spec importing the **actual production fixture** `frontend/tests/fixtures/dashboard.ts`. Contains individual test cases targeting controlled local mock pages:
-  1. `clean-page`: Confirms clean page passes with no guard errors.
-  2. `uncaught-js-error`: Triggers uncaught exception via script; expects failure with reason `UNCAUGHT_JS_ERROR`.
-  3. `console-error`: Calls `console.error()`; expects failure with reason `CONSOLE_ERROR`.
-  4. `same-origin-404`: Fetches local missing endpoint; expects failure with reason `HTTP_404`.
-  5. `same-origin-500`: Fetches local 500 endpoint; expects failure with reason `HTTP_500`.
-  6. `request-failed`: Calls unreachable port; expects failure with reason `REQUEST_FAILED`.
-  7. `second-tab-error`: Opens second page in context and emits error; expects failure with reason `UNCAUGHT_JS_ERROR`.
-  8. `navigation-abort`: Performs legitimate page navigation abort; confirms clean pass.
-- **[NEW] [frontend/scripts/test_guard_fixture.mjs](file:///Users/camiloavila/Documents/qualityops-ai/frontend/scripts/test_guard_fixture.mjs)** — Orchestrator script that starts a local mock HTTP server, runs `npx playwright test tests/meta/guard-verification.spec.ts --reporter=json`, and asserts that:
-  - The clean test passed with outcome `expected`.
-  - All 6 negative tests failed with outcome `unexpected`.
-  - In each failure, the JSON report error message originated from `guardErrors` and explicitly matched the expected failure reason code.
+Use `harness/check_healer_scope.py` from the trusted revision to check the baseline-to-candidate diff, including rename, deletion, symlink, and untracked overlay handling. The allowlist initially contains only the three reviewed ordinary spec files, with per-change approval. A new generated test remains disposable until a human accepts its spec and inventory change through a separate infrastructure review. No candidate label, manifest, or configuration can grant its own scope exception. Reject an unresolvable revision or ambiguous scope.
 
-#### Gate 1 Verification (Cumulative)
+Run candidate tests without credentials, with writes bounded to disposable inputs/output and network restricted to declared local fixture servers. Isolation must constrain candidate code execution; instructions and an AST scanner alone are insufficient. Fail verification if the launcher cannot establish those restrictions. Install locked dependencies from trusted inputs before restricted execution. Report the actual isolation mechanism and its limits.
+
+Changes to verification infrastructure follow a separate maintainer-reviewed work package. Promote a new trusted verifier revision only after independent review and explicit human acceptance bound to that revision. Candidate-controlled CI can provide useful feedback; it does not establish a non-bypassable trust boundary.
+
+### Governance
+
+Keep zero required GitHub approving reviews as the solo-maintainer default. The maintainer records human review and merge authorization against the final commit SHA; a later commit invalidates that authorization. Credential withholding is an operational requirement to establish and verify, not an assumed fact about the present agent environment.
+
+Stage 3 proposes read-only inspection of production branch rules and H1 separately handles changes. Record required-check names and trusted sources, ruleset settings and bypass actors, enforcement state, and tested revisions. CODEOWNERS routes review; it does not independently prevent modification or authorize merging.
+
+## 2. Technical Audit Reconciliation (F01–F12)
+
+All twelve findings are addressed in the proposed design below, pending implementation and verification. These are acceptance commitments, not completed results.
+
+| Finding | Severity | Proposed acceptance and stage |
+|---|---|---|
+| F01 — Solo-maintainer PR approval deadlock | Critical | Zero required approvals; SHA-bound human review; honest operational credential boundary. Record actual check sources and rules. H1 remote tests require separate authorization. Stages 1/3. |
+| F02 — Guard meta-test layer mismatch | Critical | Real runner executes the production automatic fixture under `chromium-guard-meta`; exactly two clean controls and six guard-attributed failures. Stage 1. |
+| F03 — AST rules contradict fixture and helpers | Critical | Separate ordinary, fixture/helper, WebMCP read-only, and meta-test operation policies; mutation mocks only in approved meta-tests. Stage 2. |
+| F04 — `.test.ts` escapes discovery | High | Independent filesystem scan rejects unapproved test-like files and declarations; R1a and R1b remain separate cases. Stage 2. |
+| F05 — WebMCP inventory unverified | High | Discovery and execution inventories for all four projects; ordinary and WebMCP success contracts separated from intentional guard failures. Stages 2/4. |
+| F06 — Canary server selection and mutation isolation | High | Two independently built temporary copies, strict ports, rendered-state precheck, positive control, `DASH-003` plus `DASH-003-REASON-01` failure attribution, guaranteed cleanup. Stage 2. |
+| F07 — `minExpects` assertion integrity limits | High | Counts detect deletion; the canary demonstrates only its declared regression. Human semantic review remains required. Stage 2. |
+| F08 — Workflow and checker self-modification | High | Baseline-owned scope policy, launcher, configuration, fixture, inventory, and reporters; candidate overlay limited to approved ordinary specs. Infrastructure promotion needs independent and human review. Stages 2/3. |
+| F09 — WebMCP native annotations and capability probe | High | Probe pinned browser before implementation; plain native projections with Hint annotations; separate Playwright adapter assertions. Stages 1/4. |
+| F10 — WebMCP transactional lifecycle and read-only purity | High | Dedicated lifecycle project proves unsupported mode, duplicate initialization, second-registration rollback, and disposal; interface tests observe unchanged DOM, URL, storage, and application data. Stages 1/4. |
+| F11 — Exact inventory execution contract | Medium | Stable IDs, actual titles, duplicate rejection, exact sets, one attempt, expected and actual statuses, and outcome; explicit guard exception contract. Stages 1/2. |
+| F12 — Cumulative gates and clean reproducibility | Medium | Stage N runs all checks from stages 1 through N with recorded commands, versions, digests, revisions, results, and limitations. Remote cases remain separate. Stages 1–4. |
+
+## 3. Detailed Implementation Plan — Four Stages
+
+All paths and commands described as new below are planned interfaces. They are not installed by this document and must not be reported as executed. Stage numbers refer to this PR-verification plan, not to the repository's authorization stages.
+
+### Stage 1 — Runnable Test Foundation
+
+**Owners:** C1/C2 for frontend; L1 for launcher/report validation; L2 for governance documents. **Done when:** the eight original dashboard tests retain their behavior, all test/configuration sources type-check, and production guard/lifecycle meta-tests execute under explicitly selected projects with attributable results.
+
+#### Governance and type checking
+
+- L2 adds `.github/CODEOWNERS` and `.github/PULL_REQUEST_TEMPLATE.md`. Route `.github/`, `.agents/`, `AGENTS.md`, `PLAN.md`, contracts, backend gate/ingestion, held-out truth, harness, samples, frontend agent instructions/configuration/scripts/tests/lockfiles, sanitized exports, and WebMCP source to `@camiloavilacm`. The template records owner, approved paths, changed test IDs, rationale, revisions, evidence, limitations, independent verdict, and final human authorization.
+- C1 adds `frontend/AGENTS.md` referencing repository rules and existing Planner/Generator/Healer definitions, and `frontend/CLAUDE.md` importing it. Amend `frontend/.codex/agents/playwright_test_healer.toml`: remove directions to use `test.fixme()`, weaken assertions, alter expected behavior merely to pass, or continue until every defect is hidden. A real regression retains its failure. CI invokes no agent or Healer. Generated/healed changes need independent review and human acceptance.
+- Expand `frontend/tsconfig.json` beyond its present `src` include to cover application code, fixtures, helpers, ordinary/meta/WebMCP specs, and `playwright.config.ts`. Add narrowly scoped native WebMCP declarations and required pinned type dependencies, with lockfile changes reviewed. `npm run typecheck` runs `tsc --noEmit`; `build` also type-checks. Avoid broad `any` declarations or treating Playwright's translated annotation types as native declarations.
+
+#### Production guard and existing tests
+
+- Add `frontend/tests/fixtures/dashboard.ts` exporting the shared `test`/`expect` and automatic `guardErrors` fixture (`{ auto: true }`). Observe context-level uncaught errors, `console.error`, same-origin HTTP status at least 400, and unexpected request failures across all pages, including a second tab. Accumulate bounded diagnostics, attach via `testInfo.attach`, and fail in teardown with stable reason codes. Never throw inside an asynchronous listener.
+- Ignore only a verified legitimate navigation cancellation with `net::ERR_ABORTED`, not every aborted request. Preserve listener coverage through the test and remove listeners on fixture disposal. Do not expose raw credentials in diagnostics. Add a data-URI favicon to `frontend/index.html` if needed to remove an irrelevant missing-favicon request.
+- Migrate `seed.spec.ts`, `mixed-campaign.spec.ts`, and `dashboard-flows.spec.ts` to import from `./fixtures/dashboard`. Move seed's inline browser-error observation into the automatic fixture. Preserve its UI assertions and all other behavior: one seed, one mixed, six dashboard-flow tests, including the separate recorded live/offline display assertions. No recorded artifact changes.
+- Dashboard helpers may navigate; specs retain explicit decision, reason, and evidence assertions.
+
+#### One configuration, four reachable projects
+
+Use `frontend/playwright.config.ts` exclusively, `testMatch` for `.spec.ts`, `forbidOnly: true`, `retries: 0`, bounded timeouts, traces on failure, and unique output directories. Put exclusions on each project, never on a global `testIgnore` that would hide another project's tests.
+
+| Project | Selected files | Exact planned executions | Outcome contract |
+|---|---|---:|---|
+| `chromium` | Only the three approved ordinary spec files | 8 | All pass once |
+| `chromium-guard-meta` | `tests/meta/guard-verification.spec.ts` | 8 | Two controls pass; six guard-attributed failures |
+| `chromium-webmcp` | `tests/webmcp.spec.ts` | 3, introduced Stage 4 | All pass once |
+| `chromium-webmcp-lifecycle` | `tests/meta/webmcp-lifecycle.spec.ts` | 4 | All pass once; expected host failures are handled by the test |
+
+Use existing default base URL `http://127.0.0.1:4183`, overridden only by trusted `PW_BASE_URL`. With that override, disable the internal webServer; otherwise use a strict-port preview, with server reuse disabled during verification. Each project excludes every other category. Do not execute the not-yet-authored Stage 4 interface inventory in an earlier stage or accept an empty run as a pass.
+
+#### Guard orchestrator and lifecycle foundation
+
+C1 adds `frontend/scripts/test_guard_fixture.mjs` and `tests/meta/guard-verification.spec.ts`. The orchestrator owns a bounded local mock server and explicitly selects `--project=chromium-guard-meta`, with a unique JSON report. All eight cases import the actual production fixture, not a copied guard:
+
+| Case | Required execution and attribution |
+|---|---|
+| `clean-page` | Pass, expected outcome |
+| `uncaught-js-error` | Fail, unexpected outcome; `UNCAUGHT_JS_ERROR` from guard |
+| `console-error` | Fail, unexpected outcome; `CONSOLE_ERROR` from guard |
+| `same-origin-404` | Fail, unexpected outcome; `HTTP_404` from guard |
+| `same-origin-500` | Fail, unexpected outcome; `HTTP_500` from guard |
+| `request-failed` | Fail, unexpected outcome; `REQUEST_FAILED` from guard |
+| `second-tab-error` | Fail, unexpected outcome; `UNCAUGHT_JS_ERROR` from guard |
+| `navigation-abort` | Pass, expected outcome; verified legitimate cancellation |
+
+All cases have `expectedStatus: passed`, one attempt, no skips or retries. The six negative executions must fail through the guard and expected reason, with no unrelated fatal errors. The orchestrator returns success only after validating this entire special contract; the child runner's nonzero exit alone is insufficient. Missing reports, crashes, timeouts, missing cases, and incorrect reasons fail verification. Always clean up the mock server.
+
+C2 supplies the production lifecycle core in `frontend/src/webmcp.ts` and the four-case lifecycle spec; summary payloads and dashboard registration wait for Stage 4. Run the Stage 4 capability probe before this first WebMCP implementation. Lifecycle tests import the real core and use registration-host mocks only in this approved meta-test: unsupported environment preserves a functioning dashboard, duplicate initialization creates no duplicate tools, failure on tool two aborts tool one, and explicit disposal unregisters everything and permits clean reinitialization. C2 adds `frontend/scripts/test_webmcp_lifecycle.mjs` selecting the dedicated project, collecting JSON, checking all four passing executions, and cleaning up. This early bounded core makes Stage 1 runnable without depending on Stage 4 summary tools.
+
+L1 defines `harness/check_pr_reports.mjs` to validate explicit project/outcome contracts from the trusted inventory, and `harness/run_pr_verification.mjs` as the cumulative launcher described in Section 4. Stage 1's lead-owned `harness/pr-verification-policy.json` records the actual ordinary/guard/lifecycle identities and outcome contracts before validation; Stage 2 reconciles the frontend inventory with that reviewed policy. Guard/lifecycle orchestrators must also check their own reports; the independent validator checks them again.
+
+### Stage 2 — Inventory, Hygiene, and Paired Canary
+
+**Owners:** C1 for frontend scanners/inventory/canary; L1 for trusted scope and independent validation. **Done when:** exact discovery/execution contracts, scanner negative cases, and a positive/mutated canary all satisfy the trusted verifier, without expanding Healer scope.
+
+#### Actual inventory and AST policy
+
+Add `frontend/tests/expected-tests.json` from actual discovery and reviewed assertions. Each entry records project, unique stable ID, exact file and `titlePath`, optional assertion `stepId`, and reviewed `minExpects`. Reject duplicate IDs and duplicate identities within a project. Record counts for all four project contracts when their tests are introduced. Never initialize from the illustrative titles in v6.
+
+Keep `DASH-003` assigned to the existing mixed test, whose actual title is `mixed campaign displays BLOCKED with confirmed failure for x and missing evidence for y`. Wrap the existing missing-evidence assertion in the named step `DASH-003-REASON-01`, without replacing or weakening that assertion. Preserve all original titles unless a separately reviewed identity migration is required. Review counts against the actual source after moving seed's browser-error assertion into the fixture.
+
+C1 adds `frontend/scripts/check_test_hygiene.mjs`, accepting `--project=<name>` and optional `--report <path>`, and its `node --test` suite `check_test_hygiene.test.mjs`. It invokes the installed local Playwright binary with `frontend/` as working directory and no runtime package resolution. The checker must:
+
+- Independently scan all of `frontend/tests/`, including helpers. Reject unapproved test-like extensions (`.test.ts`, `.test.js`, `.spec.js`, `.spec.mts`, `.tsx`, and equivalent variants), symlink escapes, and test declarations outside approved specs. R1a tests unexpected `.spec.ts` inventory; R1b tests filenames outside runner discovery.
+- Enforce one trusted configuration; exact approved imports; no aliases for `test` or `expect`; allow `test`, `describe`, `step`, and approved lifecycle hooks; ban `skip`, `only`, `fail`, `fixme`, `slow`, spec-level `use`/`extend`, soft assertions, configured expectations, dynamic imports, empty error swallowing, and arbitrary code execution/imports. Statically analyzable locator changes are the intended Healer scope.
+- Ban ordinary-spec browser injection, route interception, listener removal, alternate browser contexts, HAR routing, `waitForTimeout`, and evaluation escapes. Recursively scan approved helpers and reject unapproved imports. Production fixture listeners/base extension are a reviewed exception, not an ordinary-spec privilege.
+- Permit WebMCP interface tests only bounded native tool discovery/execution and read-only DOM, URL, storage, and application-data observations. Inspect allowed evaluation bodies, not just the presence of `document.modelContext`. Reject arbitrary scripts and mutation. Registration mocks, injected errors, and other mutation triggers are confined to the exact approved meta-test files, which remain scope-protected and independently inventoried.
+- Count `expect(...)` and `expect.poll(...)` against reviewed per-test minimums. This detects some assertion deletion, not semantic equivalence. A replacement tautology or wrong locator may preserve the count; the declared canary and human semantic review remain necessary.
+- Validate trusted configuration/workflow structure, zero retries, forbidden focused tests, required commands, and absence of bypasses. An AST/workflow checker does not enforce trust when a candidate controls that checker.
+- Run project-specific discovery with JSON and compare exact expected and discovered sets, then validate execution with `--report`: all tests executed exactly once, `expectedStatus === 'passed'`, actual status `passed`, and outcome `expected`. Guard-meta instead uses its two-pass/six-failure contract. Reject unexpected tests, missing results, skipped/expected-failure tests, retries, duplicate results, and runner-level failures. Keep discovery and execution evidence distinct.
+
+L1's scope checker and independent report validator use baseline-owned inventory and policy, never the candidate's revised expectations. Record and test both permitted patterns and forbidden aliases, escapes, filenames, missing imports, report tampering, retries, and missing executions.
+
+#### Isolated paired canary
+
+C1 adds `frontend/scripts/check_canary_regression.mjs`. L1's trusted launcher supplies the approved spec overlay and reviewed build inputs. The canary must:
+
+1. Create two separate temporary copies with trusted source and locked dependencies. Never edit the working tree or reuse a mutable `dist` directory between variants.
+2. Leave the positive copy unchanged. In the mutated copy of `frontend/src/showcase-export.json`, remove only reasons whose code is `INSUFFICIENT_EVIDENCE` from campaign `fixture-mixed`. Assert the exact intended one-reason change. Do not change `mixed-campaign.json`, policy, canonical evidence, reconciliation expectations, other campaigns, or recorded results.
+3. Build both copies independently after mutation. Record original/mutated export and bundle digests. Check ports 4184 and 4185 are free; start positive and mutated preview servers with `--strictPort`. Set explicit `PW_BASE_URL` to avoid an internal server or stale preview.
+4. Use an independent trusted browser precheck against each served bundle. Positive UI must show `BLOCKED`, `REQUIRED_FAILURE`, and `INSUFFICIENT_EVIDENCE`; mutated UI must retain `BLOCKED` and `REQUIRED_FAILURE` while losing only the missing-evidence reason. Fetching an HTML shell alone does not verify the rendered mutation.
+5. Run exactly `DASH-003` in each workspace, with one attempt, no retries, unique output/report destinations, and the actual approved title. The selected spec currently contains one test; exact discovery must still confirm its identity. Positive report: all selected assertions pass. Mutated report: failure at `DASH-003-REASON-01` on the missing-evidence assertion.
+6. Return `KILLED` only for that attributed positive-pass/mutated-fail pair. A surviving mutant, absent report, unrelated failure, wrong step, crash, timeout, or occupied port makes verification `FAIL`; retain the detailed cause separately. No heuristic interpretation of any nonzero exit as a kill.
+7. In `finally`, terminate only owned server processes and remove both temporary copies on success or failure, after retaining bounded evidence. Never kill an unrelated process occupying a port.
+
+The canary proves detection of this one declared presentation regression. It does not prove preservation of every assertion's meaning or authorize a merge.
+
+C1 proposes package commands `check:hygiene`, `test:hygiene`, and `test:canary`; C1/C2 also expose the Stage 1 commands listed in Section 4. L2 wires the completed checks into ordinary offline CI as they become available, without claiming trusted enforcement from candidate-owned workflow code.
+
+### Stage 3 — Complete Offline CI and Accurate Protection Claims
+
+**Owners:** L2 for `.github/`; L1 for red-team orchestration and records; H1 for separately authorized remote changes. **Done when:** all offline suites and cumulative browser checks are reproducible, thirteen local scenarios meet their expected outcomes, and remote status/limitations are stated accurately.
+
+#### Existing Python checks and browser jobs
+
+Retain the existing Python setup and dependency installation: `harness/requirements.txt` and `jsonschema[format-nongpl]==4.26.0`. Preserve pinned read-only preparation of `https://github.com/camiloavilacm/qa-features` at `e7c566ff831139889195643a1b906b7edab76f48`, the current archived failure-fixture copy, and `QUALITYOPS_QA_FEATURES_ROOT`. Preparation may fetch read-only source; offline test execution uses the prepared local reference. Do not introduce privileged untrusted-PR execution.
+
+Use these established commands, covering the current 63 Python tests across the first four commands plus the two export checks. Record actual discovered/executed counts; this planning revision does not claim to have rerun them.
+
 ```sh
-npm --prefix frontend ci
-npm --prefix frontend run build
-npm --prefix frontend run test:e2e
-node frontend/scripts/test_guard_fixture.mjs
+python -B -m unittest -v backend.ingestion.test_importer backend.gate.test_gate
+python -B -m unittest -v backend.investigator.test_investigator backend.investigator.test_retrieval
+python -B -m unittest discover -s evaluators -p test_evaluate.py -v
+python -B -m unittest -v tests/test_vertical_slice.py
+python -B frontend/scripts/export_mixed.py --check
+python -B frontend/scripts/export_showcase.py --check
 ```
 
----
+Replace the invalid v6 Python test and export invocations with this exact suite. The planned Python job also runs `python -B harness/checks.py contracts` for the existing schema/requirement-bundle checks. Do not invoke the full Stage 0 harness test discovery without its required macOS sandbox: its denial tests deliberately fail in an unrestricted process. Any separately retained Stage 0 harness run must use its documented trusted runner on a supported platform and report that result separately. The new L1 launcher must prove its own declared isolation before running candidate code.
 
-### Release Step 2 — Trustworthy Verification (AST Policy, Exact Inventory, Paired Canary & CI Integration)
+Harden `.github/workflows/ci.yml` with minimal `contents: read`, checkout `persist-credentials: false`, full 40-character action commit pins, PR concurrency cancellation, no verification path filters, and no `continue-on-error` or swallowed failures. Review exact action revisions before selecting them. Add `.github/dependabot.yml` for weekly GitHub Actions updates. No action SHA is asserted as reviewed by this planning document.
 
-**Goal:** Enforce narrow AST allowlisting, independent filesystem test discovery policy, exact test inventory and minExpects, run a strict `KILLED`-only paired mutation canary with server isolation, and wire all checks into CI immediately.
+| Planned job/check identity | Required work |
+|---|---|
+| `python-contracts-and-eval` | Pinned Python dependency/reference setup; harness/contract checks; the six established commands above; counts, export digests, and summary artifacts. |
+| `frontend-e2e` | Locked dependencies and matching Chromium installation; typecheck/build; hygiene unit tests; ordinary discovery/execution and report validation; guard-meta; paired canary; trusted local red-team runner; artifacts. |
+| `frontend-webmcp` | Locked dependencies and matching Chromium installation; capability probe; typecheck/build; lifecycle-meta with validation; Stage 4 WebMCP discovery/execution with validation; independent-oracle and read-only comparisons; artifacts. Enable required Stage 4 checks only once implemented, never manufacture a passing empty job. |
 
-#### 1. Configuration & Inventory Schema
-- **[MODIFY] [frontend/playwright.config.ts](file:///Users/camiloavila/Documents/qualityops-ai/frontend/playwright.config.ts)** —
-  - `baseURL: process.env.PW_BASE_URL ?? 'http://127.0.0.1:4173'`
-  - `webServer`: configure conditional launch (`reuseExistingServer: !process.env.CI`, skipped if `process.env.PW_BASE_URL` is set).
-  - Pin `testMatch: '**/*.spec.ts'`, `testIgnore: ['**/fixtures/**', '**/helpers/**', '**/meta/**']`.
-  - Set `forbidOnly: true`, `retries: 0`, `trace: 'retain-on-failure'`, `outputDir: process.env.PW_OUTPUT_DIR || 'test-results'`.
-- **[NEW] [frontend/tests/expected-tests.json](file:///Users/camiloavila/Documents/qualityops-ai/frontend/tests/expected-tests.json)** —
-  - Per-project schema with stable IDs and step attribution:
-    ```json
-    {
-      "projects": {
-        "chromium": {
-          "expectedCount": 8,
-          "tests": [
-            {
-              "id": "DASH-001",
-              "file": "tests/seed.spec.ts",
-              "titlePath": ["Seed verification", "renders dashboard title and tabs"],
-              "minExpects": 2
-            },
-            {
-              "id": "DASH-003",
-              "file": "tests/mixed-campaign.spec.ts",
-              "titlePath": ["Mixed campaign reconciliation", "displays all required reasons"],
-              "stepId": "DASH-003-REASON-01",
-              "minExpects": 6
-            }
-          ]
-        }
-      }
-    }
-    ```
-  - Rejects any duplicate test `id` or `titlePath` upon load.
+Before the Stage 4 interface exists, lifecycle verification is included in the foundation/browser checks, with the probe, so Stage 1 remains executable. Once the separate WebMCP job is active it owns those checks; the cumulative launcher still executes them at every applicable gate.
 
-#### 2. AST Allowlist & Filesystem Policy Checker (F03, F04, F05, F07, F08 Fixes)
-- **[NEW] [frontend/scripts/check_test_hygiene.mjs](file:///Users/camiloavila/Documents/qualityops-ai/frontend/scripts/check_test_hygiene.mjs)** —
-  - Accepts CLI argument: `--project=<chromium|chromium-webmcp>` (defaults to `chromium`).
-  - **Single config rule:** Verifies only `frontend/playwright.config.ts` exists.
-  - **Independent Filesystem Policy Scanner (F04):**
-    - Scans `frontend/tests/**`.
-    - Rejects any files matching test patterns outside approved `*.spec.ts` (e.g. `*.test.ts`, `*.test.js`, `*.spec.js`, `*.spec.mts`, `*.tsx`).
-    - Rejects any AST `test(...)` declaration found in any file other than approved spec files.
-  - **Narrow Categorized AST Rules (F03, F08):**
-    - *Approved specs (`*.spec.ts` outside `meta/`)*:
-      - `test` only allowed as `test()`, `test.describe()`, `test.step()`, and standard lifecycle hooks.
-      - Any property access (`test.skip`, `test.only`, `test.fail`, `test.fixme`, `test.slow`, `test.use`, `test.extend`) or aliasing (`const t = test`, `{ skip } = test`) is strictly rejected.
-      - `expect` only allowed as `expect()` or `expect.poll()`. Banned: `expect.soft`, `expect.configure`, aliasing.
-      - Browser escapes strictly banned: `page.evaluate`, `addInitScript`, `exposeFunction`, `exposeBinding`, `context.route`, `page.route`, `on('console')`, `context.removeAllListeners`, `browser.newContext`, `routeFromHAR`, dynamic imports, `waitForTimeout`, empty `catch {}`.
-      - Mandatory import: `import { test, expect } from './fixtures/dashboard'`.
-    - *Fixtures (`tests/fixtures/dashboard.ts`)*: Allowed base Playwright extension and event listeners (`context.on('console')`, `weberror`, `response`, `requestfailed`).
-    - *Helpers (`tests/helpers/**/*.ts`)*: Scanned recursively for banned browser escapes.
-    - *Meta-tests (`tests/meta/**/*.ts`)*: Excluded from ordinary inventory; verified separately.
-    - *WebMCP spec (`tests/webmcp.spec.ts`)*: Permitted `page.evaluate()` exclusively for calling native `document.modelContext`.
-  - **Assertion Count Ratchet (F07):**
-    - Counts `expect(...)` and `expect.poll(...)` calls per test block; fails if `actual < minExpects`.
-    - Documents in report that `minExpects` is an assertion-quantity ratchet, while semantic validity is verified by canary + review.
-  - **Workflow and Config Checks:**
-    - Verifies `playwright.config.ts` has `retries: 0`, `forbidOnly: true`.
-    - Verifies `ci.yml` has no `continue-on-error`, `|| true`, or bypass flags.
-  - **Exact-Set Project Discovery & Execution Inventory (F05, F11):**
-    - Runs `npx playwright test --list --reporter=json --project=<project>`.
-    - Validates `discovered_set === expected_set` (exact set equality: no missing tests, zero unexpected extra tests).
-    - When `--report <json>` is provided:
-      - Validates that every test in `expected_set` executed.
-      - Validates `expectedStatus === 'passed'`, `status === 'passed'`, `outcome === 'expected'`, and `executionCount === 1`.
-- **[NEW] [frontend/scripts/check_test_hygiene.test.mjs](file:///Users/camiloavila/Documents/qualityops-ai/frontend/scripts/check_test_hygiene.test.mjs)** — `node --test` suite validating that allowed patterns pass, and all banned snippets, aliases, escapes, and unapproved filenames fail.
+Every browser job invokes the shared container runner. Trusted image preparation runs `npm ci --ignore-scripts` from the verifier lockfile and builds the dashboard; the pinned base already contains matching Chromium. No dependency or browser installation occurs during candidate execution. C1 defines the `pw` package script as the installed local `playwright` binary; npm run supplies the frontend working directory and must not resolve an uninstalled package dynamically. Pin Node/Python settings and report actual versions. Collect explicit JSON reports, discovery inventories, guard diagnostics, canary state/attribution, probe results, lifecycle results, and summaries. Upload bounded sanitized JSON even on failure and traces on failure, with seven-day retention and unique artifact names. Evidence upload cannot convert verification failure into success.
 
-#### 3. Isolated Paired Canary (F06 Fix)
-- **[NEW] [frontend/scripts/check_canary_regression.mjs](file:///Users/camiloavila/Documents/qualityops-ai/frontend/scripts/check_canary_regression.mjs)** —
-  1. Checks that ports 4184 and 4185 are free; fails immediately if occupied.
-  2. Runs `npm run build` to ensure clean built preview assets.
-  3. Launches positive preview server on port 4184.
-  4. Launches mutated server on port 4185 (with `INSUFFICIENT_EVIDENCE` removed from the fixture payload in memory/endpoint).
-  5. Directly verifies via HTTP `fetch('http://127.0.0.1:4185/...')` that the mutation is active in the served payload before running Playwright.
-  6. Executes positive control:
-     ```sh
-     PW_BASE_URL=http://127.0.0.1:4184 PW_OUTPUT_DIR=artifacts/canary-positive \
-     npx --no-install playwright test tests/mixed-campaign.spec.ts --project=chromium --reporter=json
-     ```
-     Asserts positive run passes with outcome `expected`.
-  7. Executes mutated run:
-     ```sh
-     PW_BASE_URL=http://127.0.0.1:4185 PW_OUTPUT_DIR=artifacts/canary-mutated \
-     npx --no-install playwright test tests/mixed-campaign.spec.ts --project=chromium --reporter=json
-     ```
-  8. Evaluates result:
-     - Classifies result as **`KILLED`** only if:
-       * Positive run passed completely.
-       * Mutated run failed on test `DASH-003`.
-       * Failure occurred inside step `DASH-003-REASON-01` on the `INSUFFICIENT_EVIDENCE` assertion.
-     - Any timeout, crash, port collision, or unlocated error returns **`FAIL / INCONCLUSIVE`**.
-  9. Guaranteed `finally` cleanup to terminate both preview servers.
+#### Ruleset and human review boundary
 
-#### 4. Package & CI Wiring
-- **[MODIFY] [frontend/package.json](file:///Users/camiloavila/Documents/qualityops-ai/frontend/package.json)** —
-  - `"test:e2e": "playwright test --project=chromium"`
-  - `"check:hygiene": "node scripts/check_test_hygiene.mjs"`
-  - `"test:hygiene": "node --test scripts/check_test_hygiene.test.mjs"`
-  - `"test:guard": "node scripts/test_guard_fixture.mjs"`
-  - `"test:canary": "node scripts/check_canary_regression.mjs"`
-- **[MODIFY] [.github/workflows/ci.yml](file:///Users/camiloavila/Documents/qualityops-ai/.github/workflows/ci.yml)** — Wire `test:hygiene`, `check:hygiene`, `test:guard`, `test:e2e` (with report verification), and `test:canary` into CI immediately.
+H1 proposes a separately reviewed active ruleset targeting `main`: require a PR, zero required approving reviews, current-branch checks, and no configured bypass actors where supported. Record actual enforcement state, bypass settings, repository/ruleset identity, required-check names and source applications, and the commit associated with each result. Planned checks are `python-contracts-and-eval`, `frontend-e2e`, and, after Stage 4, `frontend-webmcp`. Do not assume job names alone identify a trusted check source or prevent a candidate replacing its workflow.
 
-#### Gate 2 Verification (Cumulative)
-```sh
-npm --prefix frontend ci
-npm --prefix frontend run test:hygiene
-npm --prefix frontend run check:hygiene -- --project=chromium
-node frontend/scripts/test_guard_fixture.mjs
-npm --prefix frontend run build
-npm --prefix frontend run test:e2e
-npm --prefix frontend run test:canary
-```
+Agents should have no write/merge credentials; the human maintainer reviews and authorizes merging the exact final SHA. This remains an operational boundary. Ordinary candidate-controlled CI and labels cannot make it non-bypassable. Production rule inspection is read-only; ruleset writes and disposable remote experiments require separate explicit authorization.
 
----
+#### Exactly 15 red-team scenarios
 
-### Release Step 3 — Parallel PR CI, Ruleset Hardening & Mandatory Red-Team Gate
+L1 defines `harness/verify_red_team_matrix.mjs --local --output <directory>`; this replaces v6's undefined frontend-owned red-team runner. It creates a fresh disposable workspace per local case, invokes trusted scope and appropriate checks, asserts the expected detection/outcome, records candidate/verifier revisions and artifacts, and always cleans up. A correct rejection is a passing verification of the scenario, while the rejected candidate's check is `FAIL`. R7 is a required passing control. Do not run remote cases from this command.
 
-**Goal:** Parallelize CI, enforce non-bypassable GitHub branch protection with agent credential isolation, and execute an expanded 14-scenario red-team matrix proving that guardrails prevent regressions and unauthorized changes.
+There are **15 scenarios: thirteen local cases and two remote cases**. R1a/R1b explain why IDs through R14 yield fifteen rows. Initial result for every row is `NOT RUN`.
 
-#### 1. CI Workflow Hardening & Job Separation
-- **[MODIFY] [.github/workflows/ci.yml](file:///Users/camiloavila/Documents/qualityops-ai/.github/workflows/ci.yml)** —
-  - `on: { pull_request: { branches: [main] }, push: { branches: [main] } }` (no path filtering).
-  - Concurrency: `group: ${{ github.workflow }}-${{ github.ref }}`, `cancel-in-progress: ${{ github.event_name == 'pull_request' }}`.
-  - Minimal permissions: `permissions: { contents: read }`, `persist-credentials: false`.
-  - All GitHub Actions pinned to full 40-character commit SHAs.
-  - Parallel jobs:
-    1. `python-contracts-and-eval`: Pinned Python, `pytest` (63 tests), `python -m backend.export.generate --check`, summary upload.
-    2. `frontend-e2e`: Pinned Node, `npm ci`, `test:hygiene`, `check:hygiene --project=chromium`, `build`, `test:guard`, `test:e2e` (`artifacts/e2e/report.json`), inventory execution check, `test:canary` (`artifacts/canary/`), always upload JSON evidence (7d), upload traces `if: failure()` (7d), summary upload.
-- **[NEW] [.github/dependabot.yml](file:///Users/camiloavila/Documents/qualityops-ai/.github/dependabot.yml)** — Weekly dependency checking for `github-actions`.
-
-#### 2. Ruleset Hardening & Agent Credential Boundary (F01 Fix)
-- **GitHub Ruleset Configuration on `main`**:
-  - Target: default branch (`main`).
-  - Enforcement status: **Active** (non-bypassable).
-  - Rules:
-    - **Require a pull request before merging: YES**
-    - **Required approving reviews: 0** *(Eliminates solo-maintainer self-approval deadlock; human review is operationally enforced by credential boundary)*
-    - **Require status checks to pass before merging: YES**
-      * Status checks: `python-contracts-and-eval`, `frontend-e2e` *(and `frontend-webmcp` in Step 4)*
-    - **Require branches to be up to date before merging: YES**
-    - **Do not allow bypassing the above settings: YES**
-- **Agent Credential Boundary:**
-  - AI agents operate in local Git worktrees or feature branches.
-  - Agent environments are withheld personal access tokens and SSH keys with write permissions to `main`.
-  - Maintainer performs final review, signs off, and triggers merge using human credentials.
-- **Scope Review Policy (F08 Fix):**
-  - Healer PR changed-file scope is strictly limited to approved spec files (`frontend/tests/*.spec.ts`).
-  - PRs touching `.github/workflows/`, `check_test_hygiene.mjs`, `playwright.config.ts`, or `expected-tests.json` trigger immediate CI scope check failure unless explicitly marked with maintainer authorization.
-
-#### 3. Expanded 14-Scenario Red-Team Matrix (Gate 3)
-Run all 14 scenarios in isolated disposable branches to confirm the verification engine blocks every vector:
-
-| ID | Injected Problem / Mutation | Expected Detection Mechanism | Expected Result |
+| ID | Scenario | Expected observation | Execution boundary |
 |---|---|---|---|
-| **R1a** | Add unapproved `tests/unapproved.spec.ts` | Exact-Set Inventory Check | CI FAILS (unexpected test in inventory) |
-| **R1b** | Add unapproved `tests/unapproved.test.ts` | Filesystem Policy Scanner | CI FAILS (unapproved test filename) |
-| **R2** | Add `continue-on-error: true` in `ci.yml` | Workflow Hygiene Checker | CI FAILS (banned workflow keyword) |
-| **R3** | Call `waitForTimeout` or `addInitScript` in `tests/helpers/bad.ts` | Recursive AST Hygiene Scanner | CI FAILS (banned browser escape in helper) |
-| **R4** | Delete assertion so `expect` count drops below `minExpects` | AST Assertion Count Ratchet | CI FAILS (assertion count below minimum) |
-| **R5** | Remove `INSUFFICIENT_EVIDENCE` assertion from spec | Paired Mutation Canary | CI FAILS (canary not killed at location) |
-| **R6** | Add `test.skip()`, `test.only()`, or `const t = test` | AST Allowlist Checker | CI FAILS (property access or aliasing) |
-| **R7** | Valid locator repair preserving assertions | Full CI Pipeline | ALL CHECKS PASS (clean PR candidate) |
-| **R8** | Change `retries: 2` in `playwright.config.ts` | Config Hygiene Validator | CI FAILS (retries must be 0) |
-| **R9** | Remove `guardErrors` fixture import from spec | Spec Import-Source Rule | CI FAILS (missing mandatory fixture import) |
-| **R10** | Remove mandatory CI step from `ci.yml` | Workflow Structure Validator | CI FAILS (required step missing) |
-| **R11** | Replace `check_test_hygiene.mjs` with no-op script | Healer Scope Check & Diff Audit | CI FAILS (forbidden file change in PR) |
-| **R12** | Attempt PR merge with failing required CI check | GitHub Branch Ruleset | MERGE BLOCKED by GitHub |
-| **R13** | Replace approved test with unapproved test title | Exact-Set Inventory Check | CI FAILS (mismatched test identity) |
-| **R14** | Attempt direct `git push origin main` without maintainer token | Git Remote / Ruleset | PUSH REJECTED (protected branch) |
+| R1a | Add unapproved `.spec.ts` | Scope rejection; isolated inventory-unit exercise also detects unexpected spec | Local |
+| R1b | Add unapproved `.test.ts` | Scope rejection; filesystem-policy exercise detects undiscovered test-like file | Local |
+| R2 | Add workflow `continue-on-error: true` | Trusted scope rejects workflow edit; hygiene-unit exercise rejects bypass | Local |
+| R3 | Add browser escape in helper | Trusted scope rejects helper edit; recursive scanner exercise rejects escape | Local |
+| R4 | Delete assertions below reviewed minimum | AST assertion-count rejection | Local |
+| R5 | Remove mixed missing-evidence assertion | Independent canary cannot attribute a kill; verification fails, even if another check rejects earlier | Local |
+| R6 | Add skip/only/alias operations | AST-policy rejection | Local |
+| R7 | Valid locator repair on renamed control, same behavior | Reviewed intended control, preserved assertions, full applicable trusted checks pass, canary killed | Local |
+| R8 | Set configuration retries to two | Trusted scope rejects config edit; config-unit exercise rejects retries | Local |
+| R9 | Remove production fixture import | Import-source rejection | Local |
+| R10 | Remove mandatory workflow check | Trusted scope rejects workflow edit; structure-unit exercise detects omission | Local |
+| R11 | Replace hygiene checker with no-op | Trusted scope rejects checker edit before candidate checker executes | Local |
+| R12 | Merge attempt with failing required check | Authenticated, otherwise permitted attempt rejected specifically by required-check rule | Remote; separately authorized disposable target; NOT RUN |
+| R13 | Replace approved title with unapproved title | Exact identity/inventory rejection | Local |
+| R14 | Direct push to protected branch | Authenticated, otherwise write-capable principal rejected specifically by branch rule | Remote; separately authorized disposable target; NOT RUN |
 
-#### Gate 3 Verification (Cumulative)
-```sh
-npm --prefix frontend ci
-npm --prefix frontend run test:hygiene
-npm --prefix frontend run check:hygiene -- --project=chromium
-node frontend/scripts/test_guard_fixture.mjs
-npm --prefix frontend run build
-npm --prefix frontend run test:e2e
-npm --prefix frontend run test:canary
-python3 -m pytest tests/
-python3 -m backend.export.generate --check
-# Execute Red-Team verification script:
-node frontend/scripts/verify_red_team_matrix.mjs
-```
+Component mutation exercises are trusted verifier unit tests in disposable copies, not permissions for Healer to overlay infrastructure. Record each component result separately from early scope rejection; do not claim the canary ran if scope/count checks stopped that candidate first. For R5, invoke the canary independently in its isolated unit exercise to demonstrate its own failure condition. R7's temporary control rename belongs only to its trusted disposable UI variant.
 
----
+R12/R14 remain `NOT RUN` until authorization and evidence from a disposable remote target exist. Authentication denial demonstrates credential isolation at most; it does not prove branch-rule enforcement. Never push directly to production `main` as a test. Local Gate 3 can pass its declared offline scope with these exclusions, but remote enforcement acceptance remains open.
 
-### Release Step 4 — Trustworthy WebMCP Interface & Isolated Verification
+### Stage 4 — Bounded WebMCP Presentation
 
-**Goal:** Ship a verified, transactional, read-only WebMCP interface using native Chromium WebMCP APIs with `Hint` annotations, standard MCP result envelopes, transactional rollback, and validation against an independent contract oracle in an isolated CI job.
+**Owners:** C2 for frontend; L1 for independent oracle/validation; L2 for CI; R1 for independent review. **Done when:** native and adapter contracts, lifecycle, strict arguments, independent summary comparisons, and read-only observations pass on the pinned browser in cumulative Gate 4.
 
-#### 1. Pre-Implementation Capability Probe (F09 Fix)
-- **[NEW] [frontend/scripts/probe_webmcp.mjs](file:///Users/camiloavila/Documents/qualityops-ai/frontend/scripts/probe_webmcp.mjs)** — Runtime capability probe executed against Chromium `159.0.8154.6` with `--enable-features=WebMCP`. Verifies:
-  1. Browser version matches pinned requirement.
-  2. `document.modelContext` exists on the browser window object.
-  3. `registerTool` registers a minimal dummy tool.
-  4. `getTools` discovers the registered tool.
-  5. `executeTool` executes the tool and returns expected JSON.
-  6. Annotation properties support `readOnlyHint`, `consequentialHint`, and `untrustedContentHint`.
-  7. `AbortController` signal cleanly unregisters the dummy tool.
-  8. Unsupported browser/flag environment fails gracefully without throwing uncaught errors.
+#### Mandatory capability probe
 
-#### 2. Native WebMCP Implementation & Transactional Lifecycle (F09, F10 Fixes)
-- **[NEW] [frontend/src/webmcp.ts](file:///Users/camiloavila/Documents/qualityops-ai/frontend/src/webmcp.ts)** —
-  - Pure functions: constructs responses exclusively from imported frozen static data (`mixed-campaign.json`, `showcase-export.json`).
-  - Read-only purity: tool execution performs zero mutations on DOM, application state, URL, `localStorage`, or `sessionStorage`.
-  - Transactional registration:
-    ```ts
-    const controller = new AbortController();
-    try {
-      await registerTool(tool1, { signal: controller.signal });
-      await registerTool(tool2, { signal: controller.signal });
-    } catch (err) {
-      controller.abort(); // Rollback any registered tools on partial failure
-      console.warn('WebMCP registration aborted:', err);
-    }
-    ```
-  - Registers two tools with exact native annotations:
-    - `get_campaign_summary`: `readOnlyHint: true`, `consequentialHint: false`, `untrustedContentHint: false`
-    - `get_evaluation_summary`: `readOnlyHint: true`, `consequentialHint: false`, `untrustedContentHint: false`
-  - Strict input validation against contract enums and regexes.
-  - Standard MCP result envelope:
-    ```json
-    {
-      "content": [
-        {
-          "type": "text",
-          "text": "{\"decision\":\"INCONCLUSIVE\",...}"
-        }
-      ],
-      "isError": false
-    }
-    ```
-    On invalid/unknown arguments, returns `{ content: [{ type: "text", text: "..." }], isError: true }`.
-- **[MODIFY] [frontend/src/main.tsx](file:///Users/camiloavila/Documents/qualityops-ai/frontend/src/main.tsx)** — Calls `registerDashboardWebMCP()`.
-- **[MODIFY] [.github/CODEOWNERS](file:///Users/camiloavila/Documents/qualityops-ai/.github/CODEOWNERS)** — Add `/frontend/src/webmcp.ts @camiloavilacm`.
+C2 implements `frontend/scripts/probe_webmcp.mjs --output <json>`, first used before Stage 1 lifecycle code and repeated before summary implementation and in every WebMCP CI job. It launches locked Chromium `159.0.8154.6` (Playwright `1.65.1`, Chromium revision `1255`) with `--enable-features=WebMCP`, on a local secure context. Check actual binary version, native `document.modelContext`, registration, discovery, tool execution, Hint annotations, abort cleanup, and unsupported-mode handling. Project each native tool into plain serializable name, description, input schema, and annotations before returning it through `page.evaluate`; never return native handles/window/function objects.
 
-#### 3. Test Suites & Independent Oracle Verification (F09, F10 Fixes)
-- **[MODIFY] [frontend/playwright.config.ts](file:///Users/camiloavila/Documents/qualityops-ai/frontend/playwright.config.ts)** —
-  - `chromium`: `testIgnore: ['**/webmcp.spec.ts', '**/fixtures/**', '**/helpers/**', '**/meta/**']`
-  - `chromium-webmcp`:
-    - `testMatch: '**/webmcp.spec.ts'`
-    - `use: { ...devices['Desktop Chrome'], channel: 'chromium', launchOptions: { args: ['--enable-features=WebMCP'] } }`
-- **[NEW] [frontend/tests/webmcp.spec.ts](file:///Users/camiloavila/Documents/qualityops-ai/frontend/tests/webmcp.spec.ts)** — 3 organized tests:
-  - **MCP-001 (Discovery, Annotations & Lifecycle):**
-    * Discovers tools via `page.evaluate(() => window.document.modelContext.getTools())`.
-    * Asserts exact tool set: `['get_campaign_summary', 'get_evaluation_summary']` (each registered once).
-    * Asserts `tool.annotations?.readOnlyHint === true`, `consequentialHint === false`, `untrustedContentHint === false`.
-    * Asserts repeated registration/reload is idempotent and clean.
-  - **MCP-002 (Campaign Summary vs Independent Oracle & Read-Only Purity):**
-    * Queries `get_campaign_summary` for `fixture-mixed`.
-    * Compares output directly against the independent contract oracle: **[samples/reconciliation/expectations.json](file:///Users/camiloavila/Documents/qualityops-ai/samples/reconciliation/expectations.json)** (`mixed.gate`).
-    * Tests invalid and unknown campaign IDs; asserts `{ isError: true }`.
-    * Asserts that repeated tool calls cause zero mutations to DOM, URL, or storage.
-  - **MCP-003 (Evaluation Summary vs Independent Oracle & Read-Only Purity):**
-    * Queries `get_evaluation_summary`.
-    * Compares output directly against the frozen evaluation contract ground truth.
-    * Asserts read-only purity across multiple executions.
-- **[NEW] [frontend/tests/meta/webmcp-lifecycle.spec.ts](file:///Users/camiloavila/Documents/qualityops-ai/frontend/tests/meta/webmcp-lifecycle.spec.ts)** — Meta-test verifying transactional rollback: injects a mock registration failure on tool 2 and proves tool 1 is aborted cleanly without leaving orphaned tools.
-- **[MODIFY] [frontend/tests/expected-tests.json](file:///Users/camiloavila/Documents/qualityops-ai/frontend/tests/expected-tests.json)** — Add `chromium-webmcp` project entry with 3 tests (`MCP-001`, `MCP-002`, `MCP-003`) and `minExpects`.
-- **[MODIFY] [frontend/package.json](file:///Users/camiloavila/Documents/qualityops-ai/frontend/package.json)** — Add `"test:webmcp": "playwright test --project=chromium-webmcp"`.
-- **[MODIFY] [.github/workflows/ci.yml](file:///Users/camiloavila/Documents/qualityops-ai/.github/workflows/ci.yml)** —
-  - Add parallel `frontend-webmcp` job running:
-    * `npm run check:hygiene -- --project=chromium-webmcp`
-    * `npm run build`
-    * `npm run test:webmcp`
-    * Exact execution report validation
-    * Artifact upload
-  - Add `frontend-webmcp` as a required status check in the GitHub branch ruleset.
+Separately record `page.webmcp.tools()` and `page.webmcp.callTool()` behavior. The installed adapter translates native `readOnlyHint`, `consequentialHint`, `untrustedContentHint` into `readOnly`, `consequential`, `untrustedContent`. Require native values `true`, `false`, `false`; in translated output require read-only `true` and allow the false fields to be absent, but never true. A translated omission is not evidence that the native false value was checked. The installed adapter also supports alternate native surfaces; that fallback must not silently satisfy the declared `document.modelContext` requirement.
 
-#### Gate 4 Verification (Cumulative Full Stack)
-```sh
-# Clean install and type check
-npm --prefix frontend ci
-npm --prefix frontend run build
+This is a planned runtime contract, not a claim that a probe has passed. A mismatch in native surface, signature, version, serialization, annotations, or abort behavior is `BLOCKED` before dependent implementation; record it and propose reconciliation. Unsupported user browsers still render the dashboard without uncaught errors. Do not install shims or weaken assertions to manufacture capability support.
 
-# Step 1 & 2 verification
-npm --prefix frontend run test:hygiene
-npm --prefix frontend run check:hygiene -- --project=chromium
-node frontend/scripts/test_guard_fixture.mjs
-npm --prefix frontend run test:e2e
-npm --prefix frontend run test:canary
+#### Tool contracts and lifecycle
 
-# Step 3 verification
-python3 -m pytest tests/
-python3 -m backend.export.generate --check
+Finish `frontend/src/webmcp.ts`, integrate registration in `frontend/src/main.tsx`, and protect the source via CODEOWNERS. Use only projections of the existing sanitized `showcase-export.json`:
 
-# Step 4 verification
-node frontend/scripts/probe_webmcp.mjs
-npm --prefix frontend run check:hygiene -- --project=chromium-webmcp
-npm --prefix frontend run test:webmcp
-```
-
----
-
-## 4. Final Showcase Outcomes
-
-Upon completing Step 4, the repository demonstrably proves the four essential outcomes of trustworthy AI-assisted quality engineering:
-
-| AI Agent Behavior | Guardrail / Detection Mechanism | System Outcome |
+| Tool | Exact accepted input | Successful payload |
 |---|---|---|
-| **1. Agent generates a correct test** | Passes AST hygiene, matches exact inventory, passes execution check | **Accepted for human review & merge** |
-| **2. Agent repairs an outdated locator** | Preserves assertion count, step identifiers, and passes paired canary | **Accepted for human review & merge** |
-| **3. Agent weakens or deletes an assertion** | Caught by `minExpects` count ratchet or killed by paired mutation canary | **Rejected by CI (PR Blocked)** |
-| **4. Agent encounters genuine app defect** | Retains failure in guard fixture without mutating assertion away | **Reported as Defect (PR Blocked)** |
+| `get_campaign_summary` | Object with exactly `campaign_id: "fixture-mixed"` | `{ campaign_id, gate, completeness, evidence_ids }`; `gate` is the full recorded gate for that campaign, `evidence_ids` its sanitized evidence IDs. |
+| `get_evaluation_summary` | Empty object `{}` | Existing offline `evaluation` summary: authored source, zero live trials, corpus/grader versions, case count, run IDs, baseline/candidate metrics, checks, threshold status, and promotion field. |
 
----
+Tool descriptions and payloads explicitly preserve `source: "authored"` and `live_trials: 0` for evaluation. The separately displayed recorded live benchmark is outside this tool's initial interface. No paid invocation, private evidence, held-out rubric, arbitrary path/URL, or general campaign lookup.
 
-## 5. Frozen Specification Acceptance Checklist
+Validate exact object shape in application handlers as well as advertised input schemas (`additionalProperties: false`). Reject absent campaign ID, wrong types, null/array inputs, unknown IDs, extra fields, and malformed arguments. Reject missing evaluation arguments at the application-handler boundary; the Playwright adapter may normalize omitted input to `{}`, so test that distinction in approved meta-tests instead of claiming the native UI can observe it. Invalid JSON may be rejected by the transport before handler invocation; record that boundary separately.
 
-- [x] **F01 (Governance):** Solo-maintainer ruleset configured with 0 required reviews + credential boundary.
-- [x] **F02 (Fixture Meta-Test):** Meta-tests execute production fixture via real Playwright Test runner.
-- [x] **F03 (AST Policy):** Narrow, categorized AST policies with explicit boundaries for specs, fixtures, helpers, and meta-tests.
-- [x] **F04 (File Discovery):** Independent filesystem policy rejects unapproved test filenames and rogue `test()` calls.
-- [x] **F05 (Project Inventory):** Project-aware discovery and execution verification (`chromium` vs `chromium-webmcp`).
-- [x] **F06 (Canary Isolation):** Server isolation with distinct ports, baseURL routing, HTTP mutation check, and stepId attribution.
-- [x] **F07 (Assertion Counting):** Explicitly documented as advisory quantity ratchet; semantic verification by canary + review.
-- [x] **F08 (Infrastructure Tampering):** Scope review rule strictly limits Healer changes; AST scanner bans dangerous browser escapes.
-- [x] **F09 (WebMCP Native API):** Correct `Hint` suffix annotations verified by pre-implementation capability probe.
-- [x] **F10 (WebMCP Lifecycle):** Transactional rollback verified by meta-test; read-only purity verified by zero state mutation.
-- [x] **F11 (Execution Contract):** Stable test IDs, duplicate rejection, and strict passed-status contract.
-- [x] **F12 (Cumulative Gates):** Every stage gate is cumulative, clean-checkout reproducible, and verifiable.
+Use application-owned MCP-compatible result envelopes: `{ content: [{ type: "text", text: JSON.stringify(payload) }], isError: false }`. Handled argument errors return the same envelope with `isError: true` and a bounded public error message. Do not assume the native browser validates or supplies that envelope. No paths, stack traces, labels, credentials, or private data in errors.
+
+Registration is transactional: one `AbortController` covers both tools, failure of the second registration aborts the first, repeated initialization is idempotent, explicit disposal aborts and resets state, and reinitialization after disposal is clean. Catch unsupported/failing registration without breaking the dashboard. Tool calls perform no writes to DOM, URL, storage, application data, gate decisions, or source artifacts. Host mocks and failure injection stay in the four lifecycle meta-tests.
+
+#### Independent comparisons and three interface tests
+
+L1 adds `harness/oracles/authored-evaluation-v1.json`, derived independently from pinned evaluator expectations in `evaluators/test_evaluate.py`, `evaluators/authored_examples.py`, and `evaluators/evaluate.py`, including denominators and zero-denominator states. Use evaluator interfaces as read-only sources; do not modify B-owned files or derive expected output by importing the frontend exporter. R1 independently reviews derivation. Record exact source revision, source digests, oracle bytes/digest, and reviewer verdict; no digest or approval is invented here.
+
+The oracle is a test-only expectation outside browser assets and tool inputs. Keep it and all held-out truth/rubric data out of frontend imports, bundles, served fixture roots, browser evaluations, and investigator inputs. Tests compare expectations in the runner and read only public values from the page; add a bundle/input separation check. Never fix a mismatch by changing expected values to match the exporter.
+
+Add `frontend/tests/webmcp.spec.ts` with three tests, inventoried using actual titles and reviewed assertions:
+
+- `MCP-001`: Exact two-tool discovery, plain native projections, native Hint values, separately translated annotations, bounded execution and repeated initialization without duplicates. Explicit native rollback/disposal and unsupported cases remain in the lifecycle project.
+- `MCP-002`: Exact valid campaign payload, strict invalid-input cases and bounded envelopes. Compare `gate` against `samples/reconciliation/expectations.json` at `mixed.gate` in the runner; compare completeness/evidence IDs against approved sanitized source and displayed DOM. Preserve both reasons, `BLOCKED`, and immutable provenance fields. Repeated calls leave observed state unchanged.
+- `MCP-003`: Exact authored evaluation result, strict empty-object contract, and source/zero-live-trial labeling. Compare all exposed summary fields to the independent L1 oracle and the dashboard's offline section. Repeated calls leave observed state unchanged.
+
+For purity checks, snapshot DOM, URL, localStorage, sessionStorage, and relevant application-owned data before/after repeated calls; compare source/bundle digests in the runner. Use a reviewed read-only data accessor if application state is not otherwise observable; do not add writable debug controls. Document what is observed and the limits of dynamic tests; unchanged observed values alone do not prove arbitrary code purity.
+
+## 4. Proposed Commands, Cumulative Gates, and Evidence
+
+The following command interfaces must be implemented by their owners before use. Exact report destinations are mandatory; nested orchestrators record their child commands, environments, reports, and exit codes. `ARTIFACTS` below describes paths, not an untrusted candidate override.
+
+| Planned interface | Owner and defined behavior |
+|---|---|
+| `npm --prefix frontend run pw -- <arguments>` | C1: `playwright` from locked local dependencies, running in `frontend/`; used for browser installation, version reporting, and project-specific discovery. |
+| `npm --prefix frontend run typecheck` | C1: `tsc --noEmit` over app, tests, fixture, config, and declarations. |
+| `npm --prefix frontend run test:e2e` | C1: `playwright test --project=chromium`; JSON set via `PLAYWRIGHT_JSON_OUTPUT_FILE=artifacts/e2e/report.json` and `--reporter=json`. |
+| `npm --prefix frontend run test:guard` | C1: `node scripts/test_guard_fixture.mjs --report artifacts/guard/report.json`; explicitly selects guard-meta and validates all eight executions. |
+| `npm --prefix frontend run test:webmcp-lifecycle` | C2: `node scripts/test_webmcp_lifecycle.mjs --report artifacts/webmcp-lifecycle/report.json`; explicitly selects lifecycle project and validates four executions. |
+| `npm --prefix frontend run test:hygiene` | C1: `node --test scripts/check_test_hygiene.test.mjs`. |
+| `npm --prefix frontend run check:hygiene -- --project=<name> [--report <path>]` | C1: `node scripts/check_test_hygiene.mjs`; exact discovery saved per project plus optional execution check. |
+| `npm --prefix frontend run test:canary` | C1: `node scripts/check_canary_regression.mjs --output artifacts/canary`; separate positive/mutated reports, state precheck, and attribution. |
+| `npm --prefix frontend run test:webmcp` | C2: `playwright test --project=chromium-webmcp`; `PLAYWRIGHT_JSON_OUTPUT_FILE=artifacts/webmcp/report.json` and `--reporter=json`. |
+| `node frontend/scripts/probe_webmcp.mjs --output <json>` | C2: capability checks in Stage 4, available before first lifecycle implementation; fail or block on mismatch. |
+| `python -B harness/check_healer_scope.py --verifier-revision <sha> --candidate-revision <sha>` | L1: trusted full diff/overlay allowlist and candidate scope validation, with machine-readable result. |
+| `node harness/check_pr_reports.mjs --project <name> --report <json>` | L1: independent trusted expected-set/outcome validation; report identity includes revisions/digests. |
+| `node harness/verify_red_team_matrix.mjs --local --output <directory>` | L1: thirteen isolated local cases and explicit NOT RUN remote records; no remote mutation mode in ordinary CI. |
+| `node harness/run_pr_verification.mjs --stage <1..4> --verifier-revision <sha> --candidate-revision <sha> --output <directory>` | L1: trusted cumulative launcher, restricted candidate workspace, complete command transcript, cleanup, and summary. |
+
+Frontend package commands run with `frontend/` as their working directory, so their `artifacts/...` destinations are under that directory in the disposable workspace. Direct repository-root probe/red-team outputs are explicitly rooted under `frontend/artifacts/` and `harness/artifacts/`. Each gate gets its own workspace/output root; never reuse a stale report. The launcher must reconcile paths, not assume a JSON reporter file exists because a command exited.
+
+### Cumulative command schedule
+
+For each gate, invoke the trusted launcher from its accepted revision with actual full SHAs substituted for placeholders. These are planned commands, not commands run during the documentation edit:
+
+```sh
+node harness/run_pr_verification.mjs --stage 1 --verifier-revision <verifier-sha> --candidate-revision <candidate-sha> --output <gate-1-directory>
+node harness/run_pr_verification.mjs --stage 2 --verifier-revision <verifier-sha> --candidate-revision <candidate-sha> --output <gate-2-directory>
+node harness/run_pr_verification.mjs --stage 3 --verifier-revision <verifier-sha> --candidate-revision <candidate-sha> --output <gate-3-directory>
+node harness/run_pr_verification.mjs --stage 4 --verifier-revision <verifier-sha> --candidate-revision <candidate-sha> --output <gate-4-directory>
+```
+
+The launcher records and runs these cumulative groups in dependency order, with bounded failure collection; it never skips a failed dependency and then calls the gate a pass:
+
+| Gate | Required commands and checks |
+|---|---|
+| 1 | Trusted scope preparation and image build (locked dependencies and dashboard build from verifier only); verify image-provided Chromium; `node frontend/scripts/probe_webmcp.mjs --output frontend/artifacts/probe/report.json`; `npm --prefix frontend run typecheck`; `npm --prefix frontend run build`; ordinary discovery via `npm --silent --prefix frontend run pw -- test --project=chromium --list --reporter=json` saved to `frontend/artifacts/e2e/discovery.json`; JSON ordinary execution via `PLAYWRIGHT_JSON_OUTPUT_FILE=artifacts/e2e/report.json npm --prefix frontend run test:e2e -- --reporter=json`; `npm --prefix frontend run test:guard`; `npm --prefix frontend run test:webmcp-lifecycle`; independent `check_pr_reports.mjs` for all three executing projects. |
+| 2 | All Gate 1 checks, plus `npm --prefix frontend run test:hygiene`; `check:hygiene` discovery and execution validation for `chromium`, `chromium-guard-meta`, and `chromium-webmcp-lifecycle`; `npm --prefix frontend run test:canary`; explicit KILLED attribution and baseline-owned scope tests. |
+| 3 | All Gate 2 checks, plus pinned Python/reference preparation, `python -B harness/checks.py contracts`, all six established Python/export commands in Stage 3, workflow/configuration validation, and `node harness/verify_red_team_matrix.mjs --local --output harness/artifacts/red-team`. Record R12/R14 NOT RUN with the authorization boundary. |
+| 4 | All Gate 3 checks, plus successful pre-summary-implementation probe and repeated job probe; `check:hygiene --project=chromium-webmcp`; JSON `test:webmcp`; execution revalidation using `check:hygiene --project=chromium-webmcp --report artifacts/webmcp/report.json` and independent `node harness/check_pr_reports.mjs --project chromium-webmcp --report frontend/artifacts/webmcp/report.json`; reviewed oracle provenance, bundle/input separation, DOM/offline comparisons, and native/translated annotation checks. Guard, lifecycle, canary, Python, and thirteen local red-team cases remain included. |
+
+In the schedule, `check:hygiene` and `test:webmcp` abbreviate the complete npm interfaces in the command table. For each already executed project, run `npm --prefix frontend run check:hygiene -- --project=<name> --report <frontend-relative-report>` and the independent validator with the repository-relative path. Discovery for guard/lifecycle is explicitly selected and saved by their orchestrators. The first accepted verifier must undergo infrastructure review; a candidate cannot bootstrap its own trusted status by passing itself.
+
+### Evidence contract and remaining acceptance
+
+Every cumulative gate records exact commands and working directories, exit codes, verifier/candidate revisions, dependency/Node/Python/Playwright/browser versions, source/fixture/oracle digests, discovered/executed inventories, attempt counts, guard reason attribution, canary positive/mutated outcomes, lifecycle/probe results, and per-scenario red-team outcomes. Preserve failures and relevant diagnostics. Use `PASS`, `FAIL`, `NOT RUN`, or `BLOCKED` precisely; `KILLED` is a canary classification within a verification record, not an approval status. State limitations separately and bind independent review and human acceptance to the tested final SHA.
+
+Projected outcomes remain acceptance goals: a correct generated test or valid locator repair can become a human-review candidate; weakened assertions or a known UI regression should be rejected or reported with evidence. The assertion scanner and this one mutant cannot establish universal semantic correctness. No gate here approves product release or alters deterministic campaign eligibility.
+
+## 5. Pending Acceptance Checklist
+
+- [ ] F01: Operational human review and credential boundary documented; zero required approving reviews; final-SHA acceptance; remote rules independently evidenced only when authorized.
+- [ ] F02: Production guard runs exactly eight cases, with two passing controls and six attributed failures.
+- [ ] F03: Categorized AST policies permit only declared ordinary, fixture/helper, WebMCP read-only, and meta operations.
+- [ ] F04: Filesystem scanner rejects unapproved filenames/declarations; both R1a and R1b demonstrated.
+- [ ] F05: Each project's exact discovery/execution inventory validated; no global exclusion hides meta-tests.
+- [ ] F06: Separate temporary builds/strict servers, rendered mutation precheck, positive control, designated-step kill, and cleanup verified.
+- [ ] F07: Assertion counts described and tested as deletion detection; broader semantic review recorded.
+- [ ] F08: Trusted scope/configuration/fixture/inventory/reporters outside candidate control; infrastructure changes independently reviewed and human-accepted.
+- [ ] F09: Pinned native capability probe passes before implementation and in WebMCP jobs; native versus translated fields and serialization checked separately.
+- [ ] F10: Unsupported mode, duplicate initialization, rollback, and disposal tested in reachable lifecycle project; repeated tools preserve observed state.
+- [ ] F11: Stable actual test identities, DASH-003 step attribution, duplicates, statuses, outcomes, and single attempts verified.
+- [ ] F12: All four gates cumulative and reproducible, complete offline suites included, and evidence tied to immutable revisions.
+- [ ] Authored evaluation oracle independently reviewed, source/digest recorded, and excluded from public assets/model/tool inputs.
+- [ ] All thirteen local red-team cases meet expectations, including R7 passing control; R12/R14 remain NOT RUN until separately authorized and executed.
+- [ ] Independent reviewer records final scope/security verdict and known limitations. Human accepts any trusted verifier promotion and any later merge against the final SHA.
+
+**Current execution status:** Stage 1 host development diagnostics passed (8 ordinary, 8 guard with 2 controls/6 attributed failures, 4 lifecycle; host capability probe). The shared container gate remains BLOCKED/NOT RUN. Host disk capacity and Docker availability were restored. Original pinned manifest/config/layer hashes were verified and imported, but local extracted executables are empty and trusted npm preparation exits133. A scoped removal/reload did not fix that Docker storage state. Current failure/cleanup/review evidence is retained under `harness/artifacts/`; the runtime policy is unchanged. Stages 2–4, thirteen local red-team cases, R12/R14, CI execution and human verifier acceptance remain NOT RUN. See `harness/container/implementation-record.json` for exact commands, evidence and limitations; no container isolation or remote-protection claim follows from host diagnostics.

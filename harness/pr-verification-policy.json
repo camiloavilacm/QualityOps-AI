@@ -1,0 +1,166 @@
+{
+  "version": "foundation-1",
+  "source_revision": "63bd7b88f97a4196453b728c508f9f6e32d65d7c",
+  "acceptance": "pending independent review and exact-SHA human acceptance",
+  "projects": {
+    "chromium": [
+      {
+        "id": "DASH-004",
+        "file": "tests/dashboard-flows.spec.ts",
+        "titles": [
+          "Dashboard multi-view showcase flows",
+          "passing campaign displays ELIGIBLE with complete evidence and absent investigation"
+        ]
+      },
+      {
+        "id": "DASH-005",
+        "file": "tests/dashboard-flows.spec.ts",
+        "titles": [
+          "Dashboard multi-view showcase flows",
+          "partial campaign displays INCONCLUSIVE gate and INCONCLUSIVE investigation abstention"
+        ]
+      },
+      {
+        "id": "DASH-006",
+        "file": "tests/dashboard-flows.spec.ts",
+        "titles": [
+          "Dashboard multi-view showcase flows",
+          "failing campaign keeps BLOCKED gate decision when investigator returns ERROR"
+        ]
+      },
+      {
+        "id": "DASH-007",
+        "file": "tests/dashboard-flows.spec.ts",
+        "titles": [
+          "Dashboard multi-view showcase flows",
+          "projected defect campaign displays DIAGNOSED finding with working evidence citation anchors"
+        ]
+      },
+      {
+        "id": "DASH-008",
+        "file": "tests/dashboard-flows.spec.ts",
+        "titles": [
+          "Dashboard multi-view showcase flows",
+          "evaluation view displays 120-trial live benchmark (BLOCKED FAIL) and offline authored comparison"
+        ]
+      },
+      {
+        "id": "DASH-009",
+        "file": "tests/dashboard-flows.spec.ts",
+        "titles": [
+          "Dashboard multi-view showcase flows",
+          "unknown campaign query displays unavailable fallback and navigates back"
+        ]
+      },
+      {
+        "id": "DASH-003",
+        "file": "tests/mixed-campaign.spec.ts",
+        "titles": [
+          "mixed campaign displays BLOCKED with confirmed failure for x and missing evidence for y"
+        ]
+      },
+      {
+        "id": "DASH-001",
+        "file": "tests/seed.spec.ts",
+        "titles": [
+          "Test group",
+          "seed"
+        ]
+      }
+    ],
+    "chromium-guard-meta": [
+      {
+        "id": "GUARD-001",
+        "file": "tests/meta/guard-verification.spec.ts",
+        "titles": [
+          "clean-page"
+        ]
+      },
+      {
+        "id": "GUARD-002",
+        "file": "tests/meta/guard-verification.spec.ts",
+        "titles": [
+          "uncaught-js-error"
+        ],
+        "guard_reason": "UNCAUGHT_JS_ERROR"
+      },
+      {
+        "id": "GUARD-003",
+        "file": "tests/meta/guard-verification.spec.ts",
+        "titles": [
+          "console-error"
+        ],
+        "guard_reason": "CONSOLE_ERROR"
+      },
+      {
+        "id": "GUARD-004",
+        "file": "tests/meta/guard-verification.spec.ts",
+        "titles": [
+          "same-origin-404"
+        ],
+        "guard_reason": "HTTP_404"
+      },
+      {
+        "id": "GUARD-005",
+        "file": "tests/meta/guard-verification.spec.ts",
+        "titles": [
+          "same-origin-500"
+        ],
+        "guard_reason": "HTTP_500"
+      },
+      {
+        "id": "GUARD-006",
+        "file": "tests/meta/guard-verification.spec.ts",
+        "titles": [
+          "request-failed"
+        ],
+        "guard_reason": "REQUEST_FAILED"
+      },
+      {
+        "id": "GUARD-007",
+        "file": "tests/meta/guard-verification.spec.ts",
+        "titles": [
+          "second-tab-error"
+        ],
+        "guard_reason": "UNCAUGHT_JS_ERROR"
+      },
+      {
+        "id": "GUARD-008",
+        "file": "tests/meta/guard-verification.spec.ts",
+        "titles": [
+          "navigation-abort"
+        ]
+      }
+    ],
+    "chromium-webmcp-lifecycle": [
+      {
+        "id": "LIFE-001",
+        "file": "tests/meta/webmcp-lifecycle.spec.ts",
+        "titles": [
+          "unsupported environment preserves dashboard"
+        ]
+      },
+      {
+        "id": "LIFE-002",
+        "file": "tests/meta/webmcp-lifecycle.spec.ts",
+        "titles": [
+          "duplicate initialization registers tools once"
+        ]
+      },
+      {
+        "id": "LIFE-003",
+        "file": "tests/meta/webmcp-lifecycle.spec.ts",
+        "titles": [
+          "second-registration failure rolls back first"
+        ]
+      },
+      {
+        "id": "LIFE-004",
+        "file": "tests/meta/webmcp-lifecycle.spec.ts",
+        "titles": [
+          "disposal unregisters tools and permits reinitialization"
+        ]
+      }
+    ]
+  }
+}

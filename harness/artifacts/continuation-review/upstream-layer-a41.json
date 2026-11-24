@@ -1,0 +1,23 @@
+{
+  "result": "PASS",
+  "source": "https://mcr.microsoft.com/v2/playwright/blobs/sha256:a41e11046077fca670cefe0a4d933749d030a154fc96e143e0c9aa3ca3b010a0",
+  "expected_sha256": "a41e11046077fca670cefe0a4d933749d030a154fc96e143e0c9aa3ca3b010a0",
+  "actual_sha256": "a41e11046077fca670cefe0a4d933749d030a154fc96e143e0c9aa3ca3b010a0",
+  "expected_bytes": 120071107,
+  "actual_bytes": 120071107,
+  "entry_count": 12420,
+  "selected_entries": [
+    {
+      "path": "usr/bin/node",
+      "bytes": 150348872,
+      "kind": "0",
+      "link_target": "",
+      "actual_bytes": 150348872,
+      "magic_hex": "7f454c4602010100000000000000000002003e0001000000a0248b0000000000",
+      "sha256": "d931c649850ffa7155b8ceffb400dc916ef325866e509cc52ae36e33e8fbb9a9",
+      "elf": true
+    }
+  ],
+  "elapsed_seconds": 28.739,
+  "operation": "Streamed pinned compressed layer; no extraction or Docker/cache changes."
+}

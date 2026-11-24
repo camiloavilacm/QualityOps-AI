@@ -1,0 +1,85 @@
+[
+  {
+    "command": [
+      "docker",
+      "create",
+      "--name",
+      "qualityops-base-probe-0c33ff20d2e74bbf93d7bf1738d52d91",
+      "--platform",
+      "linux/amd64",
+      "--user",
+      "pwuser",
+      "--network",
+      "none",
+      "--read-only",
+      "--cap-drop",
+      "ALL",
+      "--security-opt",
+      "no-new-privileges",
+      "--security-opt",
+      "seccomp=/Users/camiloavila/Documents/qualityops-ai/harness/container/seccomp_profile.json",
+      "--cpus",
+      "2",
+      "--memory",
+      "4294967296",
+      "--memory-swap",
+      "4294967296",
+      "--pids-limit",
+      "512",
+      "--ipc",
+      "private",
+      "--shm-size",
+      "1073741824",
+      "--tmpfs",
+      "/tmp:rw,nosuid,nodev,size=1073741824,mode=1777",
+      "--mount",
+      "type=bind,src=/Users/camiloavila/Documents/qualityops-ai/frontend/tests,dst=/opt/qualityops/frontend/tests,readonly",
+      "--mount",
+      "type=bind,src=/Users/camiloavila/Documents/qualityops-ai/harness/artifacts/base-runtime-probe-restored,dst=/evidence",
+      "--entrypoint",
+      "/bin/echo",
+      "mcr.microsoft.com/playwright@sha256:766137e2d9caad4744187e53cdc89320ba6f2eb57cff097374020944b44dd0a9",
+      "fixture-runtime-probe"
+    ],
+    "exit_code": 0,
+    "output": "12a72aa8dbe7a448e83fafdf16f4743de19cd27e03f58e389ce7f52be06d5148\nUnable to find image 'mcr.microsoft.com/playwright@sha256:766137e2d9caad4744187e53cdc89320ba6f2eb57cff097374020944b44dd0a9' locally\nmcr.microsoft.com/playwright@sha256:766137e2d9caad4744187e53cdc89320ba6f2eb57cff097374020944b44dd0a9: Pulling from playwright\nDigest: sha256:766137e2d9caad4744187e53cdc89320ba6f2eb57cff097374020944b44dd0a9\nStatus: Downloaded newer image for mcr.microsoft.com/playwright@sha256:766137e2d9caad4744187e53cdc89320ba6f2eb57cff097374020944b44dd0a9\n"
+  },
+  {
+    "command": [
+      "docker",
+      "cp",
+      "qualityops-base-probe-0c33ff20d2e74bbf93d7bf1738d52d91:/usr/bin/node",
+      "/Users/camiloavila/Documents/qualityops-ai/harness/artifacts/base-runtime-probe-restored/node-binary"
+    ],
+    "exit_code": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "docker",
+      "start",
+      "--attach",
+      "qualityops-base-probe-0c33ff20d2e74bbf93d7bf1738d52d91"
+    ],
+    "exit_code": 133,
+    "output": "rosetta error: unable to mmap ELF: 22\n "
+  },
+  {
+    "command": [
+      "docker",
+      "inspect",
+      "--format",
+      "{{json .State}}",
+      "qualityops-base-probe-0c33ff20d2e74bbf93d7bf1738d52d91"
+    ],
+    "exit_code": 0,
+    "output": "{\"Status\":\"exited\",\"Running\":false,\"Paused\":false,\"Restarting\":false,\"OOMKilled\":false,\"Dead\":false,\"Pid\":0,\"ExitCode\":133,\"Error\":\"\",\"StartedAt\":\"2026-11-24T10:57:07.425855466Z\",\"FinishedAt\":\"2026-11-24T10:57:07.49772155Z\"}\n"
+  },
+  {
+    "binary_bytes": 0,
+    "binary_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "cleanup": "PASS"
+  }
+]

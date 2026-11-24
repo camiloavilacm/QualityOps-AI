@@ -1,0 +1,76 @@
+{
+  "result": "PASS",
+  "archive_sha256": "7eb1bf93b604a34fea4ff815724b258ca415d183ffe05458ee6b6e6523f96c90",
+  "bytes": 1012686848,
+  "index": {
+    "schemaVersion": 2,
+    "mediaType": "application/vnd.oci.image.index.v1+json",
+    "manifests": [
+      {
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "digest": "sha256:766137e2d9caad4744187e53cdc89320ba6f2eb57cff097374020944b44dd0a9",
+        "size": 1644,
+        "annotations": {
+          "containerd.io/distribution.source.mcr.microsoft.com": "playwright"
+        }
+      }
+    ]
+  },
+  "verified_content": [
+    {
+      "path": "blobs/sha256/766137e2d9caad4744187e53cdc89320ba6f2eb57cff097374020944b44dd0a9",
+      "sha256": "766137e2d9caad4744187e53cdc89320ba6f2eb57cff097374020944b44dd0a9",
+      "bytes": 1644,
+      "result": "PASS"
+    },
+    {
+      "path": "blobs/sha256/12708c20bc005b7ecc920dd23b27079baa55359fd2739c7f0f3070c47cf263e9",
+      "sha256": "12708c20bc005b7ecc920dd23b27079baa55359fd2739c7f0f3070c47cf263e9",
+      "bytes": 7459,
+      "result": "PASS"
+    },
+    {
+      "path": "blobs/sha256/26538842dfbfed820e62531e047bc6cfd3359a7e0a52f59c1a951ccc6ca787fe",
+      "sha256": "26538842dfbfed820e62531e047bc6cfd3359a7e0a52f59c1a951ccc6ca787fe",
+      "bytes": 29793223,
+      "result": "PASS"
+    },
+    {
+      "path": "blobs/sha256/a41e11046077fca670cefe0a4d933749d030a154fc96e143e0c9aa3ca3b010a0",
+      "sha256": "a41e11046077fca670cefe0a4d933749d030a154fc96e143e0c9aa3ca3b010a0",
+      "bytes": 120071107,
+      "result": "PASS"
+    },
+    {
+      "path": "blobs/sha256/9e0eed0efbea1fa9e728dd871b007c05163dec7ef7fdab23b353652d842e347a",
+      "sha256": "9e0eed0efbea1fa9e728dd871b007c05163dec7ef7fdab23b353652d842e347a",
+      "bytes": 3230736,
+      "result": "PASS"
+    },
+    {
+      "path": "blobs/sha256/6802dea8d812abb78fe5f2c91d21fec13f6e18b44c93270b5c4bf43b842b63de",
+      "sha256": "6802dea8d812abb78fe5f2c91d21fec13f6e18b44c93270b5c4bf43b842b63de",
+      "bytes": 294004939,
+      "result": "PASS"
+    },
+    {
+      "path": "blobs/sha256/16013128adc12408994436e79a979c00444d275883a39ed170fb00ff95c9e193",
+      "sha256": "16013128adc12408994436e79a979c00444d275883a39ed170fb00ff95c9e193",
+      "bytes": 328985171,
+      "result": "PASS"
+    },
+    {
+      "path": "blobs/sha256/47752f912df11e40e8aa4458765dea5bc3f7203289565aac58d3e22c3ca01c93",
+      "sha256": "47752f912df11e40e8aa4458765dea5bc3f7203289565aac58d3e22c3ca01c93",
+      "bytes": 124812643,
+      "result": "PASS"
+    },
+    {
+      "path": "blobs/sha256/80e9d9e1b5bbe54a8ce0b223013d7cfdb3dcadb5dce77a24f7ad852216685223",
+      "sha256": "80e9d9e1b5bbe54a8ce0b223013d7cfdb3dcadb5dce77a24f7ad852216685223",
+      "bytes": 111767388,
+      "result": "PASS"
+    }
+  ],
+  "runtime_policy_unchanged": true
+}

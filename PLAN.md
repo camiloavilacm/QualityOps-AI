@@ -85,7 +85,7 @@ Use the same local campaign inspection for the interface comparison. Pin browser
 
 Record completion and input/output tokens for matched CLI and MCP runs. Mark token use **unmeasured** when telemetry is unavailable. See the [CLI and MCP comparison](https://github.com/microsoft/playwright-mcp#playwright-mcp-vs-playwright-cli) and [Playwright v1.64 WebMCP release notes](https://playwright.dev/docs/release-notes#version-164).
 
-### Staged Release Plan v6 (PR Verification, Agent Harness, Guardrails & WebMCP)
+### Staged PR Verification Plan v7 (Agent Harness, Guardrails & WebMCP)
 
-The frozen implementation specification for PR verification guardrails, context error guards, AST allowlisting, paired mutation canary, and native WebMCP is documented in [docs/pr-verification-webmcp-harness-plan.md](docs/pr-verification-webmcp-harness-plan.md).
+The four-stage design and approved shared Linux/amd64 container first slice for PR verification guardrails, context error guards, AST policies, an isolated paired mutation canary, complete offline CI, and bounded read-only WebMCP tools are documented in [docs/pr-verification-webmcp-harness-plan.md](docs/pr-verification-webmcp-harness-plan.md). It preserves F01–F12 traceability and the existing ownership map. The container runner and Stage 1 foundation are implemented locally; host diagnostics passed. Host capacity and daemon availability were restored, but container execution is BLOCKED by inconsistent Docker extracted-image storage (a locally empty Node executable despite valid pinned image layers), and independent review plus exact-SHA human verifier acceptance remain required. Stages 2–4 remain follow-up work. Browser CI uses bootstrap feedback, Python 3.12 offline checks are preserved, and Pages publication is held. No remote changes or release/merge eligibility are authorized. See [implementation evidence](harness/container/implementation-record.json).
 

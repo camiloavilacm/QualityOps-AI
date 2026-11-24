@@ -8,12 +8,19 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: offline-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  offline-verify:
+  python-contracts-and-eval:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
 
       - name: Fetch pinned read-only qa-features reference (e7c566ff)
         run: |
@@ -27,22 +34,17 @@ jobs:
           echo "QUALITYOPS_QA_FEATURES_ROOT=$(cd ../qa-workspace/qa-features && pwd)" >> "$GITHUB_ENV"
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: "3.12"
 
       - name: Install pinned Python harness dependency
         run: pip install --no-cache-dir -r harness/requirements.txt "jsonschema[format-nongpl]==4.26.0"
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: npm
-          cache-dependency-path: frontend/package-lock.json
-
-      - name: Install pinned frontend dependencies
-        run: npm --prefix frontend ci
+      - name: Verify contracts and container-launcher components
+        run: |
+          python -B harness/checks.py contracts
+          python -B -m unittest -v harness.test_pr_verification
 
       - name: Run A1 ingestion and deterministic gate tests
         run: python -B -m unittest -v backend.ingestion.test_importer backend.gate.test_gate
@@ -61,10 +63,41 @@ jobs:
           python -B frontend/scripts/export_mixed.py --check
           python -B frontend/scripts/export_showcase.py --check
 
-      - name: Build static dashboard
-        run: npm --prefix frontend run build
+      - name: Record sanitized export digests
+        run: sha256sum frontend/src/mixed-campaign.json frontend/src/showcase-export.json
 
-      - name: Run Playwright E2E dashboard verification
+  frontend-e2e:
+    # Bootstrap feedback only. This workflow cannot accept its own verifier revision.
+    # Trusted candidate overlays run separately from a human-accepted verifier checkout.
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout infrastructure snapshot
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Set up host launcher Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "26"
+      - name: Set up host launcher Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+      - name: Check independent report validator
+        run: node --test harness/test_pr_reports.mjs
+      - name: Run shared Linux amd64 foundation runner
         run: |
-          npx --prefix frontend playwright install --with-deps chromium
-          npm --prefix frontend run test:e2e
+          revision=$(git rev-parse HEAD)
+          node harness/run_pr_verification.mjs --bootstrap --stage 1 --verifier-revision "$revision" --candidate-revision "$revision" --output harness/artifacts/container-foundation
+      - name: Preserve bootstrap evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: container-foundation-${{ github.run_id }}-${{ github.run_attempt }}
+          # Only the stopped-container, bounded regular-file collection is uploadable.
+          path: harness/artifacts/container-foundation/publication/
+          retention-days: 7
+          if-no-files-found: error

@@ -1,0 +1,22 @@
+# Review routing; enforcement and final-SHA human authorization are separate.
+/.github/ @camiloavilacm
+/.agents/ @camiloavilacm
+/AGENTS.md @camiloavilacm
+/SPEC.md @camiloavilacm
+/PLAN.md @camiloavilacm
+/contracts/ @camiloavilacm
+/backend/ingestion/ @camiloavilacm
+/backend/gate/ @camiloavilacm
+/evaluators/ground_truth/ @camiloavilacm
+/harness/ @camiloavilacm
+/samples/ @camiloavilacm
+/frontend/AGENTS.md @camiloavilacm
+/frontend/CLAUDE.md @camiloavilacm
+/frontend/.codex/ @camiloavilacm
+/frontend/*config* @camiloavilacm
+/frontend/package*.json @camiloavilacm
+/frontend/scripts/ @camiloavilacm
+/frontend/tests/ @camiloavilacm
+/frontend/types/ @camiloavilacm
+/frontend/src/*.json @camiloavilacm
+/frontend/src/webmcp.ts @camiloavilacm

@@ -1,0 +1,21 @@
+test_child_timeout_output_limit_and_exit_are_recorded (harness.test_pr_verification.IsolationConfigurationTests.test_child_timeout_output_limit_and_exit_are_recorded) ... ok
+test_cleanup_after_ambiguous_create_requires_proven_absence (harness.test_pr_verification.IsolationConfigurationTests.test_cleanup_after_ambiguous_create_requires_proven_absence) ... ok
+test_declared_configuration_and_mutations (harness.test_pr_verification.IsolationConfigurationTests.test_declared_configuration_and_mutations) ... ok
+test_external_symlinks_parent_links_fifo_and_unknown_files_never_publish (harness.test_pr_verification.IsolationConfigurationTests.test_external_symlinks_parent_links_fifo_and_unknown_files_never_publish) ... ok
+test_image_preparation_blocks_before_low_disk_can_exhaust_reports (harness.test_pr_verification.IsolationConfigurationTests.test_image_preparation_blocks_before_low_disk_can_exhaust_reports) ... ok
+test_launcher_flags_do_not_forward_credentials_or_host_access (harness.test_pr_verification.IsolationConfigurationTests.test_launcher_flags_do_not_forward_credentials_or_host_access) ... ok
+test_live_monitor_tolerates_vanished_temporary_file_but_final_scan_is_strict (harness.test_pr_verification.IsolationConfigurationTests.test_live_monitor_tolerates_vanished_temporary_file_but_final_scan_is_strict) ... ok
+test_missing_report_and_symlink_rejected (harness.test_pr_verification.IsolationConfigurationTests.test_missing_report_and_symlink_rejected) ... ok
+test_prevalidation_scans_container_only_while_host_report_reserve_exists (harness.test_pr_verification.IsolationConfigurationTests.test_prevalidation_scans_container_only_while_host_report_reserve_exists) ... ok
+test_publication_copies_only_bounded_regular_allowlisted_files (harness.test_pr_verification.IsolationConfigurationTests.test_publication_copies_only_bounded_regular_allowlisted_files) ... ok
+test_signal_denial_reaps_exited_child_but_blocks_unproven_live_group_cleanup (harness.test_pr_verification.IsolationConfigurationTests.test_signal_denial_reaps_exited_child_but_blocks_unproven_live_group_cleanup) ... ok
+test_export_has_no_private_files_or_dot_config (harness.test_pr_verification.ScopeTests.test_export_has_no_private_files_or_dot_config) ... ok
+test_export_rejects_symlinks (harness.test_pr_verification.ScopeTests.test_export_rejects_symlinks) ... ok
+test_infrastructure_add_delete_rename_and_symlink_rejected (harness.test_pr_verification.ScopeTests.test_infrastructure_add_delete_rename_and_symlink_rejected) ... ok
+test_modified_ordinary_spec_allowed_but_untracked_not_overlaid (harness.test_pr_verification.ScopeTests.test_modified_ordinary_spec_allowed_but_untracked_not_overlaid) ... ok
+test_only_full_existing_commit_revisions (harness.test_pr_verification.ScopeTests.test_only_full_existing_commit_revisions) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 4.052s
+
+OK

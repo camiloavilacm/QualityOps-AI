@@ -1,11 +1,6 @@
 name: Deploy Static Dashboard to GitHub Pages
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "frontend/**"
-      - ".github/workflows/pages.yml"
   workflow_dispatch:
 
 permissions:
@@ -19,6 +14,8 @@ concurrency:
 
 jobs:
   build:
+    # Publication held pending separate human integration/deployment authorization.
+    if: ${{ false }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -55,6 +52,7 @@ jobs:
           path: frontend/dist
 
   deploy:
+    if: ${{ false }}
     needs: build
     runs-on: ubuntu-latest
     environment:

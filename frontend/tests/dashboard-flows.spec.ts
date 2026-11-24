@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures/dashboard'
 
 test.describe('Dashboard multi-view showcase flows', () => {
   test('passing campaign displays ELIGIBLE with complete evidence and absent investigation', async ({ page }) => {

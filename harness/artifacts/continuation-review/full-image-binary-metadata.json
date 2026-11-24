@@ -1,0 +1,104 @@
+{
+  "result": "PASS",
+  "operation": "Read-only seven-layer tar metadata and binary-prefix inspection; no extraction, execution or Docker operations.",
+  "reference": "mcr.microsoft.com/playwright@sha256:766137e2d9caad4744187e53cdc89320ba6f2eb57cff097374020944b44dd0a9",
+  "selected_entries": [
+    {
+      "layer_sha256": "26538842dfbfed820e62531e047bc6cfd3359a7e0a52f59c1a951ccc6ca787fe",
+      "path": "usr/bin/echo",
+      "bytes": 35208,
+      "kind": "0",
+      "link_target": "",
+      "magic_hex": "7f454c4602010100000000000000000003003e00010000001030000000000000",
+      "elf": true
+    },
+    {
+      "layer_sha256": "a41e11046077fca670cefe0a4d933749d030a154fc96e143e0c9aa3ca3b010a0",
+      "path": "usr/bin/node",
+      "bytes": 150348872,
+      "kind": "0",
+      "link_target": "",
+      "magic_hex": "7f454c4602010100000000000000000002003e0001000000a0248b0000000000",
+      "elf": true
+    }
+  ],
+  "layer_counts": [
+    {
+      "layer_sha256": "26538842dfbfed820e62531e047bc6cfd3359a7e0a52f59c1a951ccc6ca787fe",
+      "entries": 3442
+    },
+    {
+      "layer_sha256": "a41e11046077fca670cefe0a4d933749d030a154fc96e143e0c9aa3ca3b010a0",
+      "entries": 12420
+    },
+    {
+      "layer_sha256": "9e0eed0efbea1fa9e728dd871b007c05163dec7ef7fdab23b353652d842e347a",
+      "entries": 2
+    },
+    {
+      "layer_sha256": "6802dea8d812abb78fe5f2c91d21fec13f6e18b44c93270b5c4bf43b842b63de",
+      "entries": 20646
+    },
+    {
+      "layer_sha256": "16013128adc12408994436e79a979c00444d275883a39ed170fb00ff95c9e193",
+      "entries": 620
+    },
+    {
+      "layer_sha256": "47752f912df11e40e8aa4458765dea5bc3f7203289565aac58d3e22c3ca01c93",
+      "entries": 64
+    },
+    {
+      "layer_sha256": "80e9d9e1b5bbe54a8ce0b223013d7cfdb3dcadb5dce77a24f7ad852216685223",
+      "entries": 71
+    }
+  ],
+  "elapsed_seconds": 3.615,
+  "independent_blob_digest_verification": [
+    {
+      "digest": "766137e2d9caad4744187e53cdc89320ba6f2eb57cff097374020944b44dd0a9",
+      "bytes": 1644,
+      "result": "PASS"
+    },
+    {
+      "digest": "12708c20bc005b7ecc920dd23b27079baa55359fd2739c7f0f3070c47cf263e9",
+      "bytes": 7459,
+      "result": "PASS"
+    },
+    {
+      "digest": "26538842dfbfed820e62531e047bc6cfd3359a7e0a52f59c1a951ccc6ca787fe",
+      "bytes": 29793223,
+      "result": "PASS"
+    },
+    {
+      "digest": "a41e11046077fca670cefe0a4d933749d030a154fc96e143e0c9aa3ca3b010a0",
+      "bytes": 120071107,
+      "result": "PASS"
+    },
+    {
+      "digest": "9e0eed0efbea1fa9e728dd871b007c05163dec7ef7fdab23b353652d842e347a",
+      "bytes": 3230736,
+      "result": "PASS"
+    },
+    {
+      "digest": "6802dea8d812abb78fe5f2c91d21fec13f6e18b44c93270b5c4bf43b842b63de",
+      "bytes": 294004939,
+      "result": "PASS"
+    },
+    {
+      "digest": "16013128adc12408994436e79a979c00444d275883a39ed170fb00ff95c9e193",
+      "bytes": 328985171,
+      "result": "PASS"
+    },
+    {
+      "digest": "47752f912df11e40e8aa4458765dea5bc3f7203289565aac58d3e22c3ca01c93",
+      "bytes": 124812643,
+      "result": "PASS"
+    },
+    {
+      "digest": "80e9d9e1b5bbe54a8ce0b223013d7cfdb3dcadb5dce77a24f7ad852216685223",
+      "bytes": 111767388,
+      "result": "PASS"
+    }
+  ],
+  "later_override_review": "All seven layer tar inventories inspected for Node/echo entries and relevant ancestor/file whiteouts; none replace or remove the nonempty original binaries."
+}

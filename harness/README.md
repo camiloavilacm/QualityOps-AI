@@ -1,5 +1,8 @@
 # Stage 0 development verification
 
+For the approved shared Linux browser runner and bootstrap verification, see
+[container/README.md](container/README.md). The macOS Stage 0 harness below remains separate.
+
 Run from the repository root on macOS using a trusted Python 3.11+ environment with the dependency in harness/requirements.txt. The runner itself installs nothing. A fresh environment can be prepared outside the worktree with python3 -m venv and pip install -r harness/requirements.txt.
 
     python -B harness/verify.py

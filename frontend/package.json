@@ -7,7 +7,11 @@
     "dev": "vite --host 127.0.0.1 --strictPort",
     "build": "tsc --noEmit && vite build --base=./",
     "preview": "vite preview --host 127.0.0.1 --strictPort",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test --project=chromium",
+    "pw": "playwright",
+    "typecheck": "tsc --noEmit",
+    "test:guard": "node scripts/test_guard_fixture.mjs --report artifacts/guard/report.json",
+    "test:webmcp-lifecycle": "node scripts/test_webmcp_lifecycle.mjs --report artifacts/webmcp-lifecycle/report.json"
   },
   "dependencies": {
     "react": "19.3.1",
@@ -15,6 +19,7 @@
   },
   "devDependencies": {
     "@playwright/test": "1.65.1",
+    "@types/node": "26.0.0",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "typescript": "5.9.3",

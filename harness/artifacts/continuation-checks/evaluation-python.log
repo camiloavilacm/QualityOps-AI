@@ -1,0 +1,20 @@
+test_modified_truth_fails_before_grading (test_evaluate.ProjectionTests.test_modified_truth_fails_before_grading) ... ok
+test_standalone_allowlisted_projection (test_evaluate.ProjectionTests.test_standalone_allowlisted_projection) ... ok
+test_additional_uncertainty_requires_review (test_evaluate.ReplayTests.test_additional_uncertainty_requires_review) ... ok
+test_claims_and_safety_are_independent (test_evaluate.ReplayTests.test_claims_and_safety_are_independent) ... ok
+test_comparison_regrades_and_checks_settings (test_evaluate.ReplayTests.test_comparison_regrades_and_checks_settings) ... ok
+test_login_witnesses_support_only_status_mismatch (test_evaluate.ReplayTests.test_login_witnesses_support_only_status_mismatch) ... ok
+test_metrics_and_schema (test_evaluate.ReplayTests.test_metrics_and_schema) ... ok
+test_offline_converse_exchange_grades_unchanged_result (test_evaluate.ReplayTests.test_offline_converse_exchange_grades_unchanged_result) ... ok
+test_one_turn_support_and_abstention (test_evaluate.ReplayTests.test_one_turn_support_and_abstention) ... ok
+test_operational_error_counts_with_unknown_usage_and_cost (test_evaluate.ReplayTests.test_operational_error_counts_with_unknown_usage_and_cost) ... ok
+test_raw_manifest_binding (test_evaluate.ReplayTests.test_raw_manifest_binding) ... ok
+test_recorded_protocol_validation_with_authored_test_values (test_evaluate.ReplayTests.test_recorded_protocol_validation_with_authored_test_values) ... ok
+test_reject_coverage_safety_and_binding_changes (test_evaluate.ReplayTests.test_reject_coverage_safety_and_binding_changes) ... ok
+test_three_trial_reliability_counts_groups_and_retains_failures (test_evaluate.ReplayTests.test_three_trial_reliability_counts_groups_and_retains_failures) ... ok
+test_thresholds_check_cost_outlier_latency_boundary_and_empty_metrics (test_evaluate.ReplayTests.test_thresholds_check_cost_outlier_latency_boundary_and_empty_metrics) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.981s
+
+OK
