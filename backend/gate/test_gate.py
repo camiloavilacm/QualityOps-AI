@@ -257,3 +257,6 @@ class RecordedTests(unittest.TestCase):
         wrong = receipt.with_name("archive-failure.json")
         with self.assertRaisesRegex(a1.ImportError, "embedded receipt differs"):
             replay(bundle, LOCAL_POLICY, wrong, scratch=self.scratch)
+
+# H1 disposable remote enforcement probe
+this is intentionally invalid Python syntax
