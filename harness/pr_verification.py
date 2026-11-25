@@ -104,7 +104,11 @@ def allowed_evidence(name):
                     'e2e.log', 'guard.log', 'lifecycle.log', 'canary.log',
                     'hygiene-unit.log',
                     'hygiene-chromium.log', 'hygiene-chromium-guard-meta.log',
-                    'hygiene-chromium-webmcp-lifecycle.log'}:
+                    'hygiene-chromium-webmcp-lifecycle.log', 'red-team.log', 'ci-workflow.log',
+                    'red-team-unit.log', 'ci-workflow-unit.log'}:
+        return True
+    if relative == 'red-team/publication/red-team-summary.json' or re.fullmatch(
+            r'red-team/publication/cases/R(?:1a|1b|[2-9]|1[0-1]|13)[.]json', relative):
         return True
     if re.fullmatch(r'(e2e|guard|lifecycle)/(report|discovery|orchestrator)[.]json', relative):
         return True
@@ -212,7 +216,10 @@ def collect_publication(output, report):
 def export_files(root, commit, target):
     """No archive extraction, Git checkout hooks, symlinks, or private directories."""
     files = git(root, "ls-tree", "-rz", commit, "--", "frontend", "harness/container",
-                "harness/pr-verification-policy.json", ".github/workflows/ci.yml").split(b"\0")
+                "harness/pr-verification-policy.json", "harness/verify_red_team_matrix.mjs",
+                "harness/red_team_cases.mjs", "harness/check_ci_workflow.mjs", "harness/check_healer_scope.py",
+                "harness/test_red_team_matrix.mjs", "harness/test_ci_workflow.mjs",
+                ".github/workflows/ci.yml", ".github/dependabot.yml").split(b"\0")
     for row in filter(None, files):
         header, raw_name = row.split(b"\t", 1)
         mode, kind, blob = header.split()
@@ -220,7 +227,8 @@ def export_files(root, commit, target):
         if mode not in (b"100644", b"100755") or kind != b"blob" or ".." in Path(name).parts:
             raise Blocked("source export requires ordinary files")
         # .npmrc, .env and other hidden configuration are never build inputs.
-        if any(part.startswith(".") for part in Path(name).parts) and name != ".github/workflows/ci.yml":
+        if any(part.startswith(".") for part in Path(name).parts) and name not in {
+                ".github/workflows/ci.yml", ".github/dependabot.yml"}:
             continue
         if any(part in {"node_modules", "dist", "artifacts", "test-results", "playwright-report"}
                for part in Path(name).parts):
@@ -319,6 +327,8 @@ def main():
     scratch_manager = None
     env = {"PATH": os.environ.get("PATH", os.defpath), "LANG": "C.UTF-8",
            "PW_VERIFIER_REVISION": args.verifier_revision, "PW_CANDIDATE_REVISION": args.candidate_revision}
+    if os.environ.get("QUALITYOPS_QA_FEATURES_ROOT"):
+        env["QUALITYOPS_QA_FEATURES_ROOT"] = os.environ["QUALITYOPS_QA_FEATURES_ROOT"]
 
     def run(argv, *, timeout=300, cwd=ROOT, monitor=None):
         remaining = 1800 - (time.monotonic() - started)
@@ -351,6 +361,9 @@ def main():
                      "harness/check_hygiene_report.mjs", "harness/check_canary_report.mjs",
                      "harness/test_pr_verification.py", "harness/test_pr_reports.mjs",
                      "harness/test_stage2_report_validation.mjs",
+                     "harness/check_ci_workflow.mjs", "harness/test_ci_workflow.mjs",
+                     "harness/verify_red_team_matrix.mjs", "harness/red_team_cases.mjs",
+                     "harness/test_red_team_matrix.mjs",
                      "harness/pr-verification-policy.json", "harness/container/runtime-policy.json"]:
             try:
                 recorded = git(ROOT, "show", args.verifier_revision + ":" + file)
@@ -364,6 +377,19 @@ def main():
             run(["python3", "-B", "-m", "unittest", "harness.test_pr_verification", "-q"])
             run(["node", "--test", str(ROOT / "harness/test_pr_reports.mjs")])
             run(["node", "--test", str(ROOT / "harness/test_stage2_report_validation.mjs")])
+        if args.stage >= 3:
+            stage3_commands = [
+                ["python3", "-B", "harness/checks.py", "contracts"],
+                ["python3", "-B", "-m", "unittest", "-v", "backend.ingestion.test_importer", "backend.gate.test_gate"],
+                ["python3", "-B", "-m", "unittest", "-v", "backend.investigator.test_investigator", "backend.investigator.test_retrieval"],
+                ["python3", "-B", "-m", "unittest", "discover", "-s", "evaluators", "-p", "test_evaluate.py", "-v"],
+                ["python3", "-B", "-m", "unittest", "-v", "tests/test_vertical_slice.py"],
+                ["python3", "-B", "frontend/scripts/export_mixed.py", "--check"],
+                ["python3", "-B", "frontend/scripts/export_showcase.py", "--check"],
+                ["ruby", "-e", "require 'yaml'; YAML.parse_file('.github/workflows/ci.yml'); YAML.parse_file('.github/dependabot.yml')"],
+            ]
+            for command in stage3_commands:
+                run(command)
         # External maintainer record is never loaded from candidate inputs or mounted into Docker.
         if args.bootstrap:
             if args.candidate_revision != args.verifier_revision:
@@ -465,6 +491,24 @@ def main():
                      "--summary", str(evidence / "canary/summary.json"),
                      "--verifier-revision", args.verifier_revision,
                      "--candidate-revision", args.candidate_revision])
+            if args.stage >= 3:
+                matrix = read_json(evidence / "red-team/publication/red-team-summary.json")
+                local = matrix.get("local_scenarios", [])
+                expected_ids = {"R1a", "R1b", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "R10", "R11", "R13"}
+                if (matrix.get("result") != "PASS" or matrix.get("verifier_revision") != args.verifier_revision or
+                        matrix.get("candidate_revision") != args.candidate_revision or
+                        {row.get("id") for row in local} != expected_ids or
+                        any(row.get("status") != "PASS" or row.get("workspace_cleanup") != "PASS" for row in local) or
+                        next((row for row in local if row.get("id") == "R7"), {}).get("cumulative_control") !=
+                            {"result": "PASS", "canary": "KILLED", "evidence": "canary/summary.json"} or
+                        matrix.get("remote_scenarios") != [
+                            {"id": "R12", "status": "NOT RUN", "reason": "separate authorization and disposable remote target required"},
+                            {"id": "R14", "status": "NOT RUN", "reason": "separate authorization and disposable remote target required"}]):
+                    raise Blocked("local red-team matrix is incomplete or remote status is inaccurate")
+                for row in local:
+                    case = read_json(evidence / "red-team/publication/cases" / (row["id"] + ".json"))
+                    if case != row:
+                        raise Blocked("red-team case artifact does not match its summary row")
             report["result"] = "PASS"
     except (Blocked, ValueError, KeyError, OSError, subprocess.SubprocessError) as exc:
         report["reason"] = str(exc) if not isinstance(exc, subprocess.SubprocessError) else "unresolvable revision or local daemon"

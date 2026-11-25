@@ -17,6 +17,7 @@ from pr_verification import (Blocked, bounded_command, cleanup_container, collec
                              allowed_evidence, docker_arguments, evidence_files, export_files, read_json,
                              reap_command_group, require_preparation_space, verify_inspection)
 
+ROOT = Path(__file__).resolve().parents[1]
 POLICY = json.loads((Path(__file__).parent / "container/runtime-policy.json").read_bytes())
 REPORT_POLICY = json.loads((Path(__file__).parent / "pr-verification-policy.json").read_bytes())
 
@@ -176,6 +177,16 @@ class IsolationConfigurationTests(unittest.TestCase):
 
 
 class Stage2PolicyTests(unittest.TestCase):
+    def test_stage_three_publication_artifacts_are_bounded_and_narrowly_allowlisted(self):
+        for name in ["container/red-team/publication/red-team-summary.json",
+                     "container/red-team/publication/cases/R1a.json",
+                     "container/red-team/publication/cases/R10.json",
+                     "container/red-team/publication/cases/R13.json"]:
+            with self.subTest(name=name): self.assertTrue(allowed_evidence(name))
+        for name in ["container/red-team/summary.json", "container/red-team/publication/cases/R12.json",
+                     "container/red-team/publication/raw.log"]:
+            with self.subTest(name=name): self.assertFalse(allowed_evidence(name))
+
     def test_stage_two_artifacts_are_narrowly_allowlisted(self):
         allowed = [
             "container/hygiene/chromium/chromium-hygiene.json",
@@ -195,7 +206,13 @@ class Stage2PolicyTests(unittest.TestCase):
                 self.assertFalse(allowed_evidence(name))
 
     def test_cumulative_stage_two_is_explicitly_enabled(self):
-        self.assertEqual(POLICY["implemented_stages"], [1, 2])
+        self.assertEqual(POLICY["implemented_stages"], [1, 2, 3])
+
+    def test_stage_three_is_enabled_only_after_offline_suite_and_red_team_are_defined(self):
+        self.assertIn(3, POLICY["implemented_stages"])
+        for path in (ROOT / "harness/verify_red_team_matrix.mjs", ROOT / "harness/red_team_cases.mjs",
+                     ROOT / "harness/test_red_team_matrix.mjs"):
+            self.assertTrue(path.is_file(), path.name)
 
     def test_trusted_inventory_has_unique_ids_and_reviewed_assertion_minima(self):
         expected_counts = {"chromium": 8, "chromium-guard-meta": 8, "chromium-webmcp-lifecycle": 4}

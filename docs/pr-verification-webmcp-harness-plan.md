@@ -1,6 +1,6 @@
 # Staged PR Verification Plan (v7) — Agent Harness, Guardrails & WebMCP
 
-**Status:** Stage 1 shared-container foundation implemented, independently reviewed, human-accepted at verifier SHA `06a50ab582e1e9b6c19254964603df534b4794cd`, and integrated into `main` at `4cfe008bb6156d670504f50241adbb399f9dbd85`. The trusted Stage 1 container gate passed. Stage 2 inventory, hygiene and paired-canary work is now active; later acceptance boxes remain unchecked.
+**Status:** Stage 1 shared-container foundation implemented, independently reviewed, human-accepted at verifier SHA `06a50ab582e1e9b6c19254964603df534b4794cd`, and integrated into `main` at `4cfe008bb6156d670504f50241adbb399f9dbd85`. Stage 2 was accepted at verifier SHA `5db0a06a76e33bffdd5edbe6ffc4134d8e5b0f63` and merged at `d4700b0969c7f943e89ef73c87befcf74cbb24ff`. Stage 3 offline CI and local red-team implementation is in progress on `stage3/complete-offline-ci-redteam`. Its local component suites pass; the cumulative container run is NOT RUN because the local host has 9.5 GiB free, below the runner's 10 GiB preparation prerequisite. R12/R14 remain NOT RUN, and Stage 4 remains unimplemented.
 
 **Objective:** Establish reproducible evidence that a proposed test change preserves a reviewed requirement and detects its declared regression, then submit that evidence and the final commit SHA for human review. PR verification does not compute or override the product's deterministic campaign gate. Neither successful CI nor agent output authorizes release, merge, model promotion, or deployment.
 

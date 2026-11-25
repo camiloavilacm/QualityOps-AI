@@ -81,6 +81,12 @@ try {
       { env: { PW_HYGIENE_OUTPUT_DIR: '/evidence/hygiene/chromium-webmcp-lifecycle' } }],
     ['canary', ['npm', 'run', 'test:canary'], { env: { PW_CANARY_OUTPUT_DIR: '/evidence/canary' } }],
   )
+  if (stage >= 3) steps.push(
+    ['red-team', ['node', '/opt/qualityops/harness/verify_red_team_matrix.mjs', '--local', '--output', '/evidence/red-team']],
+    ['ci-workflow', ['node', '/opt/qualityops/harness/check_ci_workflow.mjs']],
+    ['red-team-unit', ['node', '--test', '/opt/qualityops/harness/test_red_team_matrix.mjs']],
+    ['ci-workflow-unit', ['node', '--test', '/opt/qualityops/harness/test_ci_workflow.mjs']],
+  )
   result = 'PASS'
   for (const [name, argv, options] of steps) {
     if (!await command(name, argv, options)) { result = 'FAIL'; break }
@@ -90,7 +96,8 @@ try {
 } finally {
   write('/evidence/foundation.json', { result, commands: records,
     limitations: ['Bootstrap evidence requires independent review and SHA-bound human acceptance.',
-      ...(stage < 2 ? ['Stage 2 hygiene/canary, Stage 3 red-team and Stage 4 summaries are not run in this stage.']
-        : ['Stage 3 red-team and Stage 4 summaries are not implemented in this slice.'])] })
+      ...(stage < 2 ? ['Stage 2 hygiene/canary, Stage 3 offline CI/red-team and Stage 4 summaries are not run in this stage.']
+        : stage < 3 ? ['Stage 3 offline CI/red-team and Stage 4 summaries are not run in this stage.']
+          : ['Stage 3 offline Python suites run on the trusted host; Stage 4 summaries are not implemented.'])] })
 }
 process.exitCode = result === 'PASS' ? 0 : 1
