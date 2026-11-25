@@ -138,6 +138,20 @@ async function runR7BrowserControl(root, artifactDirectory) {
   const priorCwd = process.cwd()
   const outcomes = []
   const reports = []
+  const diagnosticSummary = report => {
+    const rows = playwrightTests(report)
+    const allowed = new Set(['passed', 'failed', 'skipped', 'timedOut', 'interrupted', 'expected', 'unexpected'])
+    const safe = value => typeof value === 'string' && allowed.has(value) ? value : 'OTHER'
+    return { report_error_count: Math.min(Array.isArray(report.errors) ? report.errors.length : 0, 10),
+      test_count: rows.length, tests: rows.slice(0, 5).map(test => ({
+        expected_title_match: test.title === 'mixed campaign displays BLOCKED with confirmed failure for x and missing evidence for y',
+        expected_file_match: test.file === 'tests/mixed-campaign.spec.ts',
+        expected_project_match: test.projectName === 'chromium',
+        expected_status: safe(test.expectedStatus), status: safe(test.status),
+        attempt_count: Math.min(Array.isArray(test.results) ? test.results.length : 0, 10),
+        result_status: safe(test.results?.[0]?.status), retry: Number.isInteger(test.results?.[0]?.retry) ? test.results[0].retry : -1,
+      })) }
+  }
   const fail = async (variant, code, details, output) => {
     const evidence = { variant, reason_code: code, ...details }
     if (output) {
@@ -201,6 +215,7 @@ async function runR7BrowserControl(root, artifactDirectory) {
       }
       catch { await fail(name, 'REPORT_INVALID', { timed_out: child.timedOut, exit_code: child.exit_code }, output) }
       const reportHash = createHash('sha256').update(reportBytes).digest('hex')
+      const diagnostics = diagnosticSummary(report)
       try {
         assert.equal(child.timedOut, false)
         assert.equal(child.exit_code, 0)
@@ -219,8 +234,9 @@ async function runR7BrowserControl(root, artifactDirectory) {
         outcomes.push({ variant: name, status: 'PASS', tests: count, report_sha256: reportHash })
         reports.push(`R7/${reportName}`)
       } catch {
-        await fail(name, child.timedOut ? 'PLAYWRIGHT_TIMEOUT' : 'PLAYWRIGHT_FAILED',
-          { timed_out: child.timedOut, exit_code: child.exit_code, report_sha256: reportHash }, output)
+        const reasonCode = child.timedOut ? 'PLAYWRIGHT_TIMEOUT' : child.exit_code === 0 ? 'REPORT_INVALID' : 'PLAYWRIGHT_FAILED'
+        await fail(name, reasonCode, { timed_out: child.timedOut, exit_code: child.exit_code,
+          report_sha256: reportHash, diagnostics }, output)
       }
     }
     return { result: 'PASS', locator: 'fixture-mixed', original: outcomes[0], renamed_control: outcomes[1],
