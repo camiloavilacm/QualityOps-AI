@@ -300,7 +300,7 @@ export const localCases = [
   }, /Exactly one production fixture import/) },
   { id: 'R10', title: 'mandatory verification workflow removal rejected', run: async ({ root }) => {
     const [config, pkg, workflow] = await Promise.all([configSource(root), packageSource(root), workflowSource(root)])
-    assert.throws(() => checkConfiguration(config, pkg, workflow.replace('node harness/run_pr_verification.mjs', 'node harness/removed.mjs')), /Missing workflow command/)
+    assert.throws(() => checkConfiguration(config, pkg, workflow.replaceAll('node harness/run_pr_verification.mjs', 'node harness/removed.mjs')), /Missing workflow command/)
     await rejectsScopeEdit('workflow')
   } },
   { id: 'R11', title: 'hygiene checker replacement rejected before execution', run: () => rejectsScopeEdit('checker') },
