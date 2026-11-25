@@ -20,7 +20,7 @@
     "C_worktree": "/private/var/tmp/qualityops-container-continuation-c",
     "reviewer": "Read-only independent continuation review; persistent artifacts under harness/artifacts/continuation-review/"
   },
-  "status": "Stage 1 accepted; Stage 2 accepted; Stage 3 implementation and exact-SHA bootstrap PASS; independent review and human acceptance pending",
+  "status": "Stage 1 accepted; Stage 2 accepted; Stage 3 exact-SHA review, human acceptance, and trusted accepted run PASS",
   "host_runtime": {
     "node": "v26.13.1",
     "python": "Python 3.15.2",
@@ -366,7 +366,12 @@
     },
     "trust": "BOOTSTRAP ONLY; independent review and exact-SHA human acceptance required",
     "independent_review": "PASS: /root/stage3_review; read-only review of verifier SHA b50868ed1e6fd3fa5c630664c16620d7a6eb85fe; no material findings; report metadata, scope, cleanup, artifacts, matrix, and R7 report digests verified.",
-    "human_acceptance": "PENDING",
-    "remote_actions": "No push, PR, merge, deployment, paid inference, AWS operation, or remote ruleset operation performed."
+    "human_acceptance": "PASS: user accepted verifier SHA b50868ed1e6fd3fa5c630664c16620d7a6eb85fe with runtime-policy SHA-256 3ab18c96df18cfeba7363b7a167f5c5e9142a1baa4af87aa21d02183c498db92.",
+    "remote_actions": "No push, PR, merge, deployment, paid inference, AWS operation, or remote ruleset operation performed.",
+    "acceptance_record": "/private/var/tmp/qualityops-verifier-acceptance-b50868e.json",
+    "acceptance_record_sha256": "5190ca0ea077a1ad414b33fa40afc7c515fb789527082119c735712652026d2e",
+    "accepted_run_command": "QUALITYOPS_VERIFIER_ACCEPTANCE=/private/var/tmp/qualityops-verifier-acceptance-b50868e.json node harness/run_pr_verification.mjs --stage 3 --verifier-revision b50868ed1e6fd3fa5c630664c16620d7a6eb85fe --candidate-revision b50868ed1e6fd3fa5c630664c16620d7a6eb85fe --output /private/var/tmp/qualityops-stage3-accepted-b50868e",
+    "accepted_run_evidence": "/private/var/tmp/qualityops-stage3-accepted-b50868e/summary.json",
+    "accepted_run_result": "PASS; acceptance record digest is bound in report; scope has zero candidate changes; cleanup and artifact collection PASS."
   }
 }
