@@ -142,19 +142,25 @@ async function runR7BrowserControl(root, artifactDirectory) {
     const evidence = { variant, reason_code: code, ...details }
     if (output) {
       try {
-        const reportBytes = await readFile(join(output, 'report.json'))
+        const reportPath = join(output, 'report.json')
+        const reportInfo = await lstat(reportPath)
+        if (!reportInfo.isFile() || reportInfo.isSymbolicLink() || reportInfo.size > 8 * 1024 * 1024) throw new Error('invalid report file')
+        const reportBytes = await readFile(reportPath)
         evidence.report_sha256 = createHash('sha256').update(reportBytes).digest('hex')
       } catch {}
       const testResults = join(output, 'test-results')
       let trace
       try {
         const found = []
-        async function findTraces(directory) {
+        let entriesSeen = 0
+        async function findTraces(directory, depth = 0) {
+          assert.ok(depth <= 8, 'failure artifact depth exceeded')
           for (const entry of await readdir(directory, { withFileTypes: true })) {
+            assert.ok(++entriesSeen <= 1024, 'failure artifact count exceeded')
             const path = join(directory, entry.name)
             const info = await lstat(path)
             if (info.isSymbolicLink() || (!info.isDirectory() && !info.isFile())) throw new Error('unsafe test artifact')
-            if (info.isDirectory()) await findTraces(path)
+            if (info.isDirectory()) await findTraces(path, depth + 1)
             else if (entry.name === 'trace.zip') found.push(path)
           }
         }
@@ -188,7 +194,11 @@ async function runR7BrowserControl(root, artifactDirectory) {
         'tests/mixed-campaign.spec.ts', '--project=chromium', '--reporter=json', '--retries=0'], env, 180_000)
       await server.close()
       let reportBytes, report
-      try { reportBytes = await readFile(reportPath); report = JSON.parse(reportBytes) }
+      try {
+        const info = await lstat(reportPath)
+        assert.ok(info.isFile() && !info.isSymbolicLink() && info.size <= 8 * 1024 * 1024)
+        reportBytes = await readFile(reportPath); report = JSON.parse(reportBytes)
+      }
       catch { await fail(name, 'REPORT_INVALID', { timed_out: child.timedOut, exit_code: child.exit_code }, output) }
       const reportHash = createHash('sha256').update(reportBytes).digest('hex')
       try {
