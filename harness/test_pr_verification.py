@@ -188,6 +188,8 @@ class Stage2PolicyTests(unittest.TestCase):
                 validate_red_team_scenario_ids(rows, expected)
 
     def test_stage_three_publication_artifacts_are_bounded_and_narrowly_allowlisted(self):
+        self.assertTrue(allowed_evidence("container/r7-variant-unit.log"))
+        self.assertFalse(allowed_evidence("container/r7-extra.log"))
         for name in ["container/red-team/publication/red-team-summary.json",
                      "container/red-team/publication/cases/R1a.json",
                      "container/red-team/publication/cases/R10.json",

@@ -105,7 +105,7 @@ def allowed_evidence(name):
                     'hygiene-unit.log',
                     'hygiene-chromium.log', 'hygiene-chromium-guard-meta.log',
                     'hygiene-chromium-webmcp-lifecycle.log', 'red-team.log', 'ci-workflow.log',
-                    'red-team-unit.log', 'ci-workflow-unit.log'}:
+                    'red-team-unit.log', 'ci-workflow-unit.log', 'r7-variant-unit.log'}:
         return True
     if relative == 'red-team/publication/red-team-summary.json' or re.fullmatch(
             r'red-team/publication/cases/R(?:1a|1b|[2-9]|1[0-1]|13)[.]json', relative):
