@@ -1,5 +1,5 @@
 import { test, expect } from '../fixtures/dashboard'
-import { createToolLifecycle, type RegistrationHost } from '../../src/webmcp'
+import { createToolLifecycle, createDashboardTools, type RegistrationHost } from '../../src/webmcp'
 
 const definitions: NativeToolDefinition[] = ['lifecycle_one', 'lifecycle_two'].map(name => ({ name, description: 'Lifecycle-only fixture', inputSchema: { type: 'object' }, annotations: { readOnlyHint: true, consequentialHint: false, untrustedContentHint: false }, execute: () => ({}) }))
 function mockHost(failSecond = false) {
@@ -17,6 +17,16 @@ function mockHost(failSecond = false) {
 test('unsupported environment preserves dashboard', async ({ page }) => {
   const lifecycle = createToolLifecycle()
   expect(await lifecycle.initialize(undefined, definitions)).toBe(false)
+  const [campaignTool, evaluationTool] = createDashboardTools()
+  // Adapter omissions may normalize to {}; these assertions exercise the real handler boundary.
+  for (const input of [undefined, null, [], 1, '{}', '{', { extra: true }]) {
+    expect(await evaluationTool.execute(input)).toMatchObject({ isError: true })
+  }
+  expect(await evaluationTool.execute({})).toMatchObject({ isError: false })
+  for (const input of [undefined, null, [], '{}', '{', {}, { campaign_id: 1 }, { campaign_id: 'fixture-pass' }, { campaign_id: 'fixture-mixed', extra: true }]) {
+    expect(await campaignTool.execute(input)).toMatchObject({ isError: true })
+  }
+  expect(await campaignTool.execute({ campaign_id: 'fixture-mixed' })).toMatchObject({ isError: false })
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'Campaigns' })).toBeVisible()
   lifecycle.dispose()

@@ -1,5 +1,5 @@
 {
-  "version": "stage2-1",
+  "version": "stage4-1",
   "source_revision": "4cfe008bb6156d670504f50241adbb399f9dbd85",
   "acceptance": "Stage 2 verifier baseline; assertions and canary independently checked against this policy.",
   "projects": {
@@ -156,7 +156,7 @@
         "titles": [
           "unsupported environment preserves dashboard"
         ],
-        "min_expects": 2
+        "min_expects": 6
       },
       {
         "id": "LIFE-002",
@@ -182,6 +182,26 @@
         ],
         "min_expects": 5
       }
+    ],
+    "chromium-webmcp": [
+      {
+        "id": "MCP-001",
+        "file": "tests/webmcp.spec.ts",
+        "titles": ["MCP-001 discovers exact native and adapter read-only tool contracts after initialization"],
+        "min_expects": 15
+      },
+      {
+        "id": "MCP-002",
+        "file": "tests/webmcp.spec.ts",
+        "titles": ["MCP-002 preserves the displayed mixed campaign and rejects invalid summary arguments without state changes"],
+        "min_expects": 24
+      },
+      {
+        "id": "MCP-003",
+        "file": "tests/webmcp.spec.ts",
+        "titles": ["MCP-003 returns only the authored zero-live-trial evaluation and preserves observed state"],
+        "min_expects": 27
+      }
     ]
   },
   "canary": {
@@ -199,11 +219,5 @@
       "REQUIRED_FAILURE",
       "INSUFFICIENT_EVIDENCE"
     ]
-  },
-  "pending_projects": {
-    "chromium-webmcp": {
-      "status": "NOT INTRODUCED",
-      "count": 0
-    }
   }
 }

@@ -10,7 +10,7 @@ import { run, save, tests as reportTests } from './foundation_report.mjs'
 export const frontendRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const projects = ['chromium', 'chromium-guard-meta', 'chromium-webmcp', 'chromium-webmcp-lifecycle']
 const ordinaryFiles = ['tests/seed.spec.ts', 'tests/mixed-campaign.spec.ts', 'tests/dashboard-flows.spec.ts']
-const protectedFiles = ['tests/fixtures/dashboard.ts', 'tests/meta/guard-verification.spec.ts', 'tests/meta/webmcp-lifecycle.spec.ts']
+const protectedFiles = ['tests/fixtures/dashboard.ts', 'tests/meta/guard-verification.spec.ts', 'tests/meta/webmcp-lifecycle.spec.ts', 'tests/webmcp.spec.ts']
 const digest = bytes => createHash('sha256').update(bytes).digest('hex')
 const identity = entry => JSON.stringify([entry.project, entry.file, entry.titlePath])
 const syntax = (file, source) => {
@@ -24,7 +24,7 @@ const textLiteral = node => node && (ts.isStringLiteral(node) || ts.isNoSubstitu
 const callbackOf = node => node.arguments.find(arg => ts.isArrowFunction(arg) || ts.isFunctionExpression(arg))
 
 export function readInventory(value) {
-  assert.equal(value.version, 'stage2-1')
+  assert.equal(value.version, 'stage4-1')
   assert.deepEqual(Object.keys(value.projects).sort(), [...projects].sort(), 'Four explicit project contracts')
   const ids = new Set(), keys = new Set()
   for (const project of projects) {
@@ -231,17 +231,65 @@ export function checkOrdinarySource(file, source) {
   return declarations(file, source)
 }
 
-/** Reserved Stage 4 checker: this does not introduce or accept absent WebMCP tests. */
+/** Bounded read-only browser callback policy, checked in addition to protected source bytes. */
 export function checkReadOnlyEvaluation(source) {
   const tree = syntax('read-only-evaluation.ts', source)
-  const allowed = new Set(['document.modelContext.getTools', 'document.modelContext.executeTool', 'document.querySelector', 'document.querySelectorAll', 'localStorage.getItem', 'localStorage.key', 'sessionStorage.getItem', 'sessionStorage.key', 'JSON.stringify', 'JSON.parse', 'Object.keys', 'Object.entries', 'Array.from'])
+  const allowed = new Set(['document.modelContext.getTools', 'document.modelContext.executeTool', 'document.querySelector', 'document.querySelectorAll', 'localStorage.getItem', 'localStorage.key', 'sessionStorage.getItem', 'sessionStorage.key', 'JSON.stringify', 'JSON.parse', 'Object.keys', 'Object.entries', 'Object.getOwnPropertyDescriptor', 'Array.from'])
+  const arrays = new Set()
   visit(tree, node => {
-    if (ts.isNewExpression(node) || ts.isElementAccessExpression(node) || ts.isDeleteExpression(node) || ts.isImportDeclaration(node) || ts.isImportEqualsDeclaration(node) || ts.isTaggedTemplateExpression(node)) throw new Error('WebMCP evaluation escape')
+    if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer) {
+      const expression = ts.isAwaitExpression(node.initializer) ? node.initializer.expression : node.initializer
+      if (ts.isCallExpression(expression) && name(expression.expression) === 'document.modelContext.getTools') arrays.add(node.name.text)
+    }
+  })
+  for (const array of arrays) {
+    let bindings = 0
+    visit(tree, node => { if ((ts.isVariableDeclaration(node) || ts.isParameter(node) || ts.isBindingElement(node)) && ts.isIdentifier(node.name) && node.name.text === array) bindings++ })
+    assert.equal(bindings, 1, 'Native tool array alias cannot be shadowed')
+    allowed.add(`${array}.map`); allowed.add(`${array}.find`)
+  }
+  visit(tree, node => {
+    if (ts.isNewExpression(node) || ts.isElementAccessExpression(node) || ts.isDeleteExpression(node) || ts.isImportDeclaration(node) || ts.isImportEqualsDeclaration(node) || ts.isTaggedTemplateExpression(node) || ts.isClassExpression(node) || ts.isClassDeclaration(node) || ts.isGetAccessorDeclaration(node) || ts.isSetAccessorDeclaration(node) || ts.isForInStatement(node) || ts.isForOfStatement(node) || ts.isForStatement(node)) throw new Error('WebMCP evaluation escape')
     if (ts.isBinaryExpression(node) && node.operatorToken.kind >= ts.SyntaxKind.FirstAssignment && node.operatorToken.kind <= ts.SyntaxKind.LastAssignment) throw new Error('WebMCP evaluation mutation')
+    if ((ts.isPrefixUnaryExpression(node) || ts.isPostfixUnaryExpression(node)) && [ts.SyntaxKind.PlusPlusToken, ts.SyntaxKind.MinusMinusToken].includes(node.operator)) throw new Error('WebMCP evaluation mutation')
+    if (ts.isPropertyAccessExpression(node) && ['constructor', 'prototype', '__proto__'].includes(node.name.text)) throw new Error('WebMCP reflective escape')
     if (ts.isCallExpression(node) && !allowed.has(name(node.expression))) throw new Error(`Unapproved read-only operation: ${name(node.expression)}`)
     if (ts.isIdentifier(node) && ['fetch', 'eval', 'Function', 'process', 'require', 'setTimeout', 'setInterval'].includes(node.text)) throw new Error('WebMCP evaluation global escape')
   })
   return true
+}
+
+export function checkWebMCPSource(file, source) {
+  const tree = syntax(file, source)
+  let fixtureImports = 0, observations = 0
+  visit(tree, node => {
+    if (ts.isImportDeclaration(node)) {
+      const module = textLiteral(node.moduleSpecifier), clause = node.importClause
+      assert.ok(clause && !clause.name && ts.isNamedImports(clause.namedBindings), 'Reviewed WebMCP named imports only')
+      const imported = clause.namedBindings.elements
+      assert.ok(imported.every(item => !item.propertyName), 'WebMCP import aliases forbidden')
+      if (module === './fixtures/dashboard') {
+        assert.ok(!clause.isTypeOnly); assert.deepEqual(imported.map(item => item.name.text).sort(), ['expect', 'test']); fixtureImports++
+      } else if (module === '@playwright/test') {
+        assert.ok(clause.isTypeOnly); assert.deepEqual(imported.map(item => item.name.text), ['Page'])
+      } else {
+        assert.equal(module, 'node:crypto', 'WebMCP cannot import fixtures, oracle or arbitrary modules')
+        assert.ok(!clause.isTypeOnly); assert.deepEqual(imported.map(item => item.name.text), ['createHash'])
+      }
+    }
+    if (ts.isCallExpression(node)) {
+      if (node.expression.kind === ts.SyntaxKind.ImportKeyword) throw new Error('WebMCP dynamic import forbidden')
+      if (name(node.expression) === 'page.evaluate') {
+        assert.equal(node.arguments.length, 1, 'Browser observations cannot receive runner data')
+        assert.ok(ts.isArrowFunction(node.arguments[0]) && node.arguments[0].parameters.length === 0, 'Inline zero-argument observation required')
+        checkReadOnlyEvaluation(node.arguments[0].getText(tree)); observations++
+      }
+      if (ts.isPropertyAccessExpression(node.expression) && ['evaluateHandle', 'addScriptTag', 'addInitScript', 'route', 'routeFromHAR', 'unroute', 'removeAllListeners', 'newContext', 'waitForTimeout'].includes(node.expression.name.text)) throw new Error('WebMCP browser mutation forbidden')
+    }
+  })
+  assert.equal(fixtureImports, 1, 'Production guard fixture required')
+  assert.ok(observations > 0, 'Native/read-only observations required')
+  return declarations(file, source)
 }
 
 export function checkConfiguration(source, packageValue, workflow) {
@@ -288,7 +336,7 @@ export function checkConfiguration(source, packageValue, workflow) {
     else if (line.trim() && !/^ {10}/.test(line)) inRun = false
   }
   for (const command of ['backend.ingestion.test_importer backend.gate.test_gate', 'backend.investigator.test_investigator backend.investigator.test_retrieval', 'unittest discover -s evaluators -p test_evaluate.py', 'tests/test_vertical_slice.py', 'frontend/scripts/export_mixed.py --check', 'frontend/scripts/export_showcase.py --check', 'harness/run_pr_verification.mjs']) assert.ok(runLines.some(line => /^(?:python|node)\s/.test(line) && line.includes(command)), `Missing workflow command ${command}`)
-  for (const [key, expected] of Object.entries({ pw: 'playwright', typecheck: 'tsc --noEmit', 'test:e2e': 'playwright test --project=chromium', 'test:guard': 'node scripts/test_guard_fixture.mjs --report artifacts/guard/report.json', 'test:webmcp-lifecycle': 'node scripts/test_webmcp_lifecycle.mjs --report artifacts/webmcp-lifecycle/report.json', build: 'tsc --noEmit && vite build --base=./', 'check:hygiene': 'node scripts/check_test_hygiene.mjs', 'test:hygiene': 'node --test scripts/check_test_hygiene.test.mjs', 'test:canary': 'node scripts/check_canary_regression.mjs' })) assert.equal(packageValue.scripts[key], expected, `Changed required script ${key}`)
+  for (const [key, expected] of Object.entries({ pw: 'playwright', typecheck: 'tsc --noEmit', 'test:e2e': 'playwright test --project=chromium', 'test:guard': 'node scripts/test_guard_fixture.mjs --report artifacts/guard/report.json', 'test:webmcp-lifecycle': 'node scripts/test_webmcp_lifecycle.mjs --report artifacts/webmcp-lifecycle/report.json', 'test:webmcp': 'playwright test --project=chromium-webmcp', build: 'tsc --noEmit && vite build --base=./', 'check:hygiene': 'node scripts/check_test_hygiene.mjs', 'test:hygiene': 'node --test scripts/check_test_hygiene.test.mjs', 'test:canary': 'node scripts/check_canary_regression.mjs' })) assert.equal(packageValue.scripts[key], expected, `Changed required script ${key}`)
   assert.ok(!/(?:\|\|\s*(?:true|echo)|--pass-with-no-tests|--retries[= ]+[1-9])/.test(JSON.stringify(packageValue.scripts)), 'Package bypass')
   return true
 }
@@ -313,6 +361,7 @@ export async function scanTree(root = frontendRoot, suppliedInventory) {
       const bytes = await readFile(path), source = bytes.toString('utf8')
       if (protectedFiles.includes(rel)) {
         assert.equal(digest(bytes), inventory.protectedSources[rel], `Protected fixture/meta source changed: ${rel}`)
+        if (rel === 'tests/webmcp.spec.ts') checkWebMCPSource(rel, source)
       } else {
         assert.ok(ordinaryFiles.includes(rel), `Unreviewed source category: ${rel}`)
         checkOrdinarySource(rel, source)

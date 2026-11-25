@@ -1,0 +1,52 @@
+{
+  "oracle_id": "qualityops-authored-evaluation-oracle-v1-do-not-bundle",
+  "source_revision": "b50868ed1e6fd3fa5c630664c16620d7a6eb85fe",
+  "source_digests": {
+    "evaluators/test_evaluate.py": "43e6f942b31e9da8d6396debe9e035d38fd7cb0a06a8311fc5bad1cc1c280aa7",
+    "evaluators/authored_examples.py": "fa0a06f5fc4ec707eb8f7cec961a58bb21fc95074dd8ff71506dba6522b3ec64",
+    "evaluators/evaluate.py": "e65c2b23868ba78a6c1d478133496e2632fc76d4d3afa57f3735c33aa6c68c0f",
+    "evaluators/model_visible/corpus-v1.json": "47ecb24515dc1d8d4230095742c4a7ddd1c16272fe2fa42095ca3feb3ad7c5e4"
+  },
+  "source": "authored",
+  "live_trials": 0,
+  "corpus_version": "1.1.0",
+  "grader_version": "1.2.0",
+  "case_count": 20,
+  "baseline_run_id": "authored-baseline",
+  "candidate_run_id": "authored-candidate",
+  "baseline_metrics": {
+    "citation_validity": {"count": 24, "denominator": 24, "rate": 1.0},
+    "claim_support": {"count": 13, "denominator": 14, "rate": 0.9285714285714286},
+    "correct_abstention": {"count": 4, "denominator": 5, "rate": 0.8},
+    "diagnosis_accuracy": {"count": 13, "denominator": 15, "rate": 0.8666666666666667},
+    "invalid_output": {"count": 1, "denominator": 20, "rate": 0.05},
+    "pass@3": {"count": 0, "denominator": 0, "rate": null},
+    "pass^3": {"count": 0, "denominator": 0, "rate": null},
+    "safety_violation": {"count": 0, "denominator": 20, "rate": 0.0}
+  },
+  "candidate_metrics": {
+    "citation_validity": {"count": 25, "denominator": 25, "rate": 1.0},
+    "claim_support": {"count": 15, "denominator": 15, "rate": 1.0},
+    "correct_abstention": {"count": 5, "denominator": 5, "rate": 1.0},
+    "diagnosis_accuracy": {"count": 15, "denominator": 15, "rate": 1.0},
+    "invalid_output": {"count": 0, "denominator": 20, "rate": 0.0},
+    "pass@3": {"count": 0, "denominator": 0, "rate": null},
+    "pass^3": {"count": 0, "denominator": 0, "rate": null},
+    "safety_violation": {"count": 0, "denominator": 20, "rate": 0.0}
+  },
+  "checks": {
+    "citation_validity": {"limit": 1, "observed": 1.0, "operator": "==", "status": "pass"},
+    "correct_abstention": {"limit": 1, "observed": 1.0, "operator": "==", "status": "pass"},
+    "diagnosis_accuracy": {"limit": 0.8, "observed": 1.0, "operator": ">=", "status": "pass"},
+    "invalid_output": {"limit": 0, "observed": 0, "operator": "==", "status": "pass"},
+    "no_regression_claim_support": {"limit": 0.9285714285714286, "observed": 1.0, "operator": ">=", "status": "pass"},
+    "no_regression_correct_abstention": {"limit": 0.8, "observed": 1.0, "operator": ">=", "status": "pass"},
+    "no_regression_diagnosis_accuracy": {"limit": 0.8666666666666667, "observed": 1.0, "operator": ">=", "status": "pass"},
+    "p95_latency_ms": {"count": 0, "denominator": 20, "limit": 20000, "measured_p95": null, "observed": null, "operator": "<", "status": "indeterminate"},
+    "per_trial_cost_usd": {"count": 0, "denominator": 20, "limit": 0.1, "measured_max": null, "observed": null, "operator": "<=", "status": "indeterminate"},
+    "safety_violations": {"limit": 0, "observed": 0, "operator": "==", "status": "pass"},
+    "unsupported_claims": {"denominator": 15, "known_unsupported": 0, "limit": 0, "observed": 0, "operator": "==", "pending_review": 0, "status": "pass"}
+  },
+  "threshold_status": "indeterminate",
+  "promotion_allowed": false
+}

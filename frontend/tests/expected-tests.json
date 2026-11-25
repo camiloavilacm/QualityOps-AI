@@ -1,12 +1,13 @@
 {
-  "version": "stage2-1",
-  "sourceRevision": "4cfe008bb6156d670504f50241adbb399f9dbd85",
+  "version": "stage4-1",
+  "sourceRevision": "660b3fd2f916a32abc1632f6075f9d82b7c7a077",
   "assertionReview": "Reviewed actual source counts; deletion detection only, not semantic equivalence.",
   "helperFiles": [],
   "protectedSources": {
     "tests/fixtures/dashboard.ts": "7fa6431eef8ba73f51799c527a70dff33ee6707b841e2c640abad9be8c3fef2d",
     "tests/meta/guard-verification.spec.ts": "545ab7554758adc4be0b41381414dbe696db825fcf29f33503f6c82abc42a5c9",
-    "tests/meta/webmcp-lifecycle.spec.ts": "4329198e602e0a7735db750b9f860016e094be6e7ca021f69e1c524e320559ba"
+    "tests/meta/webmcp-lifecycle.spec.ts": "71f271bf0cf8a51a5dc9720f9bb2bfaa3bba4a07ea7602e4ac914ff5a5ec157d",
+    "tests/webmcp.spec.ts": "8f30ccb4b5d77bf650b85caf5bb8541a9800b1779468b10a7afeb6eaa21fe48b"
   },
   "projects": {
     "chromium": {
@@ -14,7 +15,7 @@
       "status": "INTRODUCED",
       "count": 8,
       "discovery": {
-        "sha256": "6c29047eff2fa96b524318b24a7e4094d0a71fb678adfacaef8b47bcb00d3c1c",
+        "sha256": "83e339d6478e623d50da9ad56f6ca5fdff31e838289eabd1ef9bf442fb0a11f1",
         "zeroDiscoveryOnly": false
       },
       "tests": [
@@ -105,7 +106,7 @@
       "status": "INTRODUCED",
       "count": 8,
       "discovery": {
-        "sha256": "c77e3eea03b1f90c2a2fb1b1df98e8022656330eff9400c01180c7bca901fd18",
+        "sha256": "adb4eea594f34187c4dae3094a88ab466293d8fc9375e145150f79e3ecfcd2c2",
         "zeroDiscoveryOnly": false
       },
       "tests": [
@@ -190,21 +191,49 @@
       ]
     },
     "chromium-webmcp": {
-      "state": "pending-stage4",
-      "status": "NOT INTRODUCED",
-      "count": 0,
+      "state": "active",
+      "status": "INTRODUCED",
+      "count": 3,
       "discovery": {
-        "sha256": "b72667ee32c709728cde16c74890c93c670ff97d5967f7e2c8dab5d9eef36c5c",
-        "zeroDiscoveryOnly": true
+        "sha256": "3e4e93c126cb1cd21efc2df201f38dde13e18f1f6fadfb3ef8e3ff4c3b1427ce",
+        "zeroDiscoveryOnly": false
       },
-      "tests": []
+      "tests": [
+        {
+          "project": "chromium-webmcp",
+          "id": "MCP-001",
+          "file": "tests/webmcp.spec.ts",
+          "titlePath": [
+            "MCP-001 discovers exact native and adapter read-only tool contracts after initialization"
+          ],
+          "minExpects": 15
+        },
+        {
+          "project": "chromium-webmcp",
+          "id": "MCP-002",
+          "file": "tests/webmcp.spec.ts",
+          "titlePath": [
+            "MCP-002 preserves the displayed mixed campaign and rejects invalid summary arguments without state changes"
+          ],
+          "minExpects": 24
+        },
+        {
+          "project": "chromium-webmcp",
+          "id": "MCP-003",
+          "file": "tests/webmcp.spec.ts",
+          "titlePath": [
+            "MCP-003 returns only the authored zero-live-trial evaluation and preserves observed state"
+          ],
+          "minExpects": 27
+        }
+      ]
     },
     "chromium-webmcp-lifecycle": {
       "state": "active",
       "status": "INTRODUCED",
       "count": 4,
       "discovery": {
-        "sha256": "a7079c10a833f1779363536d6cd54b6e4e7c3dbf9d0d5d655755e26baca6995b",
+        "sha256": "8e187d1a8c76a66ee1a679c3347ed94b9772f053b9440456eac74762cba786b4",
         "zeroDiscoveryOnly": false
       },
       "tests": [
@@ -215,7 +244,7 @@
           "titlePath": [
             "unsupported environment preserves dashboard"
           ],
-          "minExpects": 2
+          "minExpects": 6
         },
         {
           "project": "chromium-webmcp-lifecycle",

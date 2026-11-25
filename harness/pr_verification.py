@@ -100,17 +100,25 @@ def allowed_evidence(name):
         return False
     relative = name.removeprefix('container/')
     if relative in {'foundation.json', 'commands.json', 'versions.json', 'isolation.json',
-                    'blocker.json', 'probe.json', 'probe.log', 'typecheck.log',
+                    'blocker.json', 'probe.json', 'probe-stage4.json', 'probe.log', 'probe-stage4-pre-summary.log', 'typecheck.log',
                     'e2e.log', 'guard.log', 'lifecycle.log', 'canary.log',
+                    'webmcp.log', 'bundle-separation.log', 'hygiene-chromium-webmcp.log', 'hygiene-webmcp-execution.log',
                     'hygiene-unit.log',
                     'hygiene-chromium.log', 'hygiene-chromium-guard-meta.log',
-                    'hygiene-chromium-webmcp-lifecycle.log'}:
+                    'hygiene-chromium-webmcp-lifecycle.log', 'red-team.log', 'ci-workflow.log',
+                    'red-team-unit.log', 'ci-workflow-unit.log', 'r7-variant-unit.log'}:
         return True
-    if re.fullmatch(r'(e2e|guard|lifecycle)/(report|discovery|orchestrator)[.]json', relative):
+    if relative == 'red-team/publication/red-team-summary.json' or re.fullmatch(
+            r'red-team/publication/cases/R(?:1a|1b|[2-9]|1[0-1]|13)[.]json', relative):
+        return True
+    if re.fullmatch(r'red-team/publication/cases/R7/(?:baseline|renamed_control)-(?:report|failure)[.]json|'
+                    r'red-team/publication/cases/R7/(?:baseline|renamed_control)-trace[.]zip', relative):
+        return True
+    if re.fullmatch(r'(e2e|guard|lifecycle|webmcp)/(report|discovery|orchestrator)[.]json', relative):
         return True
     parts = Path(relative).parts
     if len(parts) == 3 and parts[0] == 'hygiene' and parts[1] in {
-            'chromium', 'chromium-guard-meta', 'chromium-webmcp-lifecycle'} and parts[2] in {
+            'chromium', 'chromium-guard-meta', 'chromium-webmcp-lifecycle', 'chromium-webmcp'} and parts[2] in {
                 f'{parts[1]}-hygiene.json', f'{parts[1]}-discovery.json', f'{parts[1]}-report.json'}:
         return True
     if relative in {'canary/summary.json', 'canary/mutation/mutated-export.json'} or re.fullmatch(
@@ -120,12 +128,19 @@ def allowed_evidence(name):
         return (parts[-1] in {'trace.zip', 'error-context.md', '.last-run.json'} or
                 re.fullmatch(r'[A-Za-z0-9_.-]+[.](png|webm)', parts[-1]) is not None)
     if len(parts) >= 4 and parts[0] == 'hygiene' and parts[1] in {
-            'chromium', 'chromium-guard-meta', 'chromium-webmcp-lifecycle'} and parts[2] == 'test-results':
+            'chromium', 'chromium-guard-meta', 'chromium-webmcp-lifecycle', 'chromium-webmcp'} and parts[2] == 'test-results':
         return (parts[-1] in {'trace.zip', 'error-context.md', '.last-run.json'} or
                 re.fullmatch(r'[A-Za-z0-9_.-]+[.](png|webm)', parts[-1]) is not None)
-    return (len(parts) >= 3 and parts[0] in {'e2e', 'guard', 'lifecycle'} and parts[1] == 'test-results'
+    return (len(parts) >= 3 and parts[0] in {'e2e', 'guard', 'lifecycle', 'webmcp'} and parts[1] == 'test-results'
             and (parts[-1] in {'trace.zip', 'error-context.md', '.last-run.json'} or
                  re.fullmatch(r'[A-Za-z0-9_.-]+[.](png|webm)', parts[-1]) is not None))
+
+
+def validate_red_team_scenario_ids(rows, expected_ids):
+    ids = [row.get('id') for row in rows]
+    if (any(not isinstance(value, str) for value in ids) or len(rows) != len(expected_ids) or
+            len(set(ids)) != len(rows) or set(ids) != expected_ids):
+        raise Blocked('red-team scenario IDs are missing, duplicated, or unexpected')
 
 
 def evidence_files(root, *, enforce_names=True, tolerate_vanished=False, name_prefix=''):
@@ -212,7 +227,12 @@ def collect_publication(output, report):
 def export_files(root, commit, target):
     """No archive extraction, Git checkout hooks, symlinks, or private directories."""
     files = git(root, "ls-tree", "-rz", commit, "--", "frontend", "harness/container",
-                "harness/pr-verification-policy.json", ".github/workflows/ci.yml").split(b"\0")
+                "harness/pr-verification-policy.json", "harness/verify_red_team_matrix.mjs",
+                "harness/red_team_cases.mjs", "harness/check_ci_workflow.mjs", "harness/check_healer_scope.py",
+                "harness/test_red_team_matrix.mjs", "harness/test_ci_workflow.mjs",
+                "harness/prepare_r7_variant.mjs", "harness/test_r7_variant.mjs",
+                "harness/check_webmcp_bundle.mjs",
+                ".github/workflows/ci.yml", ".github/dependabot.yml").split(b"\0")
     for row in filter(None, files):
         header, raw_name = row.split(b"\t", 1)
         mode, kind, blob = header.split()
@@ -220,7 +240,8 @@ def export_files(root, commit, target):
         if mode not in (b"100644", b"100755") or kind != b"blob" or ".." in Path(name).parts:
             raise Blocked("source export requires ordinary files")
         # .npmrc, .env and other hidden configuration are never build inputs.
-        if any(part.startswith(".") for part in Path(name).parts) and name != ".github/workflows/ci.yml":
+        if any(part.startswith(".") for part in Path(name).parts) and name not in {
+                ".github/workflows/ci.yml", ".github/dependabot.yml"}:
             continue
         if any(part in {"node_modules", "dist", "artifacts", "test-results", "playwright-report"}
                for part in Path(name).parts):
@@ -319,6 +340,8 @@ def main():
     scratch_manager = None
     env = {"PATH": os.environ.get("PATH", os.defpath), "LANG": "C.UTF-8",
            "PW_VERIFIER_REVISION": args.verifier_revision, "PW_CANDIDATE_REVISION": args.candidate_revision}
+    if os.environ.get("QUALITYOPS_QA_FEATURES_ROOT"):
+        env["QUALITYOPS_QA_FEATURES_ROOT"] = os.environ["QUALITYOPS_QA_FEATURES_ROOT"]
 
     def run(argv, *, timeout=300, cwd=ROOT, monitor=None):
         remaining = 1800 - (time.monotonic() - started)
@@ -349,9 +372,17 @@ def main():
         for file in ["harness/pr_verification.py", "harness/run_pr_verification.mjs",
                      "harness/check_healer_scope.py", "harness/check_pr_reports.mjs",
                      "harness/check_hygiene_report.mjs", "harness/check_canary_report.mjs",
+                     "harness/check_webmcp_report.mjs",
+                     "harness/check_webmcp_bundle.mjs",
                      "harness/test_pr_verification.py", "harness/test_pr_reports.mjs",
+                     "harness/test_webmcp_report.mjs",
                      "harness/test_stage2_report_validation.mjs",
-                     "harness/pr-verification-policy.json", "harness/container/runtime-policy.json"]:
+                     "harness/check_ci_workflow.mjs", "harness/test_ci_workflow.mjs",
+                     "harness/verify_red_team_matrix.mjs", "harness/red_team_cases.mjs",
+                     "harness/test_red_team_matrix.mjs", "harness/prepare_r7_variant.mjs",
+                     "harness/test_r7_variant.mjs",
+                     "harness/pr-verification-policy.json", "harness/container/runtime-policy.json",
+                     "harness/oracles/authored-evaluation-v1.json"]:
             try:
                 recorded = git(ROOT, "show", args.verifier_revision + ":" + file)
             except subprocess.SubprocessError:
@@ -364,6 +395,21 @@ def main():
             run(["python3", "-B", "-m", "unittest", "harness.test_pr_verification", "-q"])
             run(["node", "--test", str(ROOT / "harness/test_pr_reports.mjs")])
             run(["node", "--test", str(ROOT / "harness/test_stage2_report_validation.mjs")])
+        if args.stage >= 3:
+            stage3_commands = [
+                ["python3", "-B", "harness/checks.py", "contracts"],
+                ["python3", "-B", "-m", "unittest", "-v", "backend.ingestion.test_importer", "backend.gate.test_gate"],
+                ["python3", "-B", "-m", "unittest", "-v", "backend.investigator.test_investigator", "backend.investigator.test_retrieval"],
+                ["python3", "-B", "-m", "unittest", "discover", "-s", "evaluators", "-p", "test_evaluate.py", "-v"],
+                ["python3", "-B", "-m", "unittest", "-v", "tests/test_vertical_slice.py"],
+                ["python3", "-B", "frontend/scripts/export_mixed.py", "--check"],
+                ["python3", "-B", "frontend/scripts/export_showcase.py", "--check"],
+                ["ruby", "-e", "require 'yaml'; YAML.parse_file('.github/workflows/ci.yml'); YAML.parse_file('.github/dependabot.yml')"],
+            ]
+            for command in stage3_commands:
+                run(command)
+        if args.stage >= 4:
+            run(["node", "--test", str(ROOT / "harness/test_webmcp_report.mjs")])
         # External maintainer record is never loaded from candidate inputs or mounted into Docker.
         if args.bootstrap:
             if args.candidate_revision != args.verifier_revision:
@@ -465,6 +511,71 @@ def main():
                      "--summary", str(evidence / "canary/summary.json"),
                      "--verifier-revision", args.verifier_revision,
                      "--candidate-revision", args.candidate_revision])
+            if args.stage >= 3:
+                matrix = read_json(evidence / "red-team/publication/red-team-summary.json")
+                if not isinstance(matrix, dict):
+                    raise Blocked("red-team summary must be an object")
+                local = matrix.get("local_scenarios", [])
+                if not isinstance(local, list) or any(not isinstance(row, dict) for row in local):
+                    raise Blocked("red-team local scenario rows are malformed")
+                expected_ids = {"R1a", "R1b", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "R10", "R11", "R13"}
+                validate_red_team_scenario_ids(local, expected_ids)
+                r7 = next((row for row in local if row.get("id") == "R7"), {}) if isinstance(local, list) else {}
+                browser = r7.get("browser_control") if isinstance(r7, dict) else None
+                hashes = browser.get("artifact_sha256") if isinstance(browser, dict) else None
+                report_names = browser.get("playwright_reports") if isinstance(browser, dict) else None
+                original = browser.get("original") if isinstance(browser, dict) else None
+                renamed = browser.get("renamed_control") if isinstance(browser, dict) else None
+                valid_hashes = isinstance(hashes, dict) and set(hashes) == {"baseline", "renamed_control", "candidate_spec"} and \
+                    all(isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value) for value in hashes.values()) and \
+                    hashes.get("baseline") != hashes.get("renamed_control")
+                valid_report_hashes = all(isinstance(outcome, dict) and
+                    isinstance(outcome.get("report_sha256"), str) and
+                    re.fullmatch(r"[0-9a-f]{64}", outcome["report_sha256"])
+                    for outcome in (original, renamed))
+                if (matrix.get("result") != "PASS" or matrix.get("verifier_revision") != args.verifier_revision or
+                        matrix.get("candidate_revision") != args.candidate_revision or
+                        any(row.get("status") != "PASS" or row.get("workspace_cleanup") != "PASS" for row in local) or
+                        r7.get("cumulative_control") !=
+                            {"result": "PASS", "canary": "KILLED", "evidence": "canary/summary.json"} or
+                        not isinstance(browser, dict) or browser.get("result") != "PASS" or browser.get("locator") != "fixture-mixed" or
+                        not isinstance(original, dict) or
+                        {key: original.get(key) for key in ("variant", "status", "tests")} !=
+                            {"variant": "baseline", "status": "PASS", "tests": 1} or
+                        not isinstance(renamed, dict) or
+                        {key: renamed.get(key) for key in ("variant", "status", "tests")} !=
+                            {"variant": "renamed_control", "status": "PASS", "tests": 1} or
+                        report_names != ["R7/baseline-report.json", "R7/renamed_control-report.json"] or
+                        browser.get("assertion_minimum") != 7 or browser.get("behavior") !=
+                            ["BLOCKED", "REQUIRED_FAILURE", "INSUFFICIENT_EVIDENCE"] or
+                        not valid_hashes or not valid_report_hashes or
+                        matrix.get("remote_scenarios") != [
+                            {"id": "R12", "status": "NOT RUN", "reason": "separate authorization and disposable remote target required"},
+                            {"id": "R14", "status": "NOT RUN", "reason": "separate authorization and disposable remote target required"}]):
+                    raise Blocked("local red-team matrix is incomplete or remote status is inaccurate")
+                for variant, outcome_name, report_name in (("baseline", "original", "baseline-report.json"),
+                                                           ("renamed_control", "renamed_control", "renamed_control-report.json")):
+                    report_path = evidence / "red-team/publication/cases/R7" / report_name
+                    r7_report = read_json(report_path)
+                    outcome = browser.get(outcome_name)
+                    if (r7_report != {"schema_version": "r7-playwright-report-1", "variant": variant,
+                                   "report_sha256": outcome["report_sha256"],
+                                   "test": {"title": "mixed campaign displays BLOCKED with confirmed failure for x and missing evidence for y",
+                                            "file": "mixed-campaign.spec.ts", "project": "chromium", "expected_status": "passed",
+                                            "status": "expected", "retries": 0}, "result": "PASS"}):
+                        raise Blocked("R7 sanitized Playwright report is incomplete or inconsistent")
+                for row in local:
+                    case = read_json(evidence / "red-team/publication/cases" / (row["id"] + ".json"))
+                    if case != row:
+                        raise Blocked("red-team case artifact does not match its summary row")
+            if args.stage >= 4:
+                run(["node", str(ROOT / "harness/check_pr_reports.mjs"), "--project", "chromium-webmcp",
+                     "--report", str(evidence / "webmcp/report.json")])
+                run(["node", str(ROOT / "harness/check_hygiene_report.mjs"), "--root", str(evidence),
+                     "--project", "chromium-webmcp", "--verifier-revision", args.verifier_revision,
+                     "--candidate-revision", args.candidate_revision])
+                run(["node", str(ROOT / "harness/check_webmcp_report.mjs"), "--report",
+                     str(evidence / "webmcp/report.json"), "--verifier-revision", args.verifier_revision])
             report["result"] = "PASS"
     except (Blocked, ValueError, KeyError, OSError, subprocess.SubprocessError) as exc:
         report["reason"] = str(exc) if not isinstance(exc, subprocess.SubprocessError) else "unresolvable revision or local daemon"

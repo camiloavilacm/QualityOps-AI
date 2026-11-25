@@ -16,13 +16,13 @@ test('guard and lifecycle hygiene bind ordinary-spec hashes to a differing candi
   const verifierBytes = blob(verifier, `frontend/${file}`)
   const candidateBytes = blob(candidate, `frontend/${file}`)
   assert.notDeepEqual(candidateBytes, verifierBytes, 'fixture must represent a real ordinary-spec revision difference')
-  for (const project of ['chromium', 'chromium-guard-meta', 'chromium-webmcp-lifecycle']) {
+  for (const project of ['chromium', 'chromium-guard-meta', 'chromium-webmcp-lifecycle', 'chromium-webmcp']) {
     assert.equal(sourceRevisionFor(project, file, verifier, candidate), candidate)
     assert.equal(sourceRevisionFor(project, 'tests/fixtures/dashboard.ts', verifier, candidate), verifier)
   }
 })
 
-test('pending zero-discovery project cannot select a source revision for execution evidence', () => {
-  assert.throws(() => sourceRevisionFor('chromium-webmcp', 'tests/mixed-campaign.spec.ts', verifier, candidate),
-    /non-active project/)
+test('active WebMCP project binds candidate ordinary overlays and verifier-owned interface spec', () => {
+  assert.equal(sourceRevisionFor('chromium-webmcp', 'tests/mixed-campaign.spec.ts', verifier, candidate), candidate)
+  assert.equal(sourceRevisionFor('chromium-webmcp', 'tests/webmcp.spec.ts', verifier, candidate), verifier)
 })

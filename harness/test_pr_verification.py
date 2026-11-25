@@ -15,8 +15,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from check_healer_scope import check_scope, revision
 from pr_verification import (Blocked, bounded_command, cleanup_container, collect_publication,
                              allowed_evidence, docker_arguments, evidence_files, export_files, read_json,
-                             reap_command_group, require_preparation_space, verify_inspection)
+                             reap_command_group, require_preparation_space, validate_red_team_scenario_ids,
+                             verify_inspection)
 
+ROOT = Path(__file__).resolve().parents[1]
 POLICY = json.loads((Path(__file__).parent / "container/runtime-policy.json").read_bytes())
 REPORT_POLICY = json.loads((Path(__file__).parent / "pr-verification-policy.json").read_bytes())
 
@@ -176,6 +178,36 @@ class IsolationConfigurationTests(unittest.TestCase):
 
 
 class Stage2PolicyTests(unittest.TestCase):
+    def test_stage_three_scenario_ids_must_be_complete_and_unique(self):
+        expected = {"R1a", "R1b", "R2"}
+        valid = [{"id": name} for name in ("R1a", "R1b", "R2")]
+        validate_red_team_scenario_ids(valid, expected)
+        for rows in (valid[:-1], valid + [{"id": "R2"}], valid + [{"id": "R9"}],
+                     [{"id": ["R1a"]}, *valid[1:]]):
+            with self.subTest(rows=rows), self.assertRaises(Blocked):
+                validate_red_team_scenario_ids(rows, expected)
+
+    def test_stage_three_publication_artifacts_are_bounded_and_narrowly_allowlisted(self):
+        self.assertTrue(allowed_evidence("container/r7-variant-unit.log"))
+        self.assertFalse(allowed_evidence("container/r7-extra.log"))
+        for name in ["container/red-team/publication/red-team-summary.json",
+                     "container/red-team/publication/cases/R1a.json",
+                     "container/red-team/publication/cases/R10.json",
+                     "container/red-team/publication/cases/R13.json",
+                     "container/red-team/publication/cases/R7/baseline-report.json",
+                     "container/red-team/publication/cases/R7/renamed_control-report.json",
+                     "container/red-team/publication/cases/R7/baseline-failure.json",
+                     "container/red-team/publication/cases/R7/renamed_control-failure.json",
+                     "container/red-team/publication/cases/R7/baseline-trace.zip",
+                     "container/red-team/publication/cases/R7/renamed_control-trace.zip"]:
+            with self.subTest(name=name): self.assertTrue(allowed_evidence(name))
+        for name in ["container/red-team/summary.json", "container/red-team/publication/cases/R12.json",
+                     "container/red-team/publication/raw.log",
+                     "container/red-team/publication/cases/R7/arbitrary.json",
+                     "container/red-team/publication/cases/R6/trace.zip",
+                     "container/red-team/publication/cases/R7/baseline-extra.log"]:
+            with self.subTest(name=name): self.assertFalse(allowed_evidence(name))
+
     def test_stage_two_artifacts_are_narrowly_allowlisted(self):
         allowed = [
             "container/hygiene/chromium/chromium-hygiene.json",
@@ -194,11 +226,32 @@ class Stage2PolicyTests(unittest.TestCase):
             with self.subTest(name=name):
                 self.assertFalse(allowed_evidence(name))
 
-    def test_cumulative_stage_two_is_explicitly_enabled(self):
-        self.assertEqual(POLICY["implemented_stages"], [1, 2])
+    def test_stage_four_webmcp_artifacts_are_bounded_and_project_scoped(self):
+        allowed = ["container/probe-stage4.json", "container/webmcp.log", "container/bundle-separation.log",
+                   "container/webmcp/report.json",
+                   "container/hygiene/chromium-webmcp/chromium-webmcp-hygiene.json",
+                   "container/hygiene/chromium-webmcp/chromium-webmcp-discovery.json",
+                   "container/hygiene/chromium-webmcp/test-results/MCP-001-retry0/trace.zip"]
+        for name in allowed:
+            with self.subTest(name=name): self.assertTrue(allowed_evidence(name))
+        for name in ["container/oracle.json", "container/webmcp/arbitrary.json",
+                     "container/hygiene/chromium-webmcp/extra.json",
+                     "container/hygiene/chromium-webmcp/test-results/secret.txt"]:
+            with self.subTest(name=name): self.assertFalse(allowed_evidence(name))
+
+    def test_cumulative_stages_one_through_four_are_explicitly_enabled(self):
+        self.assertEqual(POLICY["implemented_stages"], [1, 2, 3, 4])
+
+    def test_stage_three_is_enabled_only_after_offline_suite_and_red_team_are_defined(self):
+        self.assertIn(3, POLICY["implemented_stages"])
+        for path in (ROOT / "harness/verify_red_team_matrix.mjs", ROOT / "harness/red_team_cases.mjs",
+                     ROOT / "harness/test_red_team_matrix.mjs", ROOT / "harness/prepare_r7_variant.mjs",
+                     ROOT / "harness/test_r7_variant.mjs"):
+            self.assertTrue(path.is_file(), path.name)
 
     def test_trusted_inventory_has_unique_ids_and_reviewed_assertion_minima(self):
-        expected_counts = {"chromium": 8, "chromium-guard-meta": 8, "chromium-webmcp-lifecycle": 4}
+        expected_counts = {"chromium": 8, "chromium-guard-meta": 8, "chromium-webmcp-lifecycle": 4,
+                           "chromium-webmcp": 3}
         for project, rows in REPORT_POLICY["projects"].items():
             with self.subTest(project=project):
                 self.assertEqual(len(rows), expected_counts[project])
@@ -208,7 +261,7 @@ class Stage2PolicyTests(unittest.TestCase):
                 self.assertEqual(len(identities), len(set(identities)))
                 self.assertTrue(all(isinstance(row.get("min_expects"), int) and row["min_expects"] >= 0
                                     for row in rows))
-        self.assertEqual(REPORT_POLICY["pending_projects"], {"chromium-webmcp": {"status": "NOT INTRODUCED", "count": 0}})
+        self.assertNotIn("pending_projects", REPORT_POLICY)
 
     def test_canary_is_exact_dash003_missing_evidence_step(self):
         canary = REPORT_POLICY["canary"]
@@ -265,7 +318,9 @@ class ScopeTests(unittest.TestCase):
                 check_scope(self.root, self.base, candidate)
 
     def test_export_has_no_private_files_or_dot_config(self):
-        for name in ('evaluators/ground_truth/answer', 'frontend/.env', 'frontend/src/main.tsx'):
+        for name in ('evaluators/ground_truth/answer', 'frontend/.env', 'frontend/src/main.tsx',
+                     'harness/oracles/authored-evaluation-v1.json', 'harness/check_webmcp_report.mjs',
+                     'harness/check_webmcp_bundle.mjs'):
             path = self.root / name; path.parent.mkdir(parents=True, exist_ok=True); path.write_text('fixture')
         commit = self.commit()
         export = self.root / 'export'; export.mkdir()
@@ -273,6 +328,9 @@ class ScopeTests(unittest.TestCase):
         self.assertTrue((export / 'frontend/src/main.tsx').exists())
         self.assertFalse((export / 'frontend/.env').exists())
         self.assertFalse((export / 'evaluators').exists())
+        self.assertFalse((export / 'harness/oracles/authored-evaluation-v1.json').exists())
+        self.assertFalse((export / 'harness/check_webmcp_report.mjs').exists())
+        self.assertTrue((export / 'harness/check_webmcp_bundle.mjs').exists())
 
     def test_export_rejects_symlinks(self):
         self.path.unlink(); self.path.symlink_to('/etc/passwd')
