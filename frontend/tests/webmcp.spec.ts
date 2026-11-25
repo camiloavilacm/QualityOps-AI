@@ -131,7 +131,9 @@ test('MCP-002 preserves the displayed mixed campaign and rejects invalid summary
     await expect(reasons.filter({ hasText: reason.code })).toContainText(`Execution ${reason.execution_id}`)
   }
   await expect(page.locator('#evidence-x')).toBeVisible()
-  for (const input of [undefined, null, [], {}, 1, { campaign_id: 1 }, { campaign_id: 'fixture-pass' }, { campaign_id: 'fixture-mixed', extra: true }]) {
+  // Native/adapter conversion precedes the handler; only object-shape errors reach it unchanged.
+  // Lifecycle meta-tests directly cover undefined, null, arrays, scalars and malformed strings.
+  for (const input of [{}, { campaign_id: 1 }, { campaign_id: 'fixture-pass' }, { campaign_id: 'fixture-mixed', extra: true }]) {
     const result = envelope(await page.webmcp.callTool('get_campaign_summary', input as Record<string, unknown>, { timeout: 5_000 }))
     expect(result.isError).toBe(true)
     expect(result.content[0].text).toBe('{"error":"Invalid arguments."}')
@@ -181,7 +183,8 @@ test('MCP-003 returns only the authored zero-live-trial evaluation and preserves
     await expect(row.getByRole('cell').nth(2)).toHaveText(`${check.operator} ${check.limit === null ? 'n/a' : String(check.limit)}`)
     await expect(row.getByRole('cell').nth(3)).toHaveText(check.status)
   }
-  for (const input of [null, [], 1, { extra: true }]) {
+  // Non-object arguments are covered at the direct-handler boundary in lifecycle meta-tests.
+  for (const input of [{ extra: true }]) {
     const result = envelope(await page.webmcp.callTool('get_evaluation_summary', input as Record<string, unknown>, { timeout: 5_000 }))
     expect(result.isError).toBe(true)
     expect(result.content[0].text).toBe('{"error":"Invalid arguments."}')

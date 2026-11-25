@@ -7,7 +7,7 @@
     "tests/fixtures/dashboard.ts": "7fa6431eef8ba73f51799c527a70dff33ee6707b841e2c640abad9be8c3fef2d",
     "tests/meta/guard-verification.spec.ts": "545ab7554758adc4be0b41381414dbe696db825fcf29f33503f6c82abc42a5c9",
     "tests/meta/webmcp-lifecycle.spec.ts": "71f271bf0cf8a51a5dc9720f9bb2bfaa3bba4a07ea7602e4ac914ff5a5ec157d",
-    "tests/webmcp.spec.ts": "d0f9b3dafba907085ddc4088843b0ff303c231c98e5c3b2a5491525495fe812c"
+    "tests/webmcp.spec.ts": "8f30ccb4b5d77bf650b85caf5bb8541a9800b1779468b10a7afeb6eaa21fe48b"
   },
   "projects": {
     "chromium": {
@@ -195,7 +195,7 @@
       "status": "INTRODUCED",
       "count": 3,
       "discovery": {
-        "sha256": "dc2df01235b0e5d180dd9626196e7a0770d02a5199c63ba1d93c43f23cfe95f5",
+        "sha256": "3e4e93c126cb1cd21efc2df201f38dde13e18f1f6fadfb3ef8e3ff4c3b1427ce",
         "zeroDiscoveryOnly": false
       },
       "tests": [
