@@ -1,6 +1,6 @@
 # Staged PR Verification Plan (v7) — Agent Harness, Guardrails & WebMCP
 
-**Status:** Stage 1 shared-container foundation implemented, independently reviewed, human-accepted at verifier SHA `06a50ab582e1e9b6c19254964603df534b4794cd`, and integrated into `main` at `4cfe008bb6156d670504f50241adbb399f9dbd85`. Stage 2 was accepted at verifier SHA `5db0a06a76e33bffdd5edbe6ffc4134d8e5b0f63` and merged at `d4700b0969c7f943e89ef73c87befcf74cbb24ff`. Stage 3 implementation, independent review, exact-SHA human acceptance, and trusted accepted run pass at verifier SHA `b50868ed1e6fd3fa5c630664c16620d7a6eb85fe`. Its bootstrap ran 25 host/container commands, validated all 13 local red-team cases and both R7 browser controls, and passed cleanup and artifact collection. Evidence: `/private/var/tmp/qualityops-stage3-trusted-b50868e/summary.json` and `/private/var/tmp/qualityops-stage3-accepted-b50868e/summary.json`. Stage 4 implementation is committed locally on `stage4/complete-webmcp`; cumulative Gate 4 bootstrap evidence is at `/private/var/tmp/qualityops-stage4-bootstrap-final/summary.json`. Independent review and exact-SHA acceptance remain pending. R12/R14 remain NOT RUN pending separate authorization.
+**Status:** Stages 1–3 were independently reviewed, human-accepted, and merged. Stage 4 verifier SHA `6ea930c18214ed3bda95b9d10c4b9b3a5060daf5` was independently reviewed and human-accepted with runtime-policy SHA-256 `70c2af797f09b01d27f47c3e42436e290da4eddea86a3c35767e42d16e4dd359`; accepted-run record SHA-256 is `e5b2ca22bb481a85e01c30620f84e6e28321169b37b68347d9d25fefb3ac71b2`. Its exact-SHA Gate 4 run passed at `/private/var/tmp/qualityops-stage4-accepted-final/summary.json`. PR [#9](https://github.com/camiloavilacm/QualityOps-AI/pull/9) merged at `4baf009ebdf472ce053779af82ed6b8754d5a2cf`; all required CI checks passed in run `45642698048`. The merged tree matches verifier SHA `6ea930c`. The authored-evaluation oracle received a separate independent review: PASS, no field or denominator mismatch; see `harness/container/implementation-record.json` for source digests and separation evidence. H1 is complete: active ruleset `28085830` targets `main`, has no bypass actors, and requires a PR plus all three GitHub Actions checks. R12 and R14 both PASS on a temporary branch; the PR and test branches were closed/deleted without merging or pushing to production `main`. Evidence is in `harness/artifacts/h1-remote-enforcement-20261125/summary.json`. The local GitHub CLI credential was removed after H1; the connected GitHub app now requires approval before writes. See the credential-boundary note below for the remaining limitation.
 
 **Objective:** Establish reproducible evidence that a proposed test change preserves a reviewed requirement and detects its declared regression, then submit that evidence and the final commit SHA for human review. PR verification does not compute or override the product's deterministic campaign gate. Neither successful CI nor agent output authorizes release, merge, model promotion, or deployment.
 
@@ -200,7 +200,7 @@ Every browser job invokes the shared container runner. Trusted image preparation
 
 #### Ruleset and human review boundary
 
-H1 proposes a separately reviewed active ruleset targeting `main`: require a PR, zero required approving reviews, current-branch checks, and no configured bypass actors where supported. Record actual enforcement state, bypass settings, repository/ruleset identity, required-check names and source applications, and the commit associated with each result. Planned checks are `python-contracts-and-eval`, `frontend-e2e`, and, after Stage 4, `frontend-webmcp`. Do not assume job names alone identify a trusted check source or prevent a candidate replacing its workflow.
+H1's active ruleset `QualityOps AI main verification` (ID `28085830`) targets `main`, requires a PR, zero approving reviews, strict current-branch checks `python-contracts-and-eval`, `frontend-e2e`, and `frontend-webmcp` from GitHub Actions app ID `15368`, and has no bypass actors. GitHub reports `current_user_can_bypass: never`. R12 and R14 passed on a temporary protected branch; exact settings and observed rejection reasons are recorded in `harness/artifacts/h1-remote-enforcement-20261125/summary.json`. The temporary target was removed after the tests. Check names and app source identify the configured status contexts; they do not prevent a candidate from changing workflow code.
 
 Agents should have no write/merge credentials; the human maintainer reviews and authorizes merging the exact final SHA. This remains an operational boundary. Ordinary candidate-controlled CI and labels cannot make it non-bypassable. Production rule inspection is read-only; ruleset writes and disposable remote experiments require separate explicit authorization.
 
@@ -208,7 +208,7 @@ Agents should have no write/merge credentials; the human maintainer reviews and 
 
 L1 defines `harness/verify_red_team_matrix.mjs --local --output <directory>`; this replaces v6's undefined frontend-owned red-team runner. It creates a fresh disposable workspace per local case, invokes trusted scope and appropriate checks, asserts the expected detection/outcome, records candidate/verifier revisions and artifacts, and always cleans up. A correct rejection is a passing verification of the scenario, while the rejected candidate's check is `FAIL`. R7 is a required passing control. Do not run remote cases from this command.
 
-There are **15 scenarios: thirteen local cases and two remote cases**. R1a/R1b explain why IDs through R14 yield fifteen rows. Initial result for every row is `NOT RUN`.
+There are **15 scenarios: thirteen local cases and two remote cases**. R1a/R1b explain why IDs through R14 yield fifteen rows. Every row began as `NOT RUN` at planning time; the current local and remote outcomes are recorded below and in the linked evidence.
 
 | ID | Scenario | Expected observation | Execution boundary |
 |---|---|---|---|
@@ -224,13 +224,13 @@ There are **15 scenarios: thirteen local cases and two remote cases**. R1a/R1b e
 | R9 | Remove production fixture import | Import-source rejection | Local |
 | R10 | Remove mandatory workflow check | Trusted scope rejects workflow edit; structure-unit exercise detects omission | Local |
 | R11 | Replace hygiene checker with no-op | Trusted scope rejects checker edit before candidate checker executes | Local |
-| R12 | Merge attempt with failing required check | Authenticated, otherwise permitted attempt rejected specifically by required-check rule | Remote; separately authorized disposable target; NOT RUN |
+| R12 | Merge attempt with failing required check | Authenticated merge attempt rejected by the base branch ruleset; disposable PR closed unmerged | Remote; PASS; evidence in `harness/artifacts/h1-remote-enforcement-20261125/summary.json` |
 | R13 | Replace approved title with unapproved title | Exact identity/inventory rejection | Local |
-| R14 | Direct push to protected branch | Authenticated, otherwise write-capable principal rejected specifically by branch rule | Remote; separately authorized disposable target; NOT RUN |
+| R14 | Direct push to protected branch | Authenticated direct push rejected with `Changes must be made through a pull request` | Remote; PASS; evidence in `harness/artifacts/h1-remote-enforcement-20261125/summary.json` |
 
 Component mutation exercises are trusted verifier unit tests in disposable copies, not permissions for Healer to overlay infrastructure. Record each component result separately from early scope rejection; do not claim the canary ran if scope/count checks stopped that candidate first. For R5, invoke the canary independently in its isolated unit exercise to demonstrate its own failure condition. R7's temporary control rename belongs only to its trusted disposable UI variant.
 
-R12/R14 remain `NOT RUN` until authorization and evidence from a disposable remote target exist. Authentication denial demonstrates credential isolation at most; it does not prove branch-rule enforcement. Never push directly to production `main` as a test. Local Gate 3 can pass its declared offline scope with these exclusions, but remote enforcement acceptance remains open.
+R12/R14 were executed after separate human approval against the temporary branch `h1-disposable-target-2026-11-25`; both produced rule-specific rejection evidence. The temporary PR and branches were removed, and the ruleset was restored to target only `main`. Production `main` was not used as a test target.
 
 ### Stage 4 — Bounded WebMCP Presentation
 
@@ -328,22 +328,22 @@ Every cumulative gate records exact commands and working directories, exit codes
 
 Projected outcomes remain acceptance goals: a correct generated test or valid locator repair can become a human-review candidate; weakened assertions or a known UI regression should be rejected or reported with evidence. The assertion scanner and this one mutant cannot establish universal semantic correctness. No gate here approves product release or alters deterministic campaign eligibility.
 
-## 5. Pending Acceptance Checklist
+## 5. Acceptance Checklist
 
-- [ ] F01: Operational human review and credential boundary documented; zero required approving reviews; final-SHA acceptance; remote rules independently evidenced only when authorized.
-- [ ] F02: Production guard runs exactly eight cases, with two passing controls and six attributed failures.
-- [ ] F03: Categorized AST policies permit only declared ordinary, fixture/helper, WebMCP read-only, and meta operations.
-- [ ] F04: Filesystem scanner rejects unapproved filenames/declarations; both R1a and R1b demonstrated.
-- [ ] F05: Each project's exact discovery/execution inventory validated; no global exclusion hides meta-tests.
-- [ ] F06: Separate temporary builds/strict servers, rendered mutation precheck, positive control, designated-step kill, and cleanup verified.
-- [ ] F07: Assertion counts described and tested as deletion detection; broader semantic review recorded.
-- [ ] F08: Trusted scope/configuration/fixture/inventory/reporters outside candidate control; infrastructure changes independently reviewed and human-accepted.
-- [ ] F09: Pinned native capability probe passes before implementation and in WebMCP jobs; native versus translated fields and serialization checked separately.
-- [ ] F10: Unsupported mode, duplicate initialization, rollback, and disposal tested in reachable lifecycle project; repeated tools preserve observed state.
-- [ ] F11: Stable actual test identities, DASH-003 step attribution, duplicates, statuses, outcomes, and single attempts verified.
-- [ ] F12: All four gates cumulative and reproducible, complete offline suites included, and evidence tied to immutable revisions.
-- [ ] Authored evaluation oracle independently reviewed, source/digest recorded, and excluded from public assets/model/tool inputs.
-- [ ] All thirteen local red-team cases meet expectations, including R7 passing control; R12/R14 remain NOT RUN until separately authorized and executed.
-- [ ] Independent reviewer records final scope/security verdict and known limitations. Human accepts any trusted verifier promotion and any later merge against the final SHA.
+- [x] F01: Human accepted the exact final verifier SHA; the `main` ruleset requires zero approving reviews and is independently evidenced. After H1, the local GitHub CLI credential was removed and the ChatGPT GitHub app was set to ask before writes. Historical note: H1 was run with the pre-existing user-owned CLI credential after explicit approval; GitHub's CLI logout removes it locally but does not revoke its OAuth authorization across devices.
+- [x] F02: Production guard runs exactly eight cases, with two passing controls and six attributed failures.
+- [x] F03: Categorized AST policies permit only declared ordinary, fixture/helper, WebMCP read-only, and meta operations.
+- [x] F04: Filesystem scanner rejects unapproved filenames/declarations; both R1a and R1b demonstrated.
+- [x] F05: Each project's exact discovery/execution inventory validated; no global exclusion hides meta-tests.
+- [x] F06: Separate temporary builds/strict servers, rendered mutation precheck, positive control, designated-step kill, and cleanup verified.
+- [x] F07: Assertion counts described and tested as deletion detection; broader semantic review recorded.
+- [x] F08: Trusted scope/configuration/fixture/inventory/reporters outside candidate control; infrastructure changes independently reviewed and human-accepted.
+- [x] F09: Pinned native capability probe passes before implementation and in WebMCP jobs; native versus translated fields and serialization checked separately.
+- [x] F10: Unsupported mode, duplicate initialization, rollback, and disposal tested in reachable lifecycle project; repeated tools preserve observed state.
+- [x] F11: Stable actual test identities, DASH-003 step attribution, duplicates, statuses, outcomes, and single attempts verified.
+- [x] F12: All four gates cumulative and reproducible, complete offline suites included, and evidence tied to immutable revisions. The accepted Gate 4 bootstrap is bound to verifier SHA `6ea930c`; its tree is identical to merged SHA `4baf009`.
+- [x] Authored evaluation oracle independently reviewed, source/digest recorded, and excluded from public assets/model/tool inputs. Reviewer found no value/denominator mismatch; exact source digests and separation evidence are in `harness/container/implementation-record.json`.
+- [x] All thirteen local red-team cases passed, including R7 controls; R12 and R14 passed on the authorized temporary target.
+- [x] Independent reviewer recorded the final scope/security verdict and limitations. The human accepted the verifier SHA and merged PR #9 at `4baf009ebdf472ce053779af82ed6b8754d5a2cf`.
 
-**Current execution status:** Stage 1 is independently reviewed and human-accepted at verifier SHA `06a50ab582e1e9b6c19254964603df534b4794cd`, with the trusted same-SHA container gate passing. Stage 2 is accepted at verifier SHA `5db0a06a76e33bffdd5edbe6ffc4134d8e5b0f63` and merged at `d4700b0969c7f943e89ef73c87befcf74cbb24ff`. Stage 3 exact-SHA bootstrap, independent review, human acceptance, and trusted accepted run PASS at `b50868ed1e6fd3fa5c630664c16620d7a6eb85fe`; all 25 commands, cleanup, artifact collection, 13 local red-team cases, and both R7 browser variants pass. Stage 4 frontend, oracle, report validation, bundle/input separation, container schedule, and CI job are implemented on `stage4/complete-webmcp`. Cumulative Gate 4 bootstrap evidence is recorded at `/private/var/tmp/qualityops-stage4-bootstrap-final/summary.json`; that evidence is not verifier acceptance. The authored oracle has not yet received independent review. R12/R14 remain NOT RUN and require separate authorization. No push, merge, or deployment is authorized by this status.
+**Current execution status:** Stages 1–4 are implemented, independently reviewed, human-accepted at their verifier SHAs, and integrated into `main`. Stage 4 Gate 4 accepted run PASS (29 commands, cleanup PASS, artifact collection PASS) at `/private/var/tmp/qualityops-stage4-accepted-final/summary.json`; acceptance record digest is bound in that report. PR #9 merged at `4baf009ebdf472ce053779af82ed6b8754d5a2cf`; required CI run `45642698048` passed `python-contracts-and-eval`, `frontend-e2e`, and `frontend-webmcp`. The authored oracle review PASS found no field/denominator mismatches and verified source provenance and browser/tool separation. The active H1 ruleset and R12/R14 enforcement tests PASS; details are in `harness/artifacts/h1-remote-enforcement-20261125/summary.json`. Credential boundary: no local GitHub CLI credential remains; the GitHub ChatGPT app asks before writes. The CLI OAuth grant itself was not revoked globally. Remaining roadmap items in `PLAN.md`—the Planner/Generator/Healer dashboard exercise and matched CLI/MCP/WebMCP comparison—are outside these four gates and remain follow-up work. Pages publication/deployment remains separately authorized.
