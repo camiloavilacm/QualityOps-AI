@@ -14,7 +14,7 @@
   "command_timeout_seconds": 300,
   "gate_timeout_seconds": 1800,
   "workers": 1,
-  "implemented_stages": [1, 2, 3],
+  "implemented_stages": [1, 2, 3, 4],
   "seccomp_sha256": "cc3e61cabda6bbc1e53e54d27ba4d55a9d3be829b6dd1a596f4a7b31b1cc7849",
   "upstream": {
     "repository": "https://github.com/microsoft/playwright",

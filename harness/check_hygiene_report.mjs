@@ -42,7 +42,7 @@ function expectedInventory(policy) {
 }
 
 export function sourceRevisionFor(project, file, verifierRevision, candidateRevision) {
-  if (!['chromium', 'chromium-guard-meta', 'chromium-webmcp-lifecycle'].includes(project))
+  if (!['chromium', 'chromium-guard-meta', 'chromium-webmcp-lifecycle', 'chromium-webmcp'].includes(project))
     throw new Error('source hash requested for a non-active project')
   return ordinarySpecs.has(file) ? candidateRevision : verifierRevision
 }

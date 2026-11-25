@@ -88,6 +88,15 @@ try {
     ['ci-workflow-unit', ['node', '--test', '/opt/qualityops/harness/test_ci_workflow.mjs']],
     ['r7-variant-unit', ['node', '--test', '/opt/qualityops/harness/test_r7_variant.mjs']],
   )
+  if (stage >= 4) steps.push(
+    ['probe-stage4-pre-summary', ['node', 'scripts/probe_webmcp.mjs', '--output', '/evidence/probe-stage4.json']],
+    ['hygiene-chromium-webmcp', ['npm', 'run', 'check:hygiene', '--', '--project=chromium-webmcp'],
+      { env: { PW_HYGIENE_OUTPUT_DIR: '/evidence/hygiene/chromium-webmcp' } }],
+    ['webmcp', ['node', 'node_modules/@playwright/test/cli.js', 'test', '--project=chromium-webmcp', '--reporter=json'],
+      { env: { PLAYWRIGHT_JSON_OUTPUT_FILE: '/evidence/webmcp/report.json' } }],
+    ['hygiene-webmcp-execution', ['npm', 'run', 'check:hygiene', '--', '--project=chromium-webmcp', '--report', '/evidence/webmcp/report.json'],
+      { env: { PW_HYGIENE_OUTPUT_DIR: '/evidence/hygiene/chromium-webmcp' } }],
+  )
   result = 'PASS'
   for (const [name, argv, options] of steps) {
     if (!await command(name, argv, options)) { result = 'FAIL'; break }
@@ -99,6 +108,7 @@ try {
     limitations: ['Bootstrap evidence requires independent review and SHA-bound human acceptance.',
       ...(stage < 2 ? ['Stage 2 hygiene/canary, Stage 3 offline CI/red-team and Stage 4 summaries are not run in this stage.']
         : stage < 3 ? ['Stage 3 offline CI/red-team and Stage 4 summaries are not run in this stage.']
-          : ['Stage 3 offline Python suites run on the trusted host; Stage 4 summaries are not implemented.'])] })
+          : stage < 4 ? ['Stage 3 offline Python suites run on the trusted host; Stage 4 WebMCP summaries are not implemented in this gate.']
+            : ['Stage 3 offline Python suites run on the trusted host; Stage 4 WebMCP report comparisons run on the trusted host after container cleanup.'])] })
 }
 process.exitCode = result === 'PASS' ? 0 : 1

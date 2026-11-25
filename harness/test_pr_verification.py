@@ -226,8 +226,21 @@ class Stage2PolicyTests(unittest.TestCase):
             with self.subTest(name=name):
                 self.assertFalse(allowed_evidence(name))
 
-    def test_cumulative_stage_two_is_explicitly_enabled(self):
-        self.assertEqual(POLICY["implemented_stages"], [1, 2, 3])
+    def test_stage_four_webmcp_artifacts_are_bounded_and_project_scoped(self):
+        allowed = ["container/probe-stage4.json", "container/webmcp.log",
+                   "container/webmcp/report.json",
+                   "container/hygiene/chromium-webmcp/chromium-webmcp-hygiene.json",
+                   "container/hygiene/chromium-webmcp/chromium-webmcp-discovery.json",
+                   "container/hygiene/chromium-webmcp/test-results/MCP-001-retry0/trace.zip"]
+        for name in allowed:
+            with self.subTest(name=name): self.assertTrue(allowed_evidence(name))
+        for name in ["container/oracle.json", "container/webmcp/arbitrary.json",
+                     "container/hygiene/chromium-webmcp/extra.json",
+                     "container/hygiene/chromium-webmcp/test-results/secret.txt"]:
+            with self.subTest(name=name): self.assertFalse(allowed_evidence(name))
+
+    def test_cumulative_stages_one_through_four_are_explicitly_enabled(self):
+        self.assertEqual(POLICY["implemented_stages"], [1, 2, 3, 4])
 
     def test_stage_three_is_enabled_only_after_offline_suite_and_red_team_are_defined(self):
         self.assertIn(3, POLICY["implemented_stages"])
@@ -237,7 +250,8 @@ class Stage2PolicyTests(unittest.TestCase):
             self.assertTrue(path.is_file(), path.name)
 
     def test_trusted_inventory_has_unique_ids_and_reviewed_assertion_minima(self):
-        expected_counts = {"chromium": 8, "chromium-guard-meta": 8, "chromium-webmcp-lifecycle": 4}
+        expected_counts = {"chromium": 8, "chromium-guard-meta": 8, "chromium-webmcp-lifecycle": 4,
+                           "chromium-webmcp": 3}
         for project, rows in REPORT_POLICY["projects"].items():
             with self.subTest(project=project):
                 self.assertEqual(len(rows), expected_counts[project])
@@ -247,7 +261,7 @@ class Stage2PolicyTests(unittest.TestCase):
                 self.assertEqual(len(identities), len(set(identities)))
                 self.assertTrue(all(isinstance(row.get("min_expects"), int) and row["min_expects"] >= 0
                                     for row in rows))
-        self.assertEqual(REPORT_POLICY["pending_projects"], {"chromium-webmcp": {"status": "NOT INTRODUCED", "count": 0}})
+        self.assertNotIn("pending_projects", REPORT_POLICY)
 
     def test_canary_is_exact_dash003_missing_evidence_step(self):
         canary = REPORT_POLICY["canary"]

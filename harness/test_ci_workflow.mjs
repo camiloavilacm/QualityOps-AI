@@ -9,7 +9,7 @@ const root = resolve(fileURLToPath(new URL('..', import.meta.url)))
 const workflow = await readFile(resolve(root, '.github/workflows/ci.yml'), 'utf8')
 const dependabot = await readFile(resolve(root, '.github/dependabot.yml'), 'utf8')
 
-test('current offline workflow meets Stage 3 structure and pin policy', () => {
+test('current offline workflow meets Stage 4 structure and pin policy', () => {
   assert.equal(validateWorkflow(workflow, dependabot).result, 'PASS')
 })
 
@@ -20,5 +20,5 @@ for (const [label, mutate] of [
   ['privileged pull request trigger', value => value.replace('  pull_request:\n', '  pull_request_target:\n')],
   ['missing Stage 3 gate', value => value.replace('--stage 3', '--stage 1')],
   ['red-team artifact outside trusted runner', value => value.replace('container-stage3/publication/container/red-team/publication/', 'red-team/publication/')],
-  ['premature WebMCP job', value => value.replace('  frontend-e2e:', '  frontend-webmcp:\n    runs-on: ubuntu-latest\n  frontend-e2e:')],
+  ['missing Stage 4 gate', value => value.replace('--stage 4', '--stage 3')],
 ]) test(`workflow policy rejects ${label}`, () => assert.throws(() => validateWorkflow(mutate(workflow), dependabot)))

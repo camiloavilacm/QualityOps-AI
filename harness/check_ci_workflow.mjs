@@ -22,7 +22,7 @@ export function validateWorkflow(source, dependabot) {
     assert.ok(source.includes(action), `Missing required action ${action}`)
   assert.equal((source.match(/^  python-contracts-and-eval:\s*$/gm) ?? []).length, 1)
   assert.equal((source.match(/^  frontend-e2e:\s*$/gm) ?? []).length, 1)
-  assert.doesNotMatch(source, /^  frontend-webmcp:\s*$/m, 'Stage 4 job is not implemented')
+  assert.equal((source.match(/^  frontend-webmcp:\s*$/gm) ?? []).length, 1)
   assert.ok(source.includes('persist-credentials: false'), 'Checkout credentials must not persist')
   for (const command of [
     'python -B harness/checks.py contracts',
@@ -34,8 +34,10 @@ export function validateWorkflow(source, dependabot) {
     'frontend/scripts/export_showcase.py --check',
   ]) assert.ok(source.includes(command), `Missing offline check: ${command}`)
   assert.match(source, /run_pr_verification\.mjs --bootstrap --stage 3/)
+  assert.match(source, /run_pr_verification\.mjs --bootstrap --stage 4/)
   assert.match(source, /path: harness\/artifacts\/container-stage3\/publication\//)
   assert.match(source, /path: harness\/artifacts\/container-stage3\/publication\/container\/red-team\/publication\//)
+  assert.match(source, /path: harness\/artifacts\/container-stage4\/publication\//)
   assert.match(source, /retention-days: 7/)
   assert.match(source, /if-no-files-found: error/)
   assert.match(dependabot, /^version: 2$/m)

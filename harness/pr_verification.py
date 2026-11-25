@@ -100,8 +100,9 @@ def allowed_evidence(name):
         return False
     relative = name.removeprefix('container/')
     if relative in {'foundation.json', 'commands.json', 'versions.json', 'isolation.json',
-                    'blocker.json', 'probe.json', 'probe.log', 'typecheck.log',
+                    'blocker.json', 'probe.json', 'probe-stage4.json', 'probe.log', 'probe-stage4-pre-summary.log', 'typecheck.log',
                     'e2e.log', 'guard.log', 'lifecycle.log', 'canary.log',
+                    'webmcp.log', 'hygiene-chromium-webmcp.log', 'hygiene-webmcp-execution.log',
                     'hygiene-unit.log',
                     'hygiene-chromium.log', 'hygiene-chromium-guard-meta.log',
                     'hygiene-chromium-webmcp-lifecycle.log', 'red-team.log', 'ci-workflow.log',
@@ -113,11 +114,11 @@ def allowed_evidence(name):
     if re.fullmatch(r'red-team/publication/cases/R7/(?:baseline|renamed_control)-(?:report|failure)[.]json|'
                     r'red-team/publication/cases/R7/(?:baseline|renamed_control)-trace[.]zip', relative):
         return True
-    if re.fullmatch(r'(e2e|guard|lifecycle)/(report|discovery|orchestrator)[.]json', relative):
+    if re.fullmatch(r'(e2e|guard|lifecycle|webmcp)/(report|discovery|orchestrator)[.]json', relative):
         return True
     parts = Path(relative).parts
     if len(parts) == 3 and parts[0] == 'hygiene' and parts[1] in {
-            'chromium', 'chromium-guard-meta', 'chromium-webmcp-lifecycle'} and parts[2] in {
+            'chromium', 'chromium-guard-meta', 'chromium-webmcp-lifecycle', 'chromium-webmcp'} and parts[2] in {
                 f'{parts[1]}-hygiene.json', f'{parts[1]}-discovery.json', f'{parts[1]}-report.json'}:
         return True
     if relative in {'canary/summary.json', 'canary/mutation/mutated-export.json'} or re.fullmatch(
@@ -127,10 +128,10 @@ def allowed_evidence(name):
         return (parts[-1] in {'trace.zip', 'error-context.md', '.last-run.json'} or
                 re.fullmatch(r'[A-Za-z0-9_.-]+[.](png|webm)', parts[-1]) is not None)
     if len(parts) >= 4 and parts[0] == 'hygiene' and parts[1] in {
-            'chromium', 'chromium-guard-meta', 'chromium-webmcp-lifecycle'} and parts[2] == 'test-results':
+            'chromium', 'chromium-guard-meta', 'chromium-webmcp-lifecycle', 'chromium-webmcp'} and parts[2] == 'test-results':
         return (parts[-1] in {'trace.zip', 'error-context.md', '.last-run.json'} or
                 re.fullmatch(r'[A-Za-z0-9_.-]+[.](png|webm)', parts[-1]) is not None)
-    return (len(parts) >= 3 and parts[0] in {'e2e', 'guard', 'lifecycle'} and parts[1] == 'test-results'
+    return (len(parts) >= 3 and parts[0] in {'e2e', 'guard', 'lifecycle', 'webmcp'} and parts[1] == 'test-results'
             and (parts[-1] in {'trace.zip', 'error-context.md', '.last-run.json'} or
                  re.fullmatch(r'[A-Za-z0-9_.-]+[.](png|webm)', parts[-1]) is not None))
 
@@ -370,13 +371,15 @@ def main():
         for file in ["harness/pr_verification.py", "harness/run_pr_verification.mjs",
                      "harness/check_healer_scope.py", "harness/check_pr_reports.mjs",
                      "harness/check_hygiene_report.mjs", "harness/check_canary_report.mjs",
+                     "harness/check_webmcp_report.mjs",
                      "harness/test_pr_verification.py", "harness/test_pr_reports.mjs",
                      "harness/test_stage2_report_validation.mjs",
                      "harness/check_ci_workflow.mjs", "harness/test_ci_workflow.mjs",
                      "harness/verify_red_team_matrix.mjs", "harness/red_team_cases.mjs",
                      "harness/test_red_team_matrix.mjs", "harness/prepare_r7_variant.mjs",
                      "harness/test_r7_variant.mjs",
-                     "harness/pr-verification-policy.json", "harness/container/runtime-policy.json"]:
+                     "harness/pr-verification-policy.json", "harness/container/runtime-policy.json",
+                     "harness/oracles/authored-evaluation-v1.json"]:
             try:
                 recorded = git(ROOT, "show", args.verifier_revision + ":" + file)
             except subprocess.SubprocessError:
@@ -560,6 +563,14 @@ def main():
                     case = read_json(evidence / "red-team/publication/cases" / (row["id"] + ".json"))
                     if case != row:
                         raise Blocked("red-team case artifact does not match its summary row")
+            if args.stage >= 4:
+                run(["node", str(ROOT / "harness/check_pr_reports.mjs"), "--project", "chromium-webmcp",
+                     "--report", str(evidence / "webmcp/report.json")])
+                run(["node", str(ROOT / "harness/check_hygiene_report.mjs"), "--root", str(evidence),
+                     "--project", "chromium-webmcp", "--verifier-revision", args.verifier_revision,
+                     "--candidate-revision", args.candidate_revision])
+                run(["node", str(ROOT / "harness/check_webmcp_report.mjs"), "--report",
+                     str(evidence / "webmcp/report.json"), "--verifier-revision", args.verifier_revision])
             report["result"] = "PASS"
     except (Blocked, ValueError, KeyError, OSError, subprocess.SubprocessError) as exc:
         report["reason"] = str(exc) if not isinstance(exc, subprocess.SubprocessError) else "unresolvable revision or local daemon"

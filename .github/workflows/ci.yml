@@ -122,3 +122,49 @@ jobs:
           path: harness/artifacts/container-stage3/publication/container/red-team/publication/
           retention-days: 7
           if-no-files-found: error
+
+  frontend-webmcp:
+    # Cumulative Stage 4 browser evidence; bootstrap feedback is not verifier acceptance.
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout infrastructure snapshot
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Set up host launcher Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "26"
+      - name: Set up host launcher Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+      - name: Fetch pinned read-only qa-features reference (e7c566ff)
+        run: |
+          mkdir -p ../qa-workspace/qa-features
+          git -C ../qa-workspace/qa-features init -q
+          git -C ../qa-workspace/qa-features remote add origin https://github.com/camiloavilacm/qa-features.git
+          git -C ../qa-workspace/qa-features fetch --depth 1 origin e7c566ff831139889195643a1b906b7edab76f48
+          git -C ../qa-workspace/qa-features checkout -q FETCH_HEAD
+          mkdir -p ../qa-workspace/qa-features/harness/evidence/readme-runs/failure
+          cp -R samples/recorded/archive-failure/. ../qa-workspace/qa-features/harness/evidence/readme-runs/failure/
+          echo "QUALITYOPS_QA_FEATURES_ROOT=$(cd ../qa-workspace/qa-features && pwd)" >> "$GITHUB_ENV"
+      - name: Install pinned Python harness dependency
+        run: pip install --no-cache-dir -r harness/requirements.txt "jsonschema[format-nongpl]==4.26.0"
+      - name: Validate WebMCP report checker
+        run: node --check harness/check_webmcp_report.mjs
+      - name: Run cumulative Linux amd64 Stage 4 verification
+        run: |
+          revision=$(git rev-parse HEAD)
+          node harness/run_pr_verification.mjs --bootstrap --stage 4 --verifier-revision "$revision" --candidate-revision "$revision" --output harness/artifacts/container-stage4
+      - name: Preserve cumulative WebMCP evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: container-stage4-${{ github.run_id }}-${{ github.run_attempt }}
+          path: harness/artifacts/container-stage4/publication/
+          retention-days: 7
+          if-no-files-found: error
