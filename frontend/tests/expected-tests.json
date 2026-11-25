@@ -1,0 +1,250 @@
+{
+  "version": "stage2-1",
+  "sourceRevision": "4cfe008bb6156d670504f50241adbb399f9dbd85",
+  "assertionReview": "Reviewed actual source counts; deletion detection only, not semantic equivalence.",
+  "helperFiles": [],
+  "protectedSources": {
+    "tests/fixtures/dashboard.ts": "7fa6431eef8ba73f51799c527a70dff33ee6707b841e2c640abad9be8c3fef2d",
+    "tests/meta/guard-verification.spec.ts": "545ab7554758adc4be0b41381414dbe696db825fcf29f33503f6c82abc42a5c9",
+    "tests/meta/webmcp-lifecycle.spec.ts": "4329198e602e0a7735db750b9f860016e094be6e7ca021f69e1c524e320559ba"
+  },
+  "projects": {
+    "chromium": {
+      "state": "active",
+      "status": "INTRODUCED",
+      "count": 8,
+      "discovery": {
+        "sha256": "6c29047eff2fa96b524318b24a7e4094d0a71fb678adfacaef8b47bcb00d3c1c",
+        "zeroDiscoveryOnly": false
+      },
+      "tests": [
+        {
+          "project": "chromium",
+          "id": "DASH-004",
+          "file": "tests/dashboard-flows.spec.ts",
+          "titlePath": [
+            "Dashboard multi-view showcase flows",
+            "passing campaign displays ELIGIBLE with complete evidence and absent investigation"
+          ],
+          "minExpects": 6
+        },
+        {
+          "project": "chromium",
+          "id": "DASH-005",
+          "file": "tests/dashboard-flows.spec.ts",
+          "titlePath": [
+            "Dashboard multi-view showcase flows",
+            "partial campaign displays INCONCLUSIVE gate and INCONCLUSIVE investigation abstention"
+          ],
+          "minExpects": 4
+        },
+        {
+          "project": "chromium",
+          "id": "DASH-006",
+          "file": "tests/dashboard-flows.spec.ts",
+          "titlePath": [
+            "Dashboard multi-view showcase flows",
+            "failing campaign keeps BLOCKED gate decision when investigator returns ERROR"
+          ],
+          "minExpects": 3
+        },
+        {
+          "project": "chromium",
+          "id": "DASH-007",
+          "file": "tests/dashboard-flows.spec.ts",
+          "titlePath": [
+            "Dashboard multi-view showcase flows",
+            "projected defect campaign displays DIAGNOSED finding with working evidence citation anchors"
+          ],
+          "minExpects": 7
+        },
+        {
+          "project": "chromium",
+          "id": "DASH-008",
+          "file": "tests/dashboard-flows.spec.ts",
+          "titlePath": [
+            "Dashboard multi-view showcase flows",
+            "evaluation view displays 120-trial live benchmark (BLOCKED FAIL) and offline authored comparison"
+          ],
+          "minExpects": 7
+        },
+        {
+          "project": "chromium",
+          "id": "DASH-009",
+          "file": "tests/dashboard-flows.spec.ts",
+          "titlePath": [
+            "Dashboard multi-view showcase flows",
+            "unknown campaign query displays unavailable fallback and navigates back"
+          ],
+          "minExpects": 2
+        },
+        {
+          "project": "chromium",
+          "id": "DASH-003",
+          "file": "tests/mixed-campaign.spec.ts",
+          "titlePath": [
+            "mixed campaign displays BLOCKED with confirmed failure for x and missing evidence for y"
+          ],
+          "minExpects": 7,
+          "stepId": "DASH-003-REASON-01"
+        },
+        {
+          "project": "chromium",
+          "id": "DASH-001",
+          "file": "tests/seed.spec.ts",
+          "titlePath": [
+            "Test group",
+            "seed"
+          ],
+          "minExpects": 3
+        }
+      ]
+    },
+    "chromium-guard-meta": {
+      "state": "active",
+      "status": "INTRODUCED",
+      "count": 8,
+      "discovery": {
+        "sha256": "c77e3eea03b1f90c2a2fb1b1df98e8022656330eff9400c01180c7bca901fd18",
+        "zeroDiscoveryOnly": false
+      },
+      "tests": [
+        {
+          "project": "chromium-guard-meta",
+          "id": "GUARD-001",
+          "file": "tests/meta/guard-verification.spec.ts",
+          "titlePath": [
+            "clean-page"
+          ],
+          "minExpects": 1
+        },
+        {
+          "project": "chromium-guard-meta",
+          "id": "GUARD-002",
+          "file": "tests/meta/guard-verification.spec.ts",
+          "titlePath": [
+            "uncaught-js-error"
+          ],
+          "minExpects": 1,
+          "guardReason": "UNCAUGHT_JS_ERROR"
+        },
+        {
+          "project": "chromium-guard-meta",
+          "id": "GUARD-003",
+          "file": "tests/meta/guard-verification.spec.ts",
+          "titlePath": [
+            "console-error"
+          ],
+          "minExpects": 1,
+          "guardReason": "CONSOLE_ERROR"
+        },
+        {
+          "project": "chromium-guard-meta",
+          "id": "GUARD-004",
+          "file": "tests/meta/guard-verification.spec.ts",
+          "titlePath": [
+            "same-origin-404"
+          ],
+          "minExpects": 0,
+          "guardReason": "HTTP_404"
+        },
+        {
+          "project": "chromium-guard-meta",
+          "id": "GUARD-005",
+          "file": "tests/meta/guard-verification.spec.ts",
+          "titlePath": [
+            "same-origin-500"
+          ],
+          "minExpects": 0,
+          "guardReason": "HTTP_500"
+        },
+        {
+          "project": "chromium-guard-meta",
+          "id": "GUARD-006",
+          "file": "tests/meta/guard-verification.spec.ts",
+          "titlePath": [
+            "request-failed"
+          ],
+          "minExpects": 0,
+          "guardReason": "REQUEST_FAILED"
+        },
+        {
+          "project": "chromium-guard-meta",
+          "id": "GUARD-007",
+          "file": "tests/meta/guard-verification.spec.ts",
+          "titlePath": [
+            "second-tab-error"
+          ],
+          "minExpects": 1,
+          "guardReason": "UNCAUGHT_JS_ERROR"
+        },
+        {
+          "project": "chromium-guard-meta",
+          "id": "GUARD-008",
+          "file": "tests/meta/guard-verification.spec.ts",
+          "titlePath": [
+            "navigation-abort"
+          ],
+          "minExpects": 2
+        }
+      ]
+    },
+    "chromium-webmcp": {
+      "state": "pending-stage4",
+      "status": "NOT INTRODUCED",
+      "count": 0,
+      "discovery": {
+        "sha256": "b72667ee32c709728cde16c74890c93c670ff97d5967f7e2c8dab5d9eef36c5c",
+        "zeroDiscoveryOnly": true
+      },
+      "tests": []
+    },
+    "chromium-webmcp-lifecycle": {
+      "state": "active",
+      "status": "INTRODUCED",
+      "count": 4,
+      "discovery": {
+        "sha256": "a7079c10a833f1779363536d6cd54b6e4e7c3dbf9d0d5d655755e26baca6995b",
+        "zeroDiscoveryOnly": false
+      },
+      "tests": [
+        {
+          "project": "chromium-webmcp-lifecycle",
+          "id": "LIFE-001",
+          "file": "tests/meta/webmcp-lifecycle.spec.ts",
+          "titlePath": [
+            "unsupported environment preserves dashboard"
+          ],
+          "minExpects": 2
+        },
+        {
+          "project": "chromium-webmcp-lifecycle",
+          "id": "LIFE-002",
+          "file": "tests/meta/webmcp-lifecycle.spec.ts",
+          "titlePath": [
+            "duplicate initialization registers tools once"
+          ],
+          "minExpects": 3
+        },
+        {
+          "project": "chromium-webmcp-lifecycle",
+          "id": "LIFE-003",
+          "file": "tests/meta/webmcp-lifecycle.spec.ts",
+          "titlePath": [
+            "second-registration failure rolls back first"
+          ],
+          "minExpects": 4
+        },
+        {
+          "project": "chromium-webmcp-lifecycle",
+          "id": "LIFE-004",
+          "file": "tests/meta/webmcp-lifecycle.spec.ts",
+          "titlePath": [
+            "disposal unregisters tools and permits reinitialization"
+          ],
+          "minExpects": 5
+        }
+      ]
+    }
+  }
+}

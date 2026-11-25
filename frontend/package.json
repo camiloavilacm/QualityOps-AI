@@ -11,7 +11,10 @@
     "pw": "playwright",
     "typecheck": "tsc --noEmit",
     "test:guard": "node scripts/test_guard_fixture.mjs --report artifacts/guard/report.json",
-    "test:webmcp-lifecycle": "node scripts/test_webmcp_lifecycle.mjs --report artifacts/webmcp-lifecycle/report.json"
+    "test:webmcp-lifecycle": "node scripts/test_webmcp_lifecycle.mjs --report artifacts/webmcp-lifecycle/report.json",
+    "check:hygiene": "node scripts/check_test_hygiene.mjs",
+    "test:hygiene": "node --test scripts/check_test_hygiene.test.mjs",
+    "test:canary": "node scripts/check_canary_regression.mjs"
   },
   "dependencies": {
     "react": "19.3.1",

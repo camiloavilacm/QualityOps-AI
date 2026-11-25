@@ -1,7 +1,7 @@
 {
-  "version": "foundation-1",
-  "source_revision": "63bd7b88f97a4196453b728c508f9f6e32d65d7c",
-  "acceptance": "pending independent review and exact-SHA human acceptance",
+  "version": "stage2-1",
+  "source_revision": "4cfe008bb6156d670504f50241adbb399f9dbd85",
+  "acceptance": "Stage 2 verifier baseline; assertions and canary independently checked against this policy.",
   "projects": {
     "chromium": [
       {
@@ -10,7 +10,8 @@
         "titles": [
           "Dashboard multi-view showcase flows",
           "passing campaign displays ELIGIBLE with complete evidence and absent investigation"
-        ]
+        ],
+        "min_expects": 6
       },
       {
         "id": "DASH-005",
@@ -18,7 +19,8 @@
         "titles": [
           "Dashboard multi-view showcase flows",
           "partial campaign displays INCONCLUSIVE gate and INCONCLUSIVE investigation abstention"
-        ]
+        ],
+        "min_expects": 4
       },
       {
         "id": "DASH-006",
@@ -26,7 +28,8 @@
         "titles": [
           "Dashboard multi-view showcase flows",
           "failing campaign keeps BLOCKED gate decision when investigator returns ERROR"
-        ]
+        ],
+        "min_expects": 3
       },
       {
         "id": "DASH-007",
@@ -34,7 +37,8 @@
         "titles": [
           "Dashboard multi-view showcase flows",
           "projected defect campaign displays DIAGNOSED finding with working evidence citation anchors"
-        ]
+        ],
+        "min_expects": 7
       },
       {
         "id": "DASH-008",
@@ -42,7 +46,8 @@
         "titles": [
           "Dashboard multi-view showcase flows",
           "evaluation view displays 120-trial live benchmark (BLOCKED FAIL) and offline authored comparison"
-        ]
+        ],
+        "min_expects": 7
       },
       {
         "id": "DASH-009",
@@ -50,14 +55,17 @@
         "titles": [
           "Dashboard multi-view showcase flows",
           "unknown campaign query displays unavailable fallback and navigates back"
-        ]
+        ],
+        "min_expects": 2
       },
       {
         "id": "DASH-003",
         "file": "tests/mixed-campaign.spec.ts",
         "titles": [
           "mixed campaign displays BLOCKED with confirmed failure for x and missing evidence for y"
-        ]
+        ],
+        "min_expects": 7,
+        "step_id": "DASH-003-REASON-01"
       },
       {
         "id": "DASH-001",
@@ -65,7 +73,8 @@
         "titles": [
           "Test group",
           "seed"
-        ]
+        ],
+        "min_expects": 3
       }
     ],
     "chromium-guard-meta": [
@@ -74,7 +83,8 @@
         "file": "tests/meta/guard-verification.spec.ts",
         "titles": [
           "clean-page"
-        ]
+        ],
+        "min_expects": 1
       },
       {
         "id": "GUARD-002",
@@ -82,7 +92,8 @@
         "titles": [
           "uncaught-js-error"
         ],
-        "guard_reason": "UNCAUGHT_JS_ERROR"
+        "guard_reason": "UNCAUGHT_JS_ERROR",
+        "min_expects": 1
       },
       {
         "id": "GUARD-003",
@@ -90,7 +101,8 @@
         "titles": [
           "console-error"
         ],
-        "guard_reason": "CONSOLE_ERROR"
+        "guard_reason": "CONSOLE_ERROR",
+        "min_expects": 1
       },
       {
         "id": "GUARD-004",
@@ -98,7 +110,8 @@
         "titles": [
           "same-origin-404"
         ],
-        "guard_reason": "HTTP_404"
+        "guard_reason": "HTTP_404",
+        "min_expects": 0
       },
       {
         "id": "GUARD-005",
@@ -106,7 +119,8 @@
         "titles": [
           "same-origin-500"
         ],
-        "guard_reason": "HTTP_500"
+        "guard_reason": "HTTP_500",
+        "min_expects": 0
       },
       {
         "id": "GUARD-006",
@@ -114,7 +128,8 @@
         "titles": [
           "request-failed"
         ],
-        "guard_reason": "REQUEST_FAILED"
+        "guard_reason": "REQUEST_FAILED",
+        "min_expects": 0
       },
       {
         "id": "GUARD-007",
@@ -122,14 +137,16 @@
         "titles": [
           "second-tab-error"
         ],
-        "guard_reason": "UNCAUGHT_JS_ERROR"
+        "guard_reason": "UNCAUGHT_JS_ERROR",
+        "min_expects": 1
       },
       {
         "id": "GUARD-008",
         "file": "tests/meta/guard-verification.spec.ts",
         "titles": [
           "navigation-abort"
-        ]
+        ],
+        "min_expects": 2
       }
     ],
     "chromium-webmcp-lifecycle": [
@@ -138,29 +155,55 @@
         "file": "tests/meta/webmcp-lifecycle.spec.ts",
         "titles": [
           "unsupported environment preserves dashboard"
-        ]
+        ],
+        "min_expects": 2
       },
       {
         "id": "LIFE-002",
         "file": "tests/meta/webmcp-lifecycle.spec.ts",
         "titles": [
           "duplicate initialization registers tools once"
-        ]
+        ],
+        "min_expects": 3
       },
       {
         "id": "LIFE-003",
         "file": "tests/meta/webmcp-lifecycle.spec.ts",
         "titles": [
           "second-registration failure rolls back first"
-        ]
+        ],
+        "min_expects": 4
       },
       {
         "id": "LIFE-004",
         "file": "tests/meta/webmcp-lifecycle.spec.ts",
         "titles": [
           "disposal unregisters tools and permits reinitialization"
-        ]
+        ],
+        "min_expects": 5
       }
     ]
+  },
+  "canary": {
+    "id": "DASH-003",
+    "project": "chromium",
+    "file": "tests/mixed-campaign.spec.ts",
+    "titles": [
+      "mixed campaign displays BLOCKED with confirmed failure for x and missing evidence for y"
+    ],
+    "step_id": "DASH-003-REASON-01",
+    "export_path": "frontend/src/showcase-export.json",
+    "campaign_id": "fixture-mixed",
+    "reason_code": "INSUFFICIENT_EVIDENCE",
+    "preserved_reason_codes": [
+      "REQUIRED_FAILURE",
+      "INSUFFICIENT_EVIDENCE"
+    ]
+  },
+  "pending_projects": {
+    "chromium-webmcp": {
+      "status": "NOT INTRODUCED",
+      "count": 0
+    }
   }
 }

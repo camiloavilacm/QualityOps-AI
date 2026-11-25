@@ -50,8 +50,8 @@ The shared trusted container runner is the candidate-execution entry point; see
 before execution. Sources and bundles remain read-only. `PW_OUTPUT_DIR`, the
 Playwright JSON reporter path, and each script's explicit `--report` / `--output`
 argument support evidence under `/evidence`; internal preview uses IPv4 loopback
-and a strict port. Tests use one worker and zero retries. There is no Stage 2
-hygiene/canary or Stage 4 summary-tool acceptance in this foundation.
+and a strict port. Tests use one worker and zero retries. Stage 2 inventory, hygiene and the paired canary are described below. Stage 4
+summary-tool acceptance remains pending.
 
 The initial container attempts were blocked by corrupted extracted-image storage and
 then Chromium's sandbox failing at `chroot` with an empty capability bounding set.
@@ -96,3 +96,46 @@ Reports and traces contain synthetic fixture diagnostics only. The production
 error guard records bounded reason codes, omitting raw console/error text, URLs,
 headers and credentials. Navigation cancellation is accepted only after another
 successful navigation on the same frame supersedes the aborted request.
+
+
+## Stage 2 inventory, hygiene and paired canary
+
+`tests/expected-tests.json` records actual discovery identities and source-reviewed
+assertion minimums: eight ordinary dashboard tests, eight production-guard meta
+tests, and four lifecycle tests. The fourth `chromium-webmcp` project records zero
+discovery as **NOT INTRODUCED**, pending Stage 4; an empty run cannot pass.
+The mixed test retains ID `DASH-003`; its unchanged missing-evidence assertions
+are grouped in `DASH-003-REASON-01` for mutation attribution.
+
+Run `npm run test:hygiene` for positive/negative scanner and report tests. Run
+`npm run check:hygiene -- --project=chromium [--report <execution-json>]` and select
+the guard/lifecycle project explicitly for their corresponding checks. The
+checker uses the installed local Playwright binary, independently scans every
+file under `tests/`, checks exact identities and per-test AST assertion counts,
+and rejects unapproved imports, hidden test files, aliases, unsupported test APIs,
+browser injection, retries and known workflow bypasses. Fixture and meta-test
+operation exceptions are pinned to reviewed source bytes; new helpers require
+separate policy review. Reserved read-only WebMCP evaluation checks do not
+introduce absent interface tests. Counts detect deletion, not semantic equivalence.
+
+Set `PW_HYGIENE_OUTPUT_DIR` to a fresh evidence directory and, from the trusted
+launcher, `PW_VERIFIER_REVISION` to the verifier SHA. Hygiene JSON records relative
+discovery/execution paths, raw report digests, separate inventory/policy digests,
+and hashes labeled as the observed candidate source bytes. Execution reports
+outside that directory are copied into it for durable publication. Without an
+output override, evidence uses a fresh temporary directory. Parent workflows and
+harness policy are read-only inputs, supplied by the trusted runner.
+
+The trusted Stage 2 image build prepares the positive and mutated bundles from
+verifier-owned sources, removes its temporary build copies, and stores both bundles
+read-only in the image. `npm run test:canary` serves those prepared bundles on free
+strict loopback ports 4184 and 4185, checks the rendered states independently, and
+executes exactly `DASH-003` once from the read-only approved test mount against
+each bundle. Runtime candidate code cannot rebuild or modify the bundles. Only the
+designated missing-evidence step can kill the mutant. Set
+`PW_CANARY_OUTPUT_DIR` to the trusted evidence mount; `summary.json` records
+`PASS`/`KILLED` only for an attributed pair with successful cleanup. The mutated
+export snapshot and each discovery/execution report remain in that output
+directory. A single presentation mutant and static checks do not establish
+universal assertion correctness or authorize merge. Host diagnostic passes remain
+distinct from accepted container runs.

@@ -19,8 +19,10 @@ test('mixed campaign displays BLOCKED with confirmed failure for x and missing e
 
   // 3. Verify missing / insufficient evidence for execution y
   const missingReason = reasons.filter({ hasText: 'INSUFFICIENT_EVIDENCE' })
-  await expect(missingReason).toContainText('Insufficient evidence')
-  await expect(missingReason).toContainText('Execution y')
+  await test.step('DASH-003-REASON-01', async () => {
+    await expect(missingReason).toContainText('Insufficient evidence')
+    await expect(missingReason).toContainText('Execution y')
+  })
 
   await expect(reasons).toHaveCount(2)
 })

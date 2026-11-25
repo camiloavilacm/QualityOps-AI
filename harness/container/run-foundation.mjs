@@ -8,7 +8,10 @@ const cwd = '/opt/qualityops/frontend'
 const records = []
 const env = { PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
   HOME: '/tmp/qualityops-home', TMPDIR: '/tmp', CI: '1', PLAYWRIGHT_BROWSERS_PATH: '/ms-playwright',
-  PW_OUTPUT_DIR: '/evidence/e2e/test-results', PLAYWRIGHT_HTML_OPEN: 'never' }
+  PW_OUTPUT_DIR: '/evidence/e2e/test-results', PLAYWRIGHT_HTML_OPEN: 'never',
+  PW_VERIFIER_REVISION: process.env.PW_VERIFIER_REVISION ?? '',
+  PW_CANDIDATE_REVISION: process.env.PW_CANDIDATE_REVISION ?? '',
+  PW_STAGE: process.env.PW_STAGE ?? '' }
 const requireFrontend = createRequire(`${cwd}/package.json`)
 const write = (file, value) => {
   fs.mkdirSync(path.dirname(file), { recursive: true })
@@ -41,10 +44,14 @@ function command(name, argv, options = {}) {
 }
 
 let result = 'BLOCKED'
+let stage = 0
 try {
   fs.mkdirSync(env.HOME, { recursive: true })
   write('/evidence/isolation.json', await probe())
   const policy = JSON.parse(fs.readFileSync('/opt/qualityops/runner/runtime-policy.json'))
+  stage = Number(env.PW_STAGE)
+  if (!Number.isInteger(stage) || !policy.implemented_stages.includes(stage))
+    throw new Error('requested stage is not implemented')
   if (Number(process.versions.node.split('.')[0]) !== policy.node_major ||
       requireFrontend('@playwright/test/package.json').version !== policy.playwright)
     throw new Error('runtime/package version mismatch')
@@ -64,6 +71,16 @@ try {
     ['guard', ['node', 'scripts/test_guard_fixture.mjs', '--report', '/evidence/guard/report.json']],
     ['lifecycle', ['node', 'scripts/test_webmcp_lifecycle.mjs', '--report', '/evidence/lifecycle/report.json']],
   ]
+  if (stage >= 2) steps.push(
+    ['hygiene-unit', ['npm', 'run', 'test:hygiene']],
+    ['hygiene-chromium', ['npm', 'run', 'check:hygiene', '--', '--project=chromium', '--report', '/evidence/e2e/report.json'],
+      { env: { PW_HYGIENE_OUTPUT_DIR: '/evidence/hygiene/chromium' } }],
+    ['hygiene-chromium-guard-meta', ['npm', 'run', 'check:hygiene', '--', '--project=chromium-guard-meta', '--report', '/evidence/guard/report.json'],
+      { env: { PW_HYGIENE_OUTPUT_DIR: '/evidence/hygiene/chromium-guard-meta' } }],
+    ['hygiene-chromium-webmcp-lifecycle', ['npm', 'run', 'check:hygiene', '--', '--project=chromium-webmcp-lifecycle', '--report', '/evidence/lifecycle/report.json'],
+      { env: { PW_HYGIENE_OUTPUT_DIR: '/evidence/hygiene/chromium-webmcp-lifecycle' } }],
+    ['canary', ['npm', 'run', 'test:canary'], { env: { PW_CANARY_OUTPUT_DIR: '/evidence/canary' } }],
+  )
   result = 'PASS'
   for (const [name, argv, options] of steps) {
     if (!await command(name, argv, options)) { result = 'FAIL'; break }
@@ -73,6 +90,7 @@ try {
 } finally {
   write('/evidence/foundation.json', { result, commands: records,
     limitations: ['Bootstrap evidence requires independent review and SHA-bound human acceptance.',
-      'Stage 2 hygiene/canary, Stage 3 red-team, Stage 4 summaries are not implemented in this slice.'] })
+      ...(stage < 2 ? ['Stage 2 hygiene/canary, Stage 3 red-team and Stage 4 summaries are not run in this stage.']
+        : ['Stage 3 red-team and Stage 4 summaries are not implemented in this slice.'])] })
 }
 process.exitCode = result === 'PASS' ? 0 : 1

@@ -1,6 +1,6 @@
 # Staged PR Verification Plan (v7) — Agent Harness, Guardrails & WebMCP
 
-**Status:** v7 design with the approved shared-container first slice implemented locally. Independent review and human acceptance of an exact verifier SHA remain required. Container execution is BLOCKED by inconsistent local Docker extracted-image storage after the disk-space blocker was resolved. Acceptance boxes remain unchecked; host diagnostics do not establish container acceptance.
+**Status:** Stage 1 shared-container foundation implemented, independently reviewed, human-accepted at verifier SHA `06a50ab582e1e9b6c19254964603df534b4794cd`, and integrated into `main` at `4cfe008bb6156d670504f50241adbb399f9dbd85`. The trusted Stage 1 container gate passed. Stage 2 inventory, hygiene and paired-canary work is now active; later acceptance boxes remain unchecked.
 
 **Objective:** Establish reproducible evidence that a proposed test change preserves a reviewed requirement and detects its declared regression, then submit that evidence and the final commit SHA for human review. PR verification does not compute or override the product's deterministic campaign gate. Neither successful CI nor agent output authorizes release, merge, model promotion, or deployment.
 
