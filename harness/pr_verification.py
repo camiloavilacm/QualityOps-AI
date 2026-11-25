@@ -135,6 +135,13 @@ def allowed_evidence(name):
                  re.fullmatch(r'[A-Za-z0-9_.-]+[.](png|webm)', parts[-1]) is not None))
 
 
+def validate_red_team_scenario_ids(rows, expected_ids):
+    ids = [row.get('id') for row in rows]
+    if (any(not isinstance(value, str) for value in ids) or len(rows) != len(expected_ids) or
+            len(set(ids)) != len(rows) or set(ids) != expected_ids):
+        raise Blocked('red-team scenario IDs are missing, duplicated, or unexpected')
+
+
 def evidence_files(root, *, enforce_names=True, tolerate_vanished=False, name_prefix=''):
     """Inspect all entries without following links; never permit uploader traversal."""
     files, total, count = [], 0, 0
@@ -504,6 +511,7 @@ def main():
                 if not isinstance(local, list) or any(not isinstance(row, dict) for row in local):
                     raise Blocked("red-team local scenario rows are malformed")
                 expected_ids = {"R1a", "R1b", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "R10", "R11", "R13"}
+                validate_red_team_scenario_ids(local, expected_ids)
                 r7 = next((row for row in local if row.get("id") == "R7"), {}) if isinstance(local, list) else {}
                 browser = r7.get("browser_control") if isinstance(r7, dict) else None
                 hashes = browser.get("artifact_sha256") if isinstance(browser, dict) else None
@@ -519,7 +527,6 @@ def main():
                     for outcome in (original, renamed))
                 if (matrix.get("result") != "PASS" or matrix.get("verifier_revision") != args.verifier_revision or
                         matrix.get("candidate_revision") != args.candidate_revision or
-                        {row.get("id") for row in local} != expected_ids or
                         any(row.get("status") != "PASS" or row.get("workspace_cleanup") != "PASS" for row in local) or
                         r7.get("cumulative_control") !=
                             {"result": "PASS", "canary": "KILLED", "evidence": "canary/summary.json"} or
