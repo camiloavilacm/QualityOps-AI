@@ -73,7 +73,7 @@ async function main() {
   const r7 = records.find(row => row.id === 'R7')
   try {
     r7.cumulative_control = await validateR7CumulativeEvidence()
-    if (process.env.PW_STAGE === '3') r7.artifact = 'container/canary/summary.json'
+    if (Number(process.env.PW_STAGE) >= 3) r7.artifact = 'container/canary/summary.json'
     else {
       r7.component_status = 'PASS'
       r7.status = 'NOT RUN'
@@ -85,7 +85,7 @@ async function main() {
   }
   const report = {
     schema_version: 'red-team-matrix-1',
-    result: records.length === 13 && records.every(row => row.status === 'PASS') && process.env.PW_STAGE === '3'
+    result: records.length === 13 && records.every(row => row.status === 'PASS') && Number(process.env.PW_STAGE) >= 3
       ? 'PASS' : records.every(row => ['PASS', 'NOT RUN'].includes(row.status)) ? 'INCOMPLETE' : 'FAIL',
     verifier_revision: candidate,
     candidate_revision: candidate,
@@ -93,7 +93,7 @@ async function main() {
     local_scenarios: records,
     remote_scenarios: pendingRemoteCases(),
     limitations: ['Component mutation probes exercise trusted validators; they do not execute an untrusted candidate overlay.',
-      ...(process.env.PW_STAGE === '3' ? [] : ['Standalone matrix tests do not assert a container canary result.']),
+      ...(Number(process.env.PW_STAGE) >= 3 ? [] : ['Standalone matrix tests do not assert a container canary result.']),
       'R12/R14 require separate authorization and disposable remote enforcement evidence.'],
   }
   const publication = resolve(output, 'publication')

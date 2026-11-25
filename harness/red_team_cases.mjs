@@ -288,7 +288,7 @@ export const localCases = [
     assert.match(original, /name: \/fixture-mixed\/i/)
     assert.match(original, /toHaveURL\(\/\\\?campaign=fixture-mixed\$\/\)/)
     assert.match(original, /DASH-003-REASON-01/)
-    if (process.env.PW_STAGE === '3') return await runR7BrowserControl(root, artifactDirectory)
+    if (Number(process.env.PW_STAGE) >= 3) return await runR7BrowserControl(root, artifactDirectory)
   } },
   { id: 'R8', title: 'retry increase rejected', run: async ({ root }) => {
     const [config, pkg, workflow] = await Promise.all([configSource(root), packageSource(root), workflowSource(root)])
@@ -311,7 +311,7 @@ export const localCases = [
 ]
 
 export async function validateR7CumulativeEvidence() {
-  if (process.env.PW_STAGE !== '3') return { result: 'STATIC CONTROL ONLY', canary: 'NOT RUN BY STANDALONE MATRIX TEST' }
+  if (Number(process.env.PW_STAGE) < 3) return { result: 'STATIC CONTROL ONLY', canary: 'NOT RUN BY STANDALONE MATRIX TEST' }
   const canaryPath = '/evidence/canary/summary.json'
   const canary = JSON.parse(await readFile(canaryPath, 'utf8'))
   assert.equal(canary.result, 'PASS')
