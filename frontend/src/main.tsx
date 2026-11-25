@@ -2,6 +2,7 @@ import { createRoot } from 'react-dom/client'
 import liveEval from './live-evaluation.json'
 import showcase from './showcase-export.json'
 import './styles.css'
+import { initializeDashboardTools } from './webmcp'
 
 type GateReason = {
   code: string
@@ -461,3 +462,5 @@ function App() {
 const root = document.getElementById('root')
 if (!root) throw new Error('Dashboard root is missing')
 createRoot(root).render(<App />)
+
+void initializeDashboardTools()

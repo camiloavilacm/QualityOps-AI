@@ -139,3 +139,41 @@ export snapshot and each discovery/execution report remain in that output
 directory. A single presentation mutant and static checks do not establish
 universal assertion correctness or authorize merge. Host diagnostic passes remain
 distinct from accepted container runs.
+
+## Native WebMCP recorded summaries (Stage 4 frontend slice)
+
+The dashboard registers two tools when native `document.modelContext` is
+available: `get_campaign_summary` accepts exactly `{ "campaign_id":
+"fixture-mixed" }`, and `get_evaluation_summary` accepts exactly `{}`. They return
+projections of the existing sanitized showcase export, including the full recorded
+mixed gate and the offline evaluation labeled `source: "authored"`,
+`live_trials: 0`. The displayed live benchmark is outside this tool interface.
+There is no inference, arbitrary lookup, private evidence retrieval or write API.
+Unsupported or failed registration leaves the dashboard functioning.
+
+Handlers enforce their own exact argument shapes and return JSON text envelopes
+bounded to 16,384 bytes, with fixed public error messages. Registration uses the
+existing transactional lifecycle: one abort signal, idempotent initialization,
+rollback and explicit disposal. The four protected lifecycle tests retain their
+identities and additionally check direct-handler rejection of omitted evaluation
+arguments, since an adapter can normalize omission to `{}`. Malformed JSON may instead be
+rejected by the native transport before a handler receives a parsed value; the
+direct handler cases cover malformed/wrong-type arguments without claiming that
+the transport passes raw invalid JSON through.
+
+`npm run test:webmcp` explicitly selects the three `chromium-webmcp` interface
+cases. Their inventory derives from actual discovery; ordinary, guard and
+lifecycle counts remain 8, 8 and 4. The privileged interface spec is protected by
+its reviewed source hash and an additional browser-callback policy that permits
+bounded native tool operations and read-only observations. Ordinary-spec policy
+and Healer scope remain unchanged.
+
+The fixed `window.qualityopsRecordedState` getter exposes only JSON for the same
+sanitized projections, with no setter or registration controls. Interface tests
+hash observed DOM, URL, storage and recorded state before/after repeated calls.
+They emit JSON-only `webmcp-discovery`, `webmcp-campaign` and
+`webmcp-evaluation` attachments, each bounded to 256 KiB; DOM and storage contents
+are not attached. These observations do not prove arbitrary code purity. The lead
+compares payloads to independent campaign/oracle expectations outside frontend
+inputs and assets. Candidate browser execution remains pending the isolated Gate
+4 runner; type checking, builds and discovery alone do not establish acceptance.

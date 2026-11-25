@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { cp, readFile, writeFile, mkdir, mkdtemp, rm, symlink } from 'node:fs/promises'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
-import { scanTree, readInventory, checkOrdinarySource, checkReadOnlyEvaluation, checkConfiguration, validateReport, frontendRoot, declarations } from './check_test_hygiene.mjs'
+import { scanTree, readInventory, checkOrdinarySource, checkReadOnlyEvaluation, checkWebMCPSource, checkConfiguration, validateReport, frontendRoot, declarations } from './check_test_hygiene.mjs'
 import { mutateExport, validateCanaryExecution } from './check_canary_regression.mjs'
 
 const original = JSON.parse(await readFile(join(frontendRoot, 'tests/expected-tests.json')))
@@ -23,7 +23,7 @@ async function workspace(t) {
 }
 
 test('actual reviewed tree, ordinary locators, fixture and protected meta policies pass', async () => {
-  assert.equal((await scanTree()).files.length, 7)
+  assert.equal((await scanTree()).files.length, 8)
 })
 test('statically analyzable locator repair preserves identities and assertions', () => {
   assert.equal(checkOrdinarySource('tests/mixed-campaign.spec.ts', ordinary.replace("name: /fixture-mixed/i", "name: /fixture-mixed renamed/i"))[0].minExpects, 7)
@@ -147,8 +147,10 @@ test('duplicate stable IDs and identities rejected', () => {
   assert.throws(() => readInventory(identity), /Duplicate identity/)
 })
 test('pending WebMCP zero discovery never passes execution', async () => {
-  assert.equal(original.projects['chromium-webmcp'].status, 'NOT INTRODUCED')
-  await assert.rejects(validateReport({ suites: [], errors: [] }, 'chromium-webmcp', original, true), /not introduced/)
+  assert.equal(original.projects['chromium-webmcp'].count, 3)
+  const pending = structuredClone(original)
+  pending.projects['chromium-webmcp'] = { state: 'pending-stage4', status: 'NOT INTRODUCED', count: 0, tests: [] }
+  await assert.rejects(validateReport({ suites: [], errors: [] }, 'chromium-webmcp', pending, true), /not introduced/)
 })
 for (const [label, change] of [
   ['retries', value => value.replace('retries: 0', 'retries: 2')],
@@ -202,4 +204,15 @@ test('canary rejects unrelated failures and wrong designated step', () => {
   const entry = original.projects.chromium.tests.find(item => item.id === 'DASH-003')
   const report = {errors:[],suites:[{title:'mixed-campaign.spec.ts', specs:[{title:entry.titlePath[0],file:'mixed-campaign.spec.ts',tests:[{projectName:'chromium',expectedStatus:'passed',status:'unexpected',results:[{status:'failed',retry:0,errors:[{message:'Insufficient evidence'}],steps:[{title:'wrong-step',error:{message:'synthetic'}}]}]}]}]}]}
   assert.throws(() => validateCanaryExecution(report, entry, true), /Only designated assertion step/)
+})
+
+
+test('protected WebMCP source has explicit native and read-only evaluation policies', async () => {
+  const source = await readFile(join(frontendRoot, 'tests/webmcp.spec.ts'), 'utf8')
+  assert.equal(checkWebMCPSource('tests/webmcp.spec.ts', source).length, 3)
+  assert.throws(() => checkWebMCPSource('tests/webmcp.spec.ts', source + '\npage.evaluate(() => localStorage.clear())'), /Unapproved read-only operation/)
+  assert.throws(() => checkWebMCPSource('tests/webmcp.spec.ts', source + '\npage.evaluate(() => document.title = "mutated")'), /mutation/)
+  assert.throws(() => checkWebMCPSource('tests/webmcp.spec.ts', source + '\npage.evaluate(() => document.modelContext.registerTool({}))'), /Unapproved read-only operation/)
+  assert.throws(() => checkWebMCPSource('tests/webmcp.spec.ts', source + '\npage.evaluate(() => window.qualityopsRecordedState, {hidden: "runner-data"})'), /cannot receive runner data/)
+  assert.throws(() => checkWebMCPSource('tests/webmcp.spec.ts', "import oracle from '../../harness/oracles/authored-evaluation-v1.json';\n" + source), /named imports/)
 })
