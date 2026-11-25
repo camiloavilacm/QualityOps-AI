@@ -553,7 +553,7 @@ def main():
                     if (report != {"schema_version": "r7-playwright-report-1", "variant": variant,
                                    "report_sha256": outcome["report_sha256"],
                                    "test": {"title": "mixed campaign displays BLOCKED with confirmed failure for x and missing evidence for y",
-                                            "file": "tests/mixed-campaign.spec.ts", "project": "chromium", "expected_status": "passed",
+                                            "file": "mixed-campaign.spec.ts", "project": "chromium", "expected_status": "passed",
                                             "status": "expected", "retries": 0}, "result": "PASS"}):
                         raise Blocked("R7 sanitized Playwright report is incomplete or inconsistent")
                 for row in local:

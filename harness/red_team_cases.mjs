@@ -145,7 +145,7 @@ async function runR7BrowserControl(root, artifactDirectory) {
     return { report_error_count: Math.min(Array.isArray(report.errors) ? report.errors.length : 0, 10),
       test_count: rows.length, tests: rows.slice(0, 5).map(test => ({
         expected_title_match: test.title === 'mixed campaign displays BLOCKED with confirmed failure for x and missing evidence for y',
-        expected_file_match: test.file === 'tests/mixed-campaign.spec.ts',
+        expected_file_match: test.file === 'mixed-campaign.spec.ts',
         expected_project_match: test.projectName === 'chromium',
         expected_status: safe(test.expectedStatus), status: safe(test.status),
         attempt_count: Math.min(Array.isArray(test.results) ? test.results.length : 0, 10),
@@ -224,7 +224,7 @@ async function runR7BrowserControl(root, artifactDirectory) {
         const test = playwrightTests(report)[0]
         assert.ok(test)
         assert.equal(test.title, 'mixed campaign displays BLOCKED with confirmed failure for x and missing evidence for y')
-        assert.equal(test.file, 'tests/mixed-campaign.spec.ts')
+        assert.equal(test.file, 'mixed-campaign.spec.ts')
         const sanitized = { schema_version: 'r7-playwright-report-1', variant: name,
           report_sha256: reportHash, test: { title: test.title, file: test.file,
             project: 'chromium', expected_status: test.expectedStatus, status: test.status,
