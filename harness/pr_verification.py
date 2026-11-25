@@ -102,7 +102,7 @@ def allowed_evidence(name):
     if relative in {'foundation.json', 'commands.json', 'versions.json', 'isolation.json',
                     'blocker.json', 'probe.json', 'probe-stage4.json', 'probe.log', 'probe-stage4-pre-summary.log', 'typecheck.log',
                     'e2e.log', 'guard.log', 'lifecycle.log', 'canary.log',
-                    'webmcp.log', 'hygiene-chromium-webmcp.log', 'hygiene-webmcp-execution.log',
+                    'webmcp.log', 'bundle-separation.log', 'hygiene-chromium-webmcp.log', 'hygiene-webmcp-execution.log',
                     'hygiene-unit.log',
                     'hygiene-chromium.log', 'hygiene-chromium-guard-meta.log',
                     'hygiene-chromium-webmcp-lifecycle.log', 'red-team.log', 'ci-workflow.log',
@@ -231,6 +231,7 @@ def export_files(root, commit, target):
                 "harness/red_team_cases.mjs", "harness/check_ci_workflow.mjs", "harness/check_healer_scope.py",
                 "harness/test_red_team_matrix.mjs", "harness/test_ci_workflow.mjs",
                 "harness/prepare_r7_variant.mjs", "harness/test_r7_variant.mjs",
+                "harness/check_webmcp_bundle.mjs",
                 ".github/workflows/ci.yml", ".github/dependabot.yml").split(b"\0")
     for row in filter(None, files):
         header, raw_name = row.split(b"\t", 1)
@@ -372,7 +373,9 @@ def main():
                      "harness/check_healer_scope.py", "harness/check_pr_reports.mjs",
                      "harness/check_hygiene_report.mjs", "harness/check_canary_report.mjs",
                      "harness/check_webmcp_report.mjs",
+                     "harness/check_webmcp_bundle.mjs",
                      "harness/test_pr_verification.py", "harness/test_pr_reports.mjs",
+                     "harness/test_webmcp_report.mjs",
                      "harness/test_stage2_report_validation.mjs",
                      "harness/check_ci_workflow.mjs", "harness/test_ci_workflow.mjs",
                      "harness/verify_red_team_matrix.mjs", "harness/red_team_cases.mjs",
@@ -405,6 +408,8 @@ def main():
             ]
             for command in stage3_commands:
                 run(command)
+        if args.stage >= 4:
+            run(["node", "--test", str(ROOT / "harness/test_webmcp_report.mjs")])
         # External maintainer record is never loaded from candidate inputs or mounted into Docker.
         if args.bootstrap:
             if args.candidate_revision != args.verifier_revision:

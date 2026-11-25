@@ -18,6 +18,7 @@ COPY harness/pr-verification-policy.json /opt/qualityops/harness/pr-verification
 COPY harness/verify_red_team_matrix.mjs harness/red_team_cases.mjs harness/check_ci_workflow.mjs harness/check_healer_scope.py /opt/qualityops/harness/
 COPY harness/test_red_team_matrix.mjs harness/test_ci_workflow.mjs /opt/qualityops/harness/
 COPY harness/test_r7_variant.mjs /opt/qualityops/harness/
+COPY harness/check_webmcp_bundle.mjs /opt/qualityops/harness/
 COPY .github/workflows/ci.yml /opt/qualityops/.github/workflows/ci.yml
 COPY .github/dependabot.yml /opt/qualityops/.github/dependabot.yml
 USER pwuser

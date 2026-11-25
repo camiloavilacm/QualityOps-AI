@@ -61,6 +61,7 @@ try {
   if (chromiumVersion !== policy.chromium) throw new Error('Chromium version mismatch')
   write('/evidence/versions.json', { node: process.version, playwright: policy.playwright, chromium: chromiumVersion })
   fs.mkdirSync('/evidence/e2e', { recursive: true })
+  if (stage >= 4) fs.mkdirSync('/evidence/webmcp', { recursive: true })
   const steps = [
     ['probe', ['node', 'scripts/probe_webmcp.mjs', '--output', '/evidence/probe.json']],
     ['typecheck', ['npm', 'run', 'typecheck']],
@@ -90,6 +91,7 @@ try {
   )
   if (stage >= 4) steps.push(
     ['probe-stage4-pre-summary', ['node', 'scripts/probe_webmcp.mjs', '--output', '/evidence/probe-stage4.json']],
+    ['bundle-separation', ['node', '/opt/qualityops/harness/check_webmcp_bundle.mjs']],
     ['hygiene-chromium-webmcp', ['npm', 'run', 'check:hygiene', '--', '--project=chromium-webmcp'],
       { env: { PW_HYGIENE_OUTPUT_DIR: '/evidence/hygiene/chromium-webmcp' } }],
     ['webmcp', ['node', 'node_modules/@playwright/test/cli.js', 'test', '--project=chromium-webmcp', '--reporter=json'],

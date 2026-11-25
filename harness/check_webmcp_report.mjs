@@ -7,6 +7,7 @@ import { readJson, validateReport } from './check_pr_reports.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const EXPECTED_ORACLE_ID = 'qualityops-authored-evaluation-oracle-v1-do-not-bundle'
+const EXPECTED_EVALUATOR_REVISION = 'b50868ed1e6fd3fa5c630664c16620d7a6eb85fe'
 const sha = bytes => crypto.createHash('sha256').update(bytes).digest('hex')
 const requiredOracleSources = [
   'evaluators/test_evaluate.py',
@@ -75,33 +76,49 @@ function validateDiscovery(value) {
   const campaignAdapter = value.adapter_tools.find(row => row.name === expected[0])
   const evaluationAdapter = value.adapter_tools.find(row => row.name === expected[1])
   for (const row of [campaign, evaluation]) {
+    if (!isDeepStrictEqual(Object.keys(row).sort(), ['annotations', 'description', 'inputSchema', 'name']) ||
+        typeof row.description !== 'string' || row.description.length < 10 || row.description.length > 256)
+      throw new Error('native discovery projection contains unexpected or unbounded fields')
+    if (!isDeepStrictEqual(Object.keys(row.annotations || {}).sort(),
+        ['consequentialHint', 'readOnlyHint', 'untrustedContentHint']))
+      throw new Error('native Hint projection is not a plain exact annotation object')
     if (row.annotations?.readOnlyHint !== true || row.annotations?.consequentialHint !== false ||
         row.annotations?.untrustedContentHint !== false)
       throw new Error('native read-only Hint annotations are not exact')
   }
   for (const row of [campaignAdapter, evaluationAdapter]) {
     const annotations = row.annotations || {}
+    if (!isDeepStrictEqual(Object.keys(row).sort(), ['annotations', 'description', 'inputSchema', 'name']) ||
+        typeof row.description !== 'string' || row.description.length < 10 || row.description.length > 256 ||
+        Object.keys(annotations).some(key => !['readOnly', 'consequential', 'untrustedContent'].includes(key)))
+      throw new Error('adapter discovery projection contains unexpected or unbounded fields')
     if (annotations.readOnly !== true || annotations.consequential === true || annotations.untrustedContent === true)
       throw new Error('adapter read-only annotation translation is invalid')
   }
+  if (!campaign.description.toLowerCase().includes('recorded') ||
+      !evaluation.description.includes('source: "authored", live_trials: 0'))
+    throw new Error('tool descriptions omit recorded or authored zero-live-trial boundaries')
   const c = campaign.inputSchema, e = evaluation.inputSchema
-  if (c?.type !== 'object' || c.additionalProperties !== false ||
+  if (!isDeepStrictEqual(Object.keys(c || {}).sort(), ['additionalProperties', 'properties', 'required', 'type']) ||
+      c?.type !== 'object' || c.additionalProperties !== false ||
       !isDeepStrictEqual(c.required, ['campaign_id']) || c.properties?.campaign_id?.type !== 'string' ||
       !isDeepStrictEqual(c.properties?.campaign_id?.enum, ['fixture-mixed']) ||
-      Object.keys(c.properties || {}).join(',') !== 'campaign_id')
+      Object.keys(c.properties || {}).join(',') !== 'campaign_id' ||
+      !isDeepStrictEqual(Object.keys(c.properties.campaign_id).sort(), ['enum', 'type']))
     throw new Error('campaign tool input schema is not the exact bounded contract')
-  if (e?.type !== 'object' || e.additionalProperties !== false || Object.keys(e.properties || {}).length !== 0 ||
+  if (!isDeepStrictEqual(Object.keys(e || {}).sort(), ['additionalProperties', 'properties', 'required', 'type']) ||
+      e?.type !== 'object' || e.additionalProperties !== false || Object.keys(e.properties || {}).length !== 0 ||
       (e.required || []).length !== 0)
     throw new Error('evaluation tool input schema is not the exact empty-object contract')
 }
 
-function validateOracle(oracle, revision) {
-  if (oracle.oracle_id !== EXPECTED_ORACLE_ID || oracle.source_revision !== revision ||
+function validateOracle(oracle) {
+  if (oracle.oracle_id !== EXPECTED_ORACLE_ID || oracle.source_revision !== EXPECTED_EVALUATOR_REVISION ||
       oracle.source !== 'authored' || oracle.live_trials !== 0 || oracle.case_count !== 20 ||
       !isDeepStrictEqual(Object.keys(oracle.source_digests || {}).sort(), [...requiredOracleSources].sort()))
     throw new Error('authored oracle identity/provenance is incomplete')
   for (const file of requiredOracleSources) {
-    if (sha(gitBlob(revision, file)) !== oracle.source_digests[file])
+    if (sha(gitBlob(oracle.source_revision, file)) !== oracle.source_digests[file])
       throw new Error(`authored oracle source digest mismatch: ${file}`)
   }
   return Object.fromEntries(['source', 'live_trials', 'corpus_version', 'grader_version', 'case_count',
@@ -135,7 +152,7 @@ export function validateWebmcp({ report, verifierRevision }) {
     throw new Error('campaign payload dropped the confirmed failure or missing-evidence reason')
 
   const oracle = JSON.parse(gitBlob(verifierRevision, 'harness/oracles/authored-evaluation-v1.json').toString('utf8'))
-  const expectedEvaluation = validateOracle(oracle, verifierRevision)
+  const expectedEvaluation = validateOracle(oracle)
   const evaluationPayload = publicEnvelope(evaluationRow.native_result)
   const evaluationAdapterPayload = publicEnvelope(evaluationRow.adapter_result)
   if (!isDeepStrictEqual(evaluationPayload, expectedEvaluation) ||

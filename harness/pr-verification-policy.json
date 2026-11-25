@@ -1,5 +1,5 @@
 {
-  "version": "stage2-1",
+  "version": "stage4-1",
   "source_revision": "4cfe008bb6156d670504f50241adbb399f9dbd85",
   "acceptance": "Stage 2 verifier baseline; assertions and canary independently checked against this policy.",
   "projects": {

@@ -23,6 +23,9 @@ export function validateWorkflow(source, dependabot) {
   assert.equal((source.match(/^  python-contracts-and-eval:\s*$/gm) ?? []).length, 1)
   assert.equal((source.match(/^  frontend-e2e:\s*$/gm) ?? []).length, 1)
   assert.equal((source.match(/^  frontend-webmcp:\s*$/gm) ?? []).length, 1)
+  const webmcpJob = source.split(/^  frontend-webmcp:\s*$/m)[1]?.split(/^  [a-z][a-z0-9-]*:\s*$/m)[0] || ''
+  assert.match(webmcpJob, /run_pr_verification\.mjs --bootstrap --stage 4 --verifier-revision/)
+  assert.match(webmcpJob, /path: harness\/artifacts\/container-stage4\/publication\//)
   assert.ok(source.includes('persist-credentials: false'), 'Checkout credentials must not persist')
   for (const command of [
     'python -B harness/checks.py contracts',
@@ -37,7 +40,6 @@ export function validateWorkflow(source, dependabot) {
   assert.match(source, /run_pr_verification\.mjs --bootstrap --stage 4/)
   assert.match(source, /path: harness\/artifacts\/container-stage3\/publication\//)
   assert.match(source, /path: harness\/artifacts\/container-stage3\/publication\/container\/red-team\/publication\//)
-  assert.match(source, /path: harness\/artifacts\/container-stage4\/publication\//)
   assert.match(source, /retention-days: 7/)
   assert.match(source, /if-no-files-found: error/)
   assert.match(dependabot, /^version: 2$/m)

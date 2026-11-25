@@ -227,7 +227,7 @@ class Stage2PolicyTests(unittest.TestCase):
                 self.assertFalse(allowed_evidence(name))
 
     def test_stage_four_webmcp_artifacts_are_bounded_and_project_scoped(self):
-        allowed = ["container/probe-stage4.json", "container/webmcp.log",
+        allowed = ["container/probe-stage4.json", "container/webmcp.log", "container/bundle-separation.log",
                    "container/webmcp/report.json",
                    "container/hygiene/chromium-webmcp/chromium-webmcp-hygiene.json",
                    "container/hygiene/chromium-webmcp/chromium-webmcp-discovery.json",
@@ -318,7 +318,9 @@ class ScopeTests(unittest.TestCase):
                 check_scope(self.root, self.base, candidate)
 
     def test_export_has_no_private_files_or_dot_config(self):
-        for name in ('evaluators/ground_truth/answer', 'frontend/.env', 'frontend/src/main.tsx'):
+        for name in ('evaluators/ground_truth/answer', 'frontend/.env', 'frontend/src/main.tsx',
+                     'harness/oracles/authored-evaluation-v1.json', 'harness/check_webmcp_report.mjs',
+                     'harness/check_webmcp_bundle.mjs'):
             path = self.root / name; path.parent.mkdir(parents=True, exist_ok=True); path.write_text('fixture')
         commit = self.commit()
         export = self.root / 'export'; export.mkdir()
@@ -326,6 +328,9 @@ class ScopeTests(unittest.TestCase):
         self.assertTrue((export / 'frontend/src/main.tsx').exists())
         self.assertFalse((export / 'frontend/.env').exists())
         self.assertFalse((export / 'evaluators').exists())
+        self.assertFalse((export / 'harness/oracles/authored-evaluation-v1.json').exists())
+        self.assertFalse((export / 'harness/check_webmcp_report.mjs').exists())
+        self.assertTrue((export / 'harness/check_webmcp_bundle.mjs').exists())
 
     def test_export_rejects_symlinks(self):
         self.path.unlink(); self.path.symlink_to('/etc/passwd')
