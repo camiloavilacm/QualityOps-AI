@@ -10,7 +10,7 @@ RUN npm ci --ignore-scripts --no-audit --no-fund
 COPY frontend/ ./
 RUN npm run typecheck && npm run build
 COPY harness/prepare_r7_variant.mjs /opt/qualityops/harness/prepare_r7_variant.mjs
-RUN if [ "$QUALITYOPS_STAGE" -ge 3 ]; then cp -a dist /opt/qualityops/r7-dist && node /opt/qualityops/harness/prepare_r7_variant.mjs /opt/qualityops/frontend/dist /opt/qualityops/r7-dist; fi
+RUN if [ "$QUALITYOPS_STAGE" -ge 3 ]; then node /opt/qualityops/harness/prepare_r7_variant.mjs /opt/qualityops/frontend/dist /opt/qualityops/r7-dist; fi
 COPY frontend/tests/ /opt/qualityops/verifier-tests/
 RUN if [ "$QUALITYOPS_STAGE" -ge 2 ]; then PW_VERIFIER_REVISION="$PW_VERIFIER_REVISION" node scripts/prepare_canary_bundles.mjs /opt/qualityops/canary-variants; fi
 COPY harness/container/ /opt/qualityops/runner/
