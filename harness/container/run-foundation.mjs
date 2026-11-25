@@ -86,6 +86,7 @@ try {
     ['ci-workflow', ['node', '/opt/qualityops/harness/check_ci_workflow.mjs']],
     ['red-team-unit', ['node', '--test', '/opt/qualityops/harness/test_red_team_matrix.mjs']],
     ['ci-workflow-unit', ['node', '--test', '/opt/qualityops/harness/test_ci_workflow.mjs']],
+    ['r7-variant-unit', ['node', '--test', '/opt/qualityops/harness/test_r7_variant.mjs']],
   )
   result = 'PASS'
   for (const [name, argv, options] of steps) {

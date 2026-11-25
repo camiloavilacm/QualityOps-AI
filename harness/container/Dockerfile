@@ -9,12 +9,15 @@ COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci --ignore-scripts --no-audit --no-fund
 COPY frontend/ ./
 RUN npm run typecheck && npm run build
+COPY harness/prepare_r7_variant.mjs /opt/qualityops/harness/prepare_r7_variant.mjs
+RUN if [ "$QUALITYOPS_STAGE" -ge 3 ]; then cp -a dist /opt/qualityops/r7-dist && node /opt/qualityops/harness/prepare_r7_variant.mjs /opt/qualityops/frontend/dist /opt/qualityops/r7-dist; fi
 COPY frontend/tests/ /opt/qualityops/verifier-tests/
 RUN if [ "$QUALITYOPS_STAGE" -ge 2 ]; then PW_VERIFIER_REVISION="$PW_VERIFIER_REVISION" node scripts/prepare_canary_bundles.mjs /opt/qualityops/canary-variants; fi
 COPY harness/container/ /opt/qualityops/runner/
 COPY harness/pr-verification-policy.json /opt/qualityops/harness/pr-verification-policy.json
 COPY harness/verify_red_team_matrix.mjs harness/red_team_cases.mjs harness/check_ci_workflow.mjs harness/check_healer_scope.py /opt/qualityops/harness/
 COPY harness/test_red_team_matrix.mjs harness/test_ci_workflow.mjs /opt/qualityops/harness/
+COPY harness/test_r7_variant.mjs /opt/qualityops/harness/
 COPY .github/workflows/ci.yml /opt/qualityops/.github/workflows/ci.yml
 COPY .github/dependabot.yml /opt/qualityops/.github/dependabot.yml
 USER pwuser

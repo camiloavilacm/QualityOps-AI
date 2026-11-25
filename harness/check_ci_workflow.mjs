@@ -13,7 +13,7 @@ export function validateWorkflow(source, dependabot) {
   assert.match(source, /^concurrency:\n  group: offline-.*\n  cancel-in-progress: true\s*$/m)
   assert.doesNotMatch(source, /^\s+paths(?:-ignore)?:/m, 'Verification triggers cannot filter paths')
   assert.doesNotMatch(source, /^\s+continue-on-error:\s*(?:true|\$\{)/m)
-  assert.doesNotMatch(source, /^\s+uses:\s*[^\s]+pull_request_target/m)
+  assert.doesNotMatch(source, /^\s*pull_request_target\s*:/m, 'Privileged workflow trigger')
   assert.doesNotMatch(source, /(?:\|\|\s*(?:true|echo)|--pass-with-no-tests)/)
   const actionPins = [...source.matchAll(/^\s+uses:\s+[^\s@]+@([^\s#]+)(?:\s+#.*)?$/gm)]
   assert.ok(actionPins.length >= 4, 'Expected reviewed actions')
@@ -33,7 +33,6 @@ export function validateWorkflow(source, dependabot) {
     'frontend/scripts/export_mixed.py --check',
     'frontend/scripts/export_showcase.py --check',
   ]) assert.ok(source.includes(command), `Missing offline check: ${command}`)
-  assert.match(source, /run_pr_verification\.mjs --bootstrap --stage 3/)
   assert.match(source, /run_pr_verification\.mjs --bootstrap --stage 3/)
   assert.match(source, /path: harness\/artifacts\/container-stage3\/publication\//)
   assert.match(source, /path: harness\/artifacts\/container-stage3\/publication\/container\/red-team\/publication\//)

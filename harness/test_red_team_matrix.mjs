@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { execFileSync, spawnSync } from 'node:child_process'
+import { spawnSync } from 'node:child_process'
 import { mkdtemp, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
@@ -13,13 +13,16 @@ test('local red-team matrix passes all thirteen cases and leaves remote cases NO
   const parent = await mkdtemp(join(tmpdir(), 'qualityops-red-team-test-'))
   const output = join(parent, 'run')
   t.after(() => rm(parent, { recursive: true, force: true }))
-  const stdout = execFileSync('node', [runner, '--local', '--output', output], { cwd: root, encoding: 'utf8' })
-  assert.match(stdout, /"result":"PASS"/)
+  const env = { ...process.env }; delete env.PW_STAGE
+  const completed = spawnSync('node', [runner, '--local', '--output', output], { cwd: root, encoding: 'utf8', env })
+  assert.equal(completed.status, 1, completed.stderr)
   const report = JSON.parse(await readFile(join(output, 'publication/red-team-summary.json'), 'utf8'))
-  assert.equal(report.result, 'PASS')
+  assert.equal(report.result, 'INCOMPLETE')
   assert.equal(report.local_scenarios.length, 13)
-  assert.ok(report.local_scenarios.every(row => row.status === 'PASS'))
   assert.ok(report.local_scenarios.every(row => row.workspace_cleanup === 'PASS'))
+  assert.ok(report.local_scenarios.filter(row => row.id !== 'R7').every(row => row.status === 'PASS'))
+  assert.equal(report.local_scenarios.find(row => row.id === 'R7').status, 'NOT RUN')
+  assert.equal(report.local_scenarios.find(row => row.id === 'R7').component_status, 'PASS')
   assert.deepEqual(report.remote_scenarios.map(row => [row.id, row.status]), [['R12', 'NOT RUN'], ['R14', 'NOT RUN']])
   assert.equal(report.candidate_revision, report.verifier_revision)
 })

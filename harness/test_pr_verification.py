@@ -211,7 +211,8 @@ class Stage2PolicyTests(unittest.TestCase):
     def test_stage_three_is_enabled_only_after_offline_suite_and_red_team_are_defined(self):
         self.assertIn(3, POLICY["implemented_stages"])
         for path in (ROOT / "harness/verify_red_team_matrix.mjs", ROOT / "harness/red_team_cases.mjs",
-                     ROOT / "harness/test_red_team_matrix.mjs"):
+                     ROOT / "harness/test_red_team_matrix.mjs", ROOT / "harness/prepare_r7_variant.mjs",
+                     ROOT / "harness/test_r7_variant.mjs"):
             self.assertTrue(path.is_file(), path.name)
 
     def test_trusted_inventory_has_unique_ids_and_reviewed_assertion_minima(self):

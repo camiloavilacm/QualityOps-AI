@@ -49,7 +49,8 @@ async function main() {
     let isolated
     try {
       isolated = await createCaseWorkspace()
-      await scenario.run(isolated)
+      const detail = await scenario.run(isolated)
+      if (detail) row.browser_control = detail
       row.status = 'PASS'
     } catch {
       row.reason = 'expected trusted component outcome was not observed'
@@ -65,13 +66,19 @@ async function main() {
   try {
     r7.cumulative_control = await validateR7CumulativeEvidence()
     if (process.env.PW_STAGE === '3') r7.artifact = 'container/canary/summary.json'
+    else {
+      r7.component_status = 'PASS'
+      r7.status = 'NOT RUN'
+      r7.reason = 'R7 browser and cumulative canary controls require Stage 3 container execution'
+    }
   } catch {
     r7.status = 'FAIL'
     r7.reason = 'cumulative canary control did not pass with KILLED classification'
   }
   const report = {
     schema_version: 'red-team-matrix-1',
-    result: records.length === 13 && records.every(row => row.status === 'PASS') ? 'PASS' : 'FAIL',
+    result: records.length === 13 && records.every(row => row.status === 'PASS') && process.env.PW_STAGE === '3'
+      ? 'PASS' : records.every(row => ['PASS', 'NOT RUN'].includes(row.status)) ? 'INCOMPLETE' : 'FAIL',
     verifier_revision: candidate,
     candidate_revision: candidate,
     source_policy_sha256: digest(policyBytes),

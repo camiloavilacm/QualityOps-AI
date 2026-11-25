@@ -219,6 +219,7 @@ def export_files(root, commit, target):
                 "harness/pr-verification-policy.json", "harness/verify_red_team_matrix.mjs",
                 "harness/red_team_cases.mjs", "harness/check_ci_workflow.mjs", "harness/check_healer_scope.py",
                 "harness/test_red_team_matrix.mjs", "harness/test_ci_workflow.mjs",
+                "harness/prepare_r7_variant.mjs", "harness/test_r7_variant.mjs",
                 ".github/workflows/ci.yml", ".github/dependabot.yml").split(b"\0")
     for row in filter(None, files):
         header, raw_name = row.split(b"\t", 1)
@@ -363,7 +364,8 @@ def main():
                      "harness/test_stage2_report_validation.mjs",
                      "harness/check_ci_workflow.mjs", "harness/test_ci_workflow.mjs",
                      "harness/verify_red_team_matrix.mjs", "harness/red_team_cases.mjs",
-                     "harness/test_red_team_matrix.mjs",
+                     "harness/test_red_team_matrix.mjs", "harness/prepare_r7_variant.mjs",
+                     "harness/test_r7_variant.mjs",
                      "harness/pr-verification-policy.json", "harness/container/runtime-policy.json"]:
             try:
                 recorded = git(ROOT, "show", args.verifier_revision + ":" + file)
@@ -493,14 +495,32 @@ def main():
                      "--candidate-revision", args.candidate_revision])
             if args.stage >= 3:
                 matrix = read_json(evidence / "red-team/publication/red-team-summary.json")
+                if not isinstance(matrix, dict):
+                    raise Blocked("red-team summary must be an object")
                 local = matrix.get("local_scenarios", [])
+                if not isinstance(local, list) or any(not isinstance(row, dict) for row in local):
+                    raise Blocked("red-team local scenario rows are malformed")
                 expected_ids = {"R1a", "R1b", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "R10", "R11", "R13"}
+                r7 = next((row for row in local if row.get("id") == "R7"), {}) if isinstance(local, list) else {}
+                browser = r7.get("browser_control") if isinstance(r7, dict) else None
+                hashes = browser.get("artifact_sha256") if isinstance(browser, dict) else None
+                valid_hashes = isinstance(hashes, dict) and set(hashes) == {"baseline", "renamed_control", "candidate_spec"} and \
+                    all(isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value) for value in hashes.values()) and \
+                    hashes.get("baseline") != hashes.get("renamed_control")
                 if (matrix.get("result") != "PASS" or matrix.get("verifier_revision") != args.verifier_revision or
                         matrix.get("candidate_revision") != args.candidate_revision or
                         {row.get("id") for row in local} != expected_ids or
                         any(row.get("status") != "PASS" or row.get("workspace_cleanup") != "PASS" for row in local) or
-                        next((row for row in local if row.get("id") == "R7"), {}).get("cumulative_control") !=
+                        r7.get("cumulative_control") !=
                             {"result": "PASS", "canary": "KILLED", "evidence": "canary/summary.json"} or
+                        not isinstance(browser, dict) or browser.get("result") != "PASS" or browser.get("locator") != "fixture-mixed" or
+                        browser.get("original") !=
+                            {"variant": "baseline", "status": "PASS", "tests": 1} or
+                        browser.get("renamed_control") !=
+                            {"variant": "renamed_control", "status": "PASS", "tests": 1} or
+                        browser.get("assertion_minimum") != 7 or browser.get("behavior") !=
+                            ["BLOCKED", "REQUIRED_FAILURE", "INSUFFICIENT_EVIDENCE"] or
+                        not valid_hashes or
                         matrix.get("remote_scenarios") != [
                             {"id": "R12", "status": "NOT RUN", "reason": "separate authorization and disposable remote target required"},
                             {"id": "R14", "status": "NOT RUN", "reason": "separate authorization and disposable remote target required"}]):

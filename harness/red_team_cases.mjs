@@ -1,12 +1,18 @@
 import assert from 'node:assert/strict'
-import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { createHash } from 'node:crypto'
+import { cp, lstat, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises'
 import { spawnSync } from 'node:child_process'
 import { mkdtemp } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
+import { extname, sep } from 'node:path'
+import { createServer } from 'node:http'
+import { createReadStream } from 'node:fs'
+import { realpath } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
-import { checkConfiguration, checkOrdinarySource, scanTree } from '../frontend/scripts/check_test_hygiene.mjs'
+import { checkConfiguration, checkOrdinarySource, readInventory, scanTree, validateReport } from '../frontend/scripts/check_test_hygiene.mjs'
 import { validateCanaryExecution } from '../frontend/scripts/check_canary_regression.mjs'
+import { run as runChild } from '../frontend/scripts/foundation_report.mjs'
 
 const repo = resolve(fileURLToPath(new URL('..', import.meta.url)))
 const frontend = join(repo, 'frontend')
@@ -69,6 +75,95 @@ async function rejectsScopeEdit(file) {
   } finally { await rm(temp, { recursive: true, force: true }) }
 }
 
+async function serveBuild(directory) {
+  const root = await realpath(directory)
+  const mime = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
+    '.css': 'text/css; charset=utf-8', '.json': 'application/json' }
+  const server = createServer(async (request, response) => {
+    try {
+      if (!['GET', 'HEAD'].includes(request.method)) { response.writeHead(405).end(); return }
+      const url = new URL(request.url || '/', 'http://127.0.0.1')
+      let pathname = decodeURIComponent(url.pathname)
+      if (pathname === '/') pathname = '/index.html'
+      let target = resolve(root, `.${pathname}`)
+      if (target !== root && !target.startsWith(root + sep)) { response.writeHead(404).end(); return }
+      let info
+      try { info = await lstat(target) } catch { target = join(root, 'index.html'); info = await lstat(target) }
+      if (info.isSymbolicLink() || !info.isFile() || info.size > 8 * 1024 * 1024) { response.writeHead(404).end(); return }
+      response.writeHead(200, { 'content-type': mime[extname(target)] || 'application/octet-stream',
+        'content-length': info.size, 'x-content-type-options': 'nosniff' })
+      if (request.method === 'HEAD') response.end()
+      else createReadStream(target).pipe(response)
+    } catch { if (!response.headersSent) response.writeHead(400); response.end() }
+  })
+  await new Promise((done, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', done) })
+  const address = server.address()
+  assert.ok(address && typeof address === 'object')
+  return { baseURL: `http://127.0.0.1:${address.port}`, close: () => new Promise((done, reject) => {
+    server.closeAllConnections(); server.close(error => error ? reject(error) : done())
+  }) }
+}
+
+async function treeDigest(root) {
+  const hash = createHash('sha256')
+  let total = 0
+  async function walk(directory) {
+    for (const name of (await readdir(directory)).sort()) {
+      const file = join(directory, name), info = await lstat(file)
+      assert.ok(!info.isSymbolicLink(), 'R7 build bundle cannot contain symlinks')
+      if (info.isDirectory()) await walk(file)
+      else {
+        assert.ok(info.isFile() && info.size <= 8 * 1024 * 1024)
+        total += info.size; assert.ok(total <= 64 * 1024 * 1024)
+        hash.update(file.slice(root.length + 1)).update('\0').update(await readFile(file)).update('\0')
+      }
+    }
+  }
+  await walk(root)
+  return hash.digest('hex')
+}
+
+async function runR7BrowserControl(root) {
+  const source = await originalSpec(root)
+  assert.match(source, /name: \/fixture-mixed\/i/, 'candidate repair must select the campaign by its stable ID')
+  const builds = [join(frontend, 'dist'), '/opt/qualityops/r7-dist']
+  const inventory = readInventory(JSON.parse(await readFile(join(root, 'tests/expected-tests.json'), 'utf8')))
+  const focused = structuredClone(inventory)
+  focused.projects.chromium.tests = focused.projects.chromium.tests.filter(row => row.id === 'DASH-003')
+  focused.projects.chromium.count = focused.projects.chromium.tests.length
+  const temp = await mkdtemp(join(tmpdir(), 'qualityops-r7-browser-'))
+  const digests = { baseline: await treeDigest(builds[0]), renamed_control: await treeDigest(builds[1]),
+    candidate_spec: createHash('sha256').update(source).digest('hex') }
+  assert.notEqual(digests.baseline, digests.renamed_control, 'R7 UI variant must change the built bundle')
+  const priorCwd = process.cwd()
+  const outcomes = []
+  try {
+    for (const [name, build] of [['baseline', builds[0]], ['renamed_control', builds[1]]]) {
+      const server = await serveBuild(build)
+      const output = join(temp, name)
+      await mkdir(output)
+      const reportPath = join(output, 'report.json')
+      const env = { ...process.env, CI: '1', PW_BASE_URL: server.baseURL,
+        PW_OUTPUT_DIR: join(output, 'test-results'), PLAYWRIGHT_JSON_OUTPUT_FILE: reportPath }
+      process.chdir(frontend)
+      const child = await runChild([join(frontend, 'node_modules/@playwright/test/cli.js'), 'test',
+        'tests/mixed-campaign.spec.ts', '--project=chromium', '--reporter=json', '--retries=0'], env, 180_000)
+      await server.close()
+      assert.equal(child.timedOut, false, `${name} UI control timed out`)
+      assert.equal(child.exit_code, 0, `${name} UI control failed`)
+      const report = JSON.parse(await readFile(reportPath, 'utf8'))
+      const count = await validateReport(report, 'chromium', focused, true)
+      outcomes.push({ variant: name, status: 'PASS', tests: count })
+    }
+    return { result: 'PASS', locator: 'fixture-mixed', original: outcomes[0], renamed_control: outcomes[1],
+      artifact_sha256: digests,
+      assertion_minimum: 7, behavior: ['BLOCKED', 'REQUIRED_FAILURE', 'INSUFFICIENT_EVIDENCE'] }
+  } finally {
+    process.chdir(priorCwd)
+    await rm(temp, { recursive: true, force: true })
+  }
+}
+
 export const localCases = [
   { id: 'R1a', title: 'unapproved spec extension rejected', run: ({ root }) => rejectsScan(root, root => writeFile(join(root, 'tests/hidden.spec.ts'), "test('hidden',()=>{})"), /Unapproved test\/helper file/) },
   { id: 'R1b', title: 'undiscovered test extension rejected', run: ({ root }) => rejectsScan(root, root => writeFile(join(root, 'tests/hidden.test.ts'), "test('hidden',()=>{})"), /Unapproved test\/helper file/) },
@@ -108,6 +203,7 @@ export const localCases = [
     assert.match(original, /name: \/fixture-mixed\/i/)
     assert.match(original, /toHaveURL\(\/\\\?campaign=fixture-mixed\$\/\)/)
     assert.match(original, /DASH-003-REASON-01/)
+    if (process.env.PW_STAGE === '3') return await runR7BrowserControl(root)
   } },
   { id: 'R8', title: 'retry increase rejected', run: async ({ root }) => {
     const [config, pkg, workflow] = await Promise.all([configSource(root), packageSource(root), workflowSource(root)])
