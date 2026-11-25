@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
-import { mkdir, readFile, lstat, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, lstat, writeFile, copyFile, readdir, rm } from 'node:fs/promises'
 import { spawnSync } from 'node:child_process'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -43,17 +43,25 @@ async function main() {
   await mkdir(output)
   const candidate = revision()
   const policyBytes = await readFile(joinPath('harness/pr-verification-policy.json'))
+  const stagedArtifacts = resolve(output, 'staged-r7')
+  await mkdir(stagedArtifacts)
   const records = []
   for (const scenario of localCases) {
     const row = { id: scenario.id, scenario: scenario.title, status: 'FAIL', workspace_cleanup: 'NOT RUN' }
     let isolated
     try {
       isolated = await createCaseWorkspace()
-      const detail = await scenario.run(isolated)
+      const artifactDirectory = scenario.id === 'R7' ? resolve(stagedArtifacts, 'R7') : undefined
+      if (artifactDirectory) await mkdir(artifactDirectory)
+      const detail = await scenario.run({ ...isolated, artifactDirectory })
       if (detail) row.browser_control = detail
       row.status = 'PASS'
-    } catch {
+    } catch (error) {
       row.reason = 'expected trusted component outcome was not observed'
+      if (scenario.id === 'R7' && Array.isArray(error?.evidence))
+        row.browser_control_evidence = error.evidence.filter(name =>
+          ['baseline-failure.json', 'baseline-trace.zip', 'renamed_control-failure.json', 'renamed_control-trace.zip'].includes(name))
+          .map(name => `R7/${name}`)
     } finally {
       if (isolated) {
         try { await removeCaseWorkspace(isolated.temp); row.workspace_cleanup = 'PASS' }
@@ -92,6 +100,17 @@ async function main() {
   await mkdir(publication)
   const cases = resolve(publication, 'cases')
   await mkdir(cases)
+  const r7Cases = resolve(cases, 'R7')
+  await mkdir(r7Cases)
+  const stagedR7 = resolve(stagedArtifacts, 'R7')
+  try {
+    for (const name of await readdir(stagedR7)) {
+      if (!/^(baseline|renamed_control)-(?:report|failure)[.]json$|^(baseline|renamed_control)-trace[.]zip$/.test(name))
+        throw new Error('unexpected R7 artifact')
+      await copyFile(resolve(stagedR7, name), resolve(r7Cases, name), 0)
+    }
+  } catch (error) { if (error.code !== 'ENOENT') throw error }
+  await rm(stagedArtifacts, { recursive: true, force: true })
   for (const row of records)
     await writeFile(resolve(cases, `${row.id}.json`), JSON.stringify(row, null, 2) + '\n', { flag: 'wx', mode: 0o600 })
   const payload = JSON.stringify(report, null, 2) + '\n'

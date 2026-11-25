@@ -181,10 +181,19 @@ class Stage2PolicyTests(unittest.TestCase):
         for name in ["container/red-team/publication/red-team-summary.json",
                      "container/red-team/publication/cases/R1a.json",
                      "container/red-team/publication/cases/R10.json",
-                     "container/red-team/publication/cases/R13.json"]:
+                     "container/red-team/publication/cases/R13.json",
+                     "container/red-team/publication/cases/R7/baseline-report.json",
+                     "container/red-team/publication/cases/R7/renamed_control-report.json",
+                     "container/red-team/publication/cases/R7/baseline-failure.json",
+                     "container/red-team/publication/cases/R7/renamed_control-failure.json",
+                     "container/red-team/publication/cases/R7/baseline-trace.zip",
+                     "container/red-team/publication/cases/R7/renamed_control-trace.zip"]:
             with self.subTest(name=name): self.assertTrue(allowed_evidence(name))
         for name in ["container/red-team/summary.json", "container/red-team/publication/cases/R12.json",
-                     "container/red-team/publication/raw.log"]:
+                     "container/red-team/publication/raw.log",
+                     "container/red-team/publication/cases/R7/arbitrary.json",
+                     "container/red-team/publication/cases/R6/trace.zip",
+                     "container/red-team/publication/cases/R7/baseline-extra.log"]:
             with self.subTest(name=name): self.assertFalse(allowed_evidence(name))
 
     def test_stage_two_artifacts_are_narrowly_allowlisted(self):

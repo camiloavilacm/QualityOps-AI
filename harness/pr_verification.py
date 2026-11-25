@@ -110,6 +110,9 @@ def allowed_evidence(name):
     if relative == 'red-team/publication/red-team-summary.json' or re.fullmatch(
             r'red-team/publication/cases/R(?:1a|1b|[2-9]|1[0-1]|13)[.]json', relative):
         return True
+    if re.fullmatch(r'red-team/publication/cases/R7/(?:baseline|renamed_control)-(?:report|failure)[.]json|'
+                    r'red-team/publication/cases/R7/(?:baseline|renamed_control)-trace[.]zip', relative):
+        return True
     if re.fullmatch(r'(e2e|guard|lifecycle)/(report|discovery|orchestrator)[.]json', relative):
         return True
     parts = Path(relative).parts
@@ -504,9 +507,16 @@ def main():
                 r7 = next((row for row in local if row.get("id") == "R7"), {}) if isinstance(local, list) else {}
                 browser = r7.get("browser_control") if isinstance(r7, dict) else None
                 hashes = browser.get("artifact_sha256") if isinstance(browser, dict) else None
+                report_names = browser.get("playwright_reports") if isinstance(browser, dict) else None
+                original = browser.get("original") if isinstance(browser, dict) else None
+                renamed = browser.get("renamed_control") if isinstance(browser, dict) else None
                 valid_hashes = isinstance(hashes, dict) and set(hashes) == {"baseline", "renamed_control", "candidate_spec"} and \
                     all(isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value) for value in hashes.values()) and \
                     hashes.get("baseline") != hashes.get("renamed_control")
+                valid_report_hashes = all(isinstance(outcome, dict) and
+                    isinstance(outcome.get("report_sha256"), str) and
+                    re.fullmatch(r"[0-9a-f]{64}", outcome["report_sha256"])
+                    for outcome in (original, renamed))
                 if (matrix.get("result") != "PASS" or matrix.get("verifier_revision") != args.verifier_revision or
                         matrix.get("candidate_revision") != args.candidate_revision or
                         {row.get("id") for row in local} != expected_ids or
@@ -514,17 +524,31 @@ def main():
                         r7.get("cumulative_control") !=
                             {"result": "PASS", "canary": "KILLED", "evidence": "canary/summary.json"} or
                         not isinstance(browser, dict) or browser.get("result") != "PASS" or browser.get("locator") != "fixture-mixed" or
-                        browser.get("original") !=
+                        not isinstance(original, dict) or
+                        {key: original.get(key) for key in ("variant", "status", "tests")} !=
                             {"variant": "baseline", "status": "PASS", "tests": 1} or
-                        browser.get("renamed_control") !=
+                        not isinstance(renamed, dict) or
+                        {key: renamed.get(key) for key in ("variant", "status", "tests")} !=
                             {"variant": "renamed_control", "status": "PASS", "tests": 1} or
+                        report_names != ["R7/baseline-report.json", "R7/renamed_control-report.json"] or
                         browser.get("assertion_minimum") != 7 or browser.get("behavior") !=
                             ["BLOCKED", "REQUIRED_FAILURE", "INSUFFICIENT_EVIDENCE"] or
-                        not valid_hashes or
+                        not valid_hashes or not valid_report_hashes or
                         matrix.get("remote_scenarios") != [
                             {"id": "R12", "status": "NOT RUN", "reason": "separate authorization and disposable remote target required"},
                             {"id": "R14", "status": "NOT RUN", "reason": "separate authorization and disposable remote target required"}]):
                     raise Blocked("local red-team matrix is incomplete or remote status is inaccurate")
+                for variant, outcome_name, report_name in (("baseline", "original", "baseline-report.json"),
+                                                           ("renamed_control", "renamed_control", "renamed_control-report.json")):
+                    report_path = evidence / "red-team/publication/cases/R7" / report_name
+                    report = read_json(report_path)
+                    outcome = browser.get(outcome_name)
+                    if (report != {"schema_version": "r7-playwright-report-1", "variant": variant,
+                                   "report_sha256": outcome["report_sha256"],
+                                   "test": {"title": "mixed campaign displays BLOCKED with confirmed failure for x and missing evidence for y",
+                                            "file": "tests/mixed-campaign.spec.ts", "project": "chromium", "expected_status": "passed",
+                                            "status": "expected", "retries": 0}, "result": "PASS"}):
+                        raise Blocked("R7 sanitized Playwright report is incomplete or inconsistent")
                 for row in local:
                     case = read_json(evidence / "red-team/publication/cases" / (row["id"] + ".json"))
                     if case != row:

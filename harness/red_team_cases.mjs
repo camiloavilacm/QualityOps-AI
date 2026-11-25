@@ -12,7 +12,7 @@ import { realpath } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import { checkConfiguration, checkOrdinarySource, readInventory, scanTree, validateReport } from '../frontend/scripts/check_test_hygiene.mjs'
 import { validateCanaryExecution } from '../frontend/scripts/check_canary_regression.mjs'
-import { run as runChild } from '../frontend/scripts/foundation_report.mjs'
+import { run as runChild, tests as playwrightTests } from '../frontend/scripts/foundation_report.mjs'
 
 const repo = resolve(fileURLToPath(new URL('..', import.meta.url)))
 const frontend = join(repo, 'frontend')
@@ -123,7 +123,7 @@ async function treeDigest(root) {
   return hash.digest('hex')
 }
 
-async function runR7BrowserControl(root) {
+async function runR7BrowserControl(root, artifactDirectory) {
   const source = await originalSpec(root)
   assert.match(source, /name: \/fixture-mixed\/i/, 'candidate repair must select the campaign by its stable ID')
   const builds = [join(frontend, 'dist'), '/opt/qualityops/r7-dist']
@@ -137,6 +137,44 @@ async function runR7BrowserControl(root) {
   assert.notEqual(digests.baseline, digests.renamed_control, 'R7 UI variant must change the built bundle')
   const priorCwd = process.cwd()
   const outcomes = []
+  const reports = []
+  const fail = async (variant, code, details, output) => {
+    const evidence = { variant, reason_code: code, ...details }
+    if (output) {
+      try {
+        const reportBytes = await readFile(join(output, 'report.json'))
+        evidence.report_sha256 = createHash('sha256').update(reportBytes).digest('hex')
+      } catch {}
+      const testResults = join(output, 'test-results')
+      let trace
+      try {
+        const found = []
+        async function findTraces(directory) {
+          for (const entry of await readdir(directory, { withFileTypes: true })) {
+            const path = join(directory, entry.name)
+            const info = await lstat(path)
+            if (info.isSymbolicLink() || (!info.isDirectory() && !info.isFile())) throw new Error('unsafe test artifact')
+            if (info.isDirectory()) await findTraces(path)
+            else if (entry.name === 'trace.zip') found.push(path)
+          }
+        }
+        await findTraces(testResults)
+        assert.ok(found.length <= 1, 'unexpected number of failure traces')
+        if (found.length === 1) {
+          const info = await lstat(found[0])
+          assert.ok(info.size <= 16 * 1024 * 1024, 'failure trace exceeds size limit')
+          const bytes = await readFile(found[0])
+          trace = { bytes, sha256: createHash('sha256').update(bytes).digest('hex') }
+          evidence.trace_sha256 = trace.sha256
+        }
+      } catch { evidence.trace_collection = 'REJECTED' }
+      if (trace) await writeFile(join(artifactDirectory, `${variant}-trace.zip`), trace.bytes, { flag: 'wx', mode: 0o600 })
+    }
+    await writeFile(join(artifactDirectory, `${variant}-failure.json`), JSON.stringify(evidence, null, 2) + '\n', { flag: 'wx', mode: 0o600 })
+    const error = new Error('R7 browser control did not pass')
+    error.evidence = [`${variant}-failure.json`, ...(evidence.trace_sha256 ? [`${variant}-trace.zip`] : [])]
+    throw error
+  }
   try {
     for (const [name, build] of [['baseline', builds[0]], ['renamed_control', builds[1]]]) {
       const server = await serveBuild(build)
@@ -149,13 +187,34 @@ async function runR7BrowserControl(root) {
       const child = await runChild([join(frontend, 'node_modules/@playwright/test/cli.js'), 'test',
         'tests/mixed-campaign.spec.ts', '--project=chromium', '--reporter=json', '--retries=0'], env, 180_000)
       await server.close()
-      assert.equal(child.timedOut, false, `${name} UI control timed out`)
-      assert.equal(child.exit_code, 0, `${name} UI control failed`)
-      const report = JSON.parse(await readFile(reportPath, 'utf8'))
-      const count = await validateReport(report, 'chromium', focused, true)
-      outcomes.push({ variant: name, status: 'PASS', tests: count })
+      let reportBytes, report
+      try { reportBytes = await readFile(reportPath); report = JSON.parse(reportBytes) }
+      catch { await fail(name, 'REPORT_INVALID', { timed_out: child.timedOut, exit_code: child.exit_code }, output) }
+      const reportHash = createHash('sha256').update(reportBytes).digest('hex')
+      try {
+        assert.equal(child.timedOut, false)
+        assert.equal(child.exit_code, 0)
+        const count = await validateReport(report, 'chromium', focused, true)
+        assert.equal(count, 1)
+        const test = playwrightTests(report)[0]
+        assert.ok(test)
+        assert.equal(test.title, 'mixed campaign displays BLOCKED with confirmed failure for x and missing evidence for y')
+        assert.equal(test.file, 'tests/mixed-campaign.spec.ts')
+        const sanitized = { schema_version: 'r7-playwright-report-1', variant: name,
+          report_sha256: reportHash, test: { title: test.title, file: test.file,
+            project: 'chromium', expected_status: test.expectedStatus, status: test.status,
+            retries: test.results.length - 1 }, result: 'PASS' }
+        const reportName = `${name}-report.json`
+        await writeFile(join(artifactDirectory, reportName), JSON.stringify(sanitized, null, 2) + '\n', { flag: 'wx', mode: 0o600 })
+        outcomes.push({ variant: name, status: 'PASS', tests: count, report_sha256: reportHash })
+        reports.push(`R7/${reportName}`)
+      } catch {
+        await fail(name, child.timedOut ? 'PLAYWRIGHT_TIMEOUT' : 'PLAYWRIGHT_FAILED',
+          { timed_out: child.timedOut, exit_code: child.exit_code, report_sha256: reportHash }, output)
+      }
     }
     return { result: 'PASS', locator: 'fixture-mixed', original: outcomes[0], renamed_control: outcomes[1],
+      playwright_reports: reports,
       artifact_sha256: digests,
       assertion_minimum: 7, behavior: ['BLOCKED', 'REQUIRED_FAILURE', 'INSUFFICIENT_EVIDENCE'] }
   } finally {
@@ -195,7 +254,7 @@ export const localCases = [
     rejects(original.replace('test(', 'test.only('), /Unapproved call test\.only/)
     rejects(original + '\nconst localTest = test\n', /API alias forbidden/)
   } },
-  { id: 'R7', title: 'reviewed locator repair passes static checks', run: async ({ root }) => {
+  { id: 'R7', title: 'reviewed locator repair passes static checks', run: async ({ root, artifactDirectory }) => {
     const original = await originalSpec(root)
     const rows = checkOrdinarySource('tests/mixed-campaign.spec.ts', original)
     assert.equal(rows.length, 1)
@@ -203,7 +262,7 @@ export const localCases = [
     assert.match(original, /name: \/fixture-mixed\/i/)
     assert.match(original, /toHaveURL\(\/\\\?campaign=fixture-mixed\$\/\)/)
     assert.match(original, /DASH-003-REASON-01/)
-    if (process.env.PW_STAGE === '3') return await runR7BrowserControl(root)
+    if (process.env.PW_STAGE === '3') return await runR7BrowserControl(root, artifactDirectory)
   } },
   { id: 'R8', title: 'retry increase rejected', run: async ({ root }) => {
     const [config, pkg, workflow] = await Promise.all([configSource(root), packageSource(root), workflowSource(root)])
