@@ -24,7 +24,7 @@ const textLiteral = node => node && (ts.isStringLiteral(node) || ts.isNoSubstitu
 const callbackOf = node => node.arguments.find(arg => ts.isArrowFunction(arg) || ts.isFunctionExpression(arg))
 
 export function readInventory(value) {
-  assert.equal(value.version, 'stage2-1')
+  assert.equal(value.version, 'stage4-1')
   assert.deepEqual(Object.keys(value.projects).sort(), [...projects].sort(), 'Four explicit project contracts')
   const ids = new Set(), keys = new Set()
   for (const project of projects) {
