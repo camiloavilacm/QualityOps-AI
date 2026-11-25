@@ -162,8 +162,8 @@ for (const [label, change] of [
 ]) test(`configuration rejects ${label}`, () => assert.throws(() => checkConfiguration(change(config), pkg, workflow)))
 test('workflow bypass and missing required commands rejected', () => {
   assert.throws(() => checkConfiguration(config, pkg, workflow + '\ncontinue-on-error: true'), /Workflow bypass/)
-  assert.throws(() => checkConfiguration(config, pkg, workflow.replace('harness/run_pr_verification.mjs', 'replaced.mjs')), /Missing workflow command/)
-  assert.throws(() => checkConfiguration(config, pkg, workflow.replace('node harness/run_pr_verification.mjs', '# node harness/run_pr_verification.mjs')), /Missing workflow command/)
+  assert.throws(() => checkConfiguration(config, pkg, workflow.replaceAll('harness/run_pr_verification.mjs', 'replaced.mjs')), /Missing workflow command/)
+  assert.throws(() => checkConfiguration(config, pkg, workflow.replaceAll('node harness/run_pr_verification.mjs', '# node harness/run_pr_verification.mjs')), /Missing workflow command/)
   assert.throws(() => checkConfiguration(config, pkg, workflow.replace('frontend-e2e:', 'frontend-e2e:\n    if: false')), /Conditional verification bypass/)
   assert.throws(() => checkConfiguration(config, { ...pkg, scripts: { ...pkg.scripts, 'test:e2e': 'playwright test || true' } }, workflow), /Changed required script/)
 })
