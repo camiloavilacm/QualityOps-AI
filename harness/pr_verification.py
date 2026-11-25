@@ -548,9 +548,9 @@ def main():
                 for variant, outcome_name, report_name in (("baseline", "original", "baseline-report.json"),
                                                            ("renamed_control", "renamed_control", "renamed_control-report.json")):
                     report_path = evidence / "red-team/publication/cases/R7" / report_name
-                    report = read_json(report_path)
+                    r7_report = read_json(report_path)
                     outcome = browser.get(outcome_name)
-                    if (report != {"schema_version": "r7-playwright-report-1", "variant": variant,
+                    if (r7_report != {"schema_version": "r7-playwright-report-1", "variant": variant,
                                    "report_sha256": outcome["report_sha256"],
                                    "test": {"title": "mixed campaign displays BLOCKED with confirmed failure for x and missing evidence for y",
                                             "file": "mixed-campaign.spec.ts", "project": "chromium", "expected_status": "passed",
