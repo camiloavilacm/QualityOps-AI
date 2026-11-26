@@ -30,8 +30,10 @@ for (const [label, mutate] of [
 ]) test(`workflow policy rejects ${label}`, () => assert.throws(() => validateWorkflow(mutate(workflow), dependabot)))
 
 test('mutable checkout-tag control follows an updated action SHA', () => {
-  const upgraded = workflow.replace(/actions\/checkout@[0-9a-f]{40}/,
-    'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1')
+  const checkout = workflow.match(/actions\/checkout@([0-9a-f]{40})/)
+  assert.ok(checkout, 'Expected an immutable checkout SHA')
+  const alternativeSha = checkout[1] === 'a'.repeat(40) ? 'b'.repeat(40) : 'a'.repeat(40)
+  const upgraded = workflow.replace(checkout[0], `actions/checkout@${alternativeSha}`)
   assert.notEqual(upgraded, workflow)
   assert.throws(() => validateWorkflow(replaceCheckoutPinWithMutableTag(upgraded), dependabot))
 })
