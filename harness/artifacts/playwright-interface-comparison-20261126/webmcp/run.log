@@ -1,0 +1,17 @@
+
+> qualityops-dashboard@0.1.0 test:webmcp
+> playwright test --project=chromium-webmcp --reporter=json --retries=0
+
+[WebServer] (node:29957) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+
+Running 3 tests using 1 worker
+
+(node:29958) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/3] [chromium-webmcp] › tests/webmcp.spec.ts:61:1 › MCP-001 discovers exact native and adapter read-only tool contracts after initialization
+[2/3] [chromium-webmcp] › tests/webmcp.spec.ts:105:1 › MCP-002 preserves the displayed mixed campaign and rejects invalid summary arguments without state changes
+[3/3] [chromium-webmcp] › tests/webmcp.spec.ts:149:1 › MCP-003 returns only the authored zero-live-trial evaluation and preserves observed state
+  3 passed (3.8s)

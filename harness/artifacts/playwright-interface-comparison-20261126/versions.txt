@@ -1,0 +1,11 @@
+Dashboard revision: a85de9faab17d86450ac792a44fc9a86d37d4a66
+Frontend package-lock SHA-256: e4d54d2d6f07de39643b509bfbc952b0922619dce424a5107946a8a4498cf04b
+Node: v26.12.0
+npm: 11.20.0
+@playwright/cli: 0.1.25
+@playwright/mcp: 0.0.86
+Playwright runtime used by CLI and MCP package: 1.66.0-alpha-2026-11-18
+@playwright/test used by native/adapter suite: 1.65.1
+Google Chrome for Testing: 159.0.8154.6
+Viewport: 1280x800
+Initial route: http://127.0.0.1:4183/
