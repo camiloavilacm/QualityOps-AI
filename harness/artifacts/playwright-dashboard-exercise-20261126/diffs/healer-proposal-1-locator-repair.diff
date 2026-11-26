@@ -1,0 +1,11 @@
+--- exercise/artifacts/generator-output-original.ts	2026-11-26 12:03:23
++++ tests/mixed-campaign.spec.ts	2026-11-26 12:03:23
+@@ -2,7 +2,7 @@
+ 
+ test('mixed campaign displays BLOCKED with both independent reasons', async ({ page }) => {
+   await page.goto('/')
+-  const campaign = page.getByRole('link', { name: /Mixed campaign/i })
++  const campaign = page.getByRole('link', { name: /fixture-mixed/i })
+   await expect(campaign).toHaveCount(1)
+   await campaign.click()
+   await expect(page).toHaveURL(/\?campaign=fixture-mixed$/)

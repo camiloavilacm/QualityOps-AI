@@ -1,0 +1,3 @@
+{
+  "result": "{\n  \"url\": \"http://127.0.0.1:4183/?campaign=fixture-mixed\",\n  \"decision\": \"BLOCKED\",\n  \"reasons\": [\n    {\n      \"label\": \"Confirmed required failure\",\n      \"execution_id\": \"x\",\n      \"code\": \"REQUIRED_FAILURE\"\n    },\n    {\n      \"label\": \"Insufficient evidence\",\n      \"execution_id\": \"y\",\n      \"code\": \"INSUFFICIENT_EVIDENCE\"\n    }\n  ]\n}"
+}

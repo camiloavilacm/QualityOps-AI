@@ -1,0 +1,16 @@
+{
+  "browser": {
+    "browserName": "chromium",
+    "isolated": true,
+    "launchOptions": {
+      "headless": true,
+      "executablePath": "/Users/camiloavila/Library/Caches/ms-playwright/chromium-1255/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing",
+      "args": ["--enable-features=WebMCP"]
+    },
+    "contextOptions": { "viewport": { "width": 1280, "height": 800 } }
+  },
+  "capabilities": ["core"],
+  "server": { "host": "127.0.0.1" },
+  "webmcp": true,
+  "saveSession": true
+}

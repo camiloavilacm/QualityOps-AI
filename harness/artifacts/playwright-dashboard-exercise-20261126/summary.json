@@ -1,0 +1,85 @@
+{
+  "task": "Playwright Planner/Generator/Healer dashboard exercise for mixed campaign",
+  "result": "EXERCISE_PASS_WITH_EXPECTED_REGRESSION_DETECTION",
+  "dashboard_revision": "a85de9faab17d86450ac792a44fc9a86d37d4a66",
+  "fixture": {
+    "campaign_id": "fixture-mixed",
+    "mixed_campaign_sha256": "1bdda5cadd7c835f08123d29af8c56eb51c7356cdd9153bd34c865c0c84f0662",
+    "showcase_export_sha256": "98f266bcc81ebfe35989d90a626ff71b396990b28f761c59b66829610cafe739",
+    "gate": "BLOCKED",
+    "required_reasons": [
+      "REQUIRED_FAILURE for execution x",
+      "INSUFFICIENT_EVIDENCE for execution y"
+    ]
+  },
+  "environment": {
+    "node": "v26.12.0",
+    "npm": "11.20.0",
+    "playwright_test": "1.65.1",
+    "chromium": "159.0.8154.6",
+    "platform": "macOS arm64 (host development run)"
+  },
+  "execution": {
+    "command": "PW_OUTPUT_DIR=<fresh path> npm run test:e2e -- tests/mixed-campaign.spec.ts --trace=on --retries=0",
+    "attempts_per_scenario": 1,
+    "retries": 0,
+    "worker_count": 1,
+    "scenarios": [
+      {
+        "id": "mixed-baseline",
+        "outcome": "PASS",
+        "meaning": "generated test verifies BLOCKED, REQUIRED_FAILURE/x, INSUFFICIENT_EVIDENCE/y, and exactly two reasons",
+        "trace": "traces/01-baseline/"
+      },
+      {
+        "id": "renamed-control-original-locator",
+        "outcome": "EXPECTED_FAIL",
+        "meaning": "original Mixed campaign locator resolves to zero after title changes to Combined campaign",
+        "trace": "traces/02-renamed-original-fails/"
+      },
+      {
+        "id": "renamed-control-healed-locator",
+        "outcome": "PASS",
+        "meaning": "unique fixture-mixed accessible-name locator passes against renamed control",
+        "trace": "traces/03-renamed-healed-passes/"
+      },
+      {
+        "id": "baseline-healed-locator",
+        "outcome": "PASS",
+        "meaning": "healed locator also passes against unmodified dashboard",
+        "trace": "traces/04-healed-baseline-passes/"
+      },
+      {
+        "id": "dropped-insufficient-evidence-reason",
+        "outcome": "EXPECTED_FAIL",
+        "meaning": "UI remains BLOCKED and shows failure x, but assertion fails on the absent INSUFFICIENT_EVIDENCE reason for y; no repair was applied",
+        "trace": "traces/05-dropped-reason-regression/"
+      }
+    ],
+    "builds": "PASS for baseline, renamed-control, healed-baseline, dropped-reason, and restored-baseline variants; five npm run build logs are included under logs/."
+  },
+  "review_decisions_requested": {
+    "renamed_control": "Accept locator-only repair if unique target and both reason assertions remain unchanged.",
+    "dropped_reason": "Retain first-attempt failure as product regression; reject assertion deletion, skip, or retry increase."
+  },
+  "workflow_provenance": "The session executed the documented Planner \u2192 Generator \u2192 Healer workflow outputs manually using the installed @playwright/test CLI. The Planner Markdown, generated spec candidate, Healer locator diff and UI variants are preserved. Dedicated Playwright Test Agent MCP actions were unavailable in this session and were not invoked.",
+  "limitations": [
+    "Host development browser run; not a new accepted isolated-container gate run.",
+    "The exact approved locator already exists in frontend/tests/mixed-campaign.spec.ts; no duplicate edit was made.",
+    "The full generated spec remains disposable and was not promoted."
+  ],
+  "independent_review": {
+    "result": "PASS",
+    "reviewer": "/root/playwright_exercise_review (read-only)",
+    "reviewed_commit": "a85de9faab17d86450ac792a44fc9a86d37d4a66",
+    "reviewed_tree": "c47bc2700dd4a9130698faa097be740e6486e13a",
+    "findings": "All five traces and build logs checked; locator-only repair preserves both BLOCKED reason assertions; dropped-reason variant fails on INSUFFICIENT_EVIDENCE at zero retries; all manifest entries matched."
+  },
+  "human_acceptance": {
+    "result": "APPROVED",
+    "scope": "Locator-only repair using the unique accessible name containing fixture-mixed.",
+    "source": "Explicit user approval in conversation on 2026-11-26.",
+    "implementation": "The approved locator already exists at frontend/tests/mixed-campaign.spec.ts in dashboard_revision; no source edit was needed.",
+    "generated_spec": "The complete disposable generated spec remains an exercise artifact and is not promoted."
+  }
+}

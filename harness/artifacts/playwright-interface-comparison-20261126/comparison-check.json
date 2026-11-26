@@ -1,0 +1,23 @@
+{
+  "cli_matches_dom_and_webmcp": true,
+  "mcp_matches_dom_and_webmcp": true,
+  "invalid_campaign_rejected_by_cli_and_mcp": true,
+  "native_and_adapter_webmcp_suite": {
+    "expected": 3,
+    "passed": 3,
+    "unexpected": 0,
+    "skipped": 0,
+    "flaky": 0
+  },
+  "expected": {
+    "decision": "BLOCKED",
+    "reason_codes": [
+      "REQUIRED_FAILURE",
+      "INSUFFICIENT_EVIDENCE"
+    ],
+    "execution_ids": [
+      "x",
+      "y"
+    ]
+  }
+}
