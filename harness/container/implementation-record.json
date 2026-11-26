@@ -20,7 +20,7 @@
     "C_worktree": "/private/var/tmp/qualityops-container-continuation-c",
     "reviewer": "Read-only independent continuation review; persistent artifacts under harness/artifacts/continuation-review/"
   },
-  "status": "Stage 1 accepted; Stage 2 accepted; Stage 3 accepted; Stage 4 implementation committed locally, Gate 4 bootstrap evidence recorded, independent review and exact-SHA acceptance pending",
+  "status": "Stages 1\u20134 accepted and merged; Stage 4 exact-SHA Gate 4 PASS at 6ea930c and merged as 4baf009; H1 ruleset and R12/R14 PASS. Authored oracle independent review PASS. Local GitHub CLI credential removed; connected GitHub app requires approval before writes.",
   "host_runtime": {
     "node": "v26.13.1",
     "python": "Python 3.15.2",
@@ -375,8 +375,8 @@
     "accepted_run_result": "PASS; acceptance record digest is bound in report; scope has zero candidate changes; cleanup and artifact collection PASS."
   },
   "stage4_implementation": {
-    "result": "IMPLEMENTED; cumulative Gate 4 bootstrap evidence stored at /private/var/tmp/qualityops-stage4-bootstrap-final/summary.json; bootstrap is not verifier acceptance",
-    "commit": "stage4/complete-webmcp local integration branch; exact final SHA is reported after commit",
+    "result": "ACCEPTED and merged: exact-SHA Gate 4 accepted run PASS; PR #9 merged at 4baf009ebdf472ce053779af82ed6b8754d5a2cf.",
+    "commit": "6ea930c18214ed3bda95b9d10c4b9b3a5060daf5 (accepted verifier; merged PR #9 as 4baf009ebdf472ce053779af82ed6b8754d5a2cf)",
     "frontend_owner": "V7-C2; allowed paths frontend/**",
     "frontend_source_commit": "d46ffabaf49b55e339a6e9d1b6afa1b0f83f6d8f",
     "frontend_inventory_followup_commit": "a02b7f640aae555028b25c6a1f835917440b621e",
@@ -409,9 +409,128 @@
       "path": "harness/oracles/authored-evaluation-v1.json",
       "sha256": "5823fe849efea777b500fce9bce88c6038e3120d65b3a78cf048f78200d97968",
       "source_revision": "b50868ed1e6fd3fa5c630664c16620d7a6eb85fe",
-      "independent_review": "PENDING"
+      "independent_review": "PASS: separate read-only V7-R1-ORACLE review; no oracle field or denominator mismatch; provenance and separation verified.",
+      "independent_review_details": {
+        "reviewer": "/root/stage3_review (V7-R1-ORACLE)",
+        "reviewed_revision": "4baf009ebdf472ce053779af82ed6b8754d5a2cf",
+        "oracle_sha256": "5823fe849efea777b500fce9bce88c6038e3120d65b3a78cf048f78200d97968",
+        "pinned_source_revision": "b50868ed1e6fd3fa5c630664c16620d7a6eb85fe",
+        "source_sha256": {
+          "evaluators/test_evaluate.py": "43e6f942b31e9da8d6396debe9e035d38fd7cb0a06a8311fc5bad1cc1c280aa7",
+          "evaluators/authored_examples.py": "fa0a06f5fc4ec707eb8f7cec961a58bb21fc95074dd8ff71506dba6522b3ec64",
+          "evaluators/evaluate.py": "e65c2b23868ba78a6c1d478133496e2632fc76d4d3afa57f3735c33aa6c68c0f",
+          "evaluators/model_visible/corpus-v1.json": "47ecb24515dc1d8d4230095742c4a7ddd1c16272fe2fa42095ca3feb3ad7c5e4"
+        },
+        "verdict": "PASS; all source digests and oracle values match; baseline denominators/rates and candidate authored no-mutation metrics reconcile with pinned grader/threshold logic; latency/cost remain indeterminate, promotion false.",
+        "separation_evidence": {
+          "bundle_scan": "/private/var/tmp/qualityops-stage4-bootstrap-final/container/bundle-separation.log",
+          "bundle_scan_result": "PASS; oracle_input ABSENT; source scan 6 files/46744 bytes; bundle scan 4 files/252023 bytes",
+          "command_record": "/private/var/tmp/qualityops-stage4-bootstrap-final/container/commands.json",
+          "container_foundation": "/private/var/tmp/qualityops-stage4-bootstrap-final/container/foundation.json",
+          "host_validator": "/private/var/tmp/qualityops-stage4-bootstrap-final/command-28.log",
+          "webmcp_report": "/private/var/tmp/qualityops-stage4-bootstrap-final/container/webmcp/report.json",
+          "evaluator_suite": "/private/var/tmp/qualityops-stage4-bootstrap-final/command-06.log"
+        },
+        "review_method": "Read-only git show/rev-parse/diff, shasum, jq, and file inspection; manual reconciliation of authored generator, evaluator tests, grader, and threshold logic. No candidate code or tests were run by the reviewer.",
+        "limitations": [
+          "Gate 4 bootstrap/accepted-run evidence is bound to verifier SHA 6ea930c, not merge SHA 4baf009; their tree IDs are identical (a237fd28d39e265dd70cfdac64b91db0747c2a91).",
+          "Dynamic purity checks observe DOM, URL, storage, and recorded state only.",
+          "Live model trials are zero; latency and cost are indeterminate by design."
+        ]
+      }
     },
     "runtime_policy_sha256": "70c2af797f09b01d27f47c3e42436e290da4eddea86a3c35767e42d16e4dd359",
-    "approval": "Stage 3 SHA approval does not approve this Stage 4 verifier revision; exact-SHA review and human acceptance required after Gate 4."
+    "approval": "Exact-SHA independent review and human acceptance PASS; PR #9 merged by the human maintainer at 4baf009ebdf472ce053779af82ed6b8754d5a2cf.",
+    "accepted_run": {
+      "result": "PASS",
+      "stage": 4,
+      "verifier_revision": "6ea930c18214ed3bda95b9d10c4b9b3a5060daf5",
+      "candidate_revision": "6ea930c18214ed3bda95b9d10c4b9b3a5060daf5",
+      "runtime_policy_sha256": "70c2af797f09b01d27f47c3e42436e290da4eddea86a3c35767e42d16e4dd359",
+      "acceptance_record_sha256": "e5b2ca22bb481a85e01c30620f84e6e28321169b37b68347d9d25fefb3ac71b2",
+      "commands_passed": 29,
+      "cleanup": "PASS",
+      "artifact_collection": "PASS",
+      "evidence": "/private/var/tmp/qualityops-stage4-accepted-final/summary.json"
+    },
+    "integration": {
+      "pull_request": "https://github.com/camiloavilacm/QualityOps-AI/pull/9",
+      "merge_commit": "4baf009ebdf472ce053779af82ed6b8754d5a2cf",
+      "ci_run_id": 45642698048,
+      "required_checks": {
+        "python-contracts-and-eval": "PASS",
+        "frontend-e2e": "PASS",
+        "frontend-webmcp": "PASS"
+      },
+      "tree_oid_identity_with_verifier": "a237fd28d39e265dd70cfdac64b91db0747c2a91"
+    },
+    "human_acceptance": {
+      "result": "PASS",
+      "verifier_revision": "6ea930c18214ed3bda95b9d10c4b9b3a5060daf5",
+      "runtime_policy_sha256": "70c2af797f09b01d27f47c3e42436e290da4eddea86a3c35767e42d16e4dd359",
+      "acceptance_record_sha256": "e5b2ca22bb481a85e01c30620f84e6e28321169b37b68347d9d25fefb3ac71b2",
+      "source": "Explicit user acceptance in conversation; user subsequently merged PR #9."
+    }
+  },
+  "h1_remote_protection": {
+    "result": "PASS",
+    "repository": "camiloavilacm/QualityOps-AI",
+    "ruleset": {
+      "id": 28085830,
+      "name": "QualityOps AI main verification",
+      "target_refs": [
+        "refs/heads/main"
+      ],
+      "enforcement": "active",
+      "require_pull_request": true,
+      "required_approving_reviews": 0,
+      "strict_required_status_checks": true,
+      "required_checks": [
+        {
+          "context": "python-contracts-and-eval",
+          "integration_id": 15368
+        },
+        {
+          "context": "frontend-e2e",
+          "integration_id": 15368
+        },
+        {
+          "context": "frontend-webmcp",
+          "integration_id": 15368
+        }
+      ],
+      "bypass_actors": [],
+      "current_user_can_bypass": "never"
+    },
+    "R12": {
+      "result": "PASS",
+      "pull_request": 8,
+      "head_sha": "f1d7237adec2e450851bb115e70ce2ae62a3cd4a",
+      "workflow_run_id": 45640985324,
+      "required_checks": "All three failed on the intentionally malformed disposable candidate.",
+      "merge_attempt": "Rejected by GitHub because base branch policy prohibited the merge; PR closed unmerged."
+    },
+    "R14": {
+      "result": "PASS",
+      "probe_commit": "aadf3139efe82ab8e7a470968c5ea76db0c54517",
+      "rejection": "GH013; Changes must be made through a pull request.",
+      "required_check_note": "GitHub also reported 3 of 3 required status checks expected."
+    },
+    "temporary_target": "h1-disposable-target-2026-11-25 (temporary branch in the repository; not production main)",
+    "cleanup": "PASS; PR closed unmerged, temporary branches deleted, ruleset restored to main only, main head unchanged.",
+    "evidence": "harness/artifacts/h1-remote-enforcement-20261125/summary.json"
+  },
+  "credential_boundary": {
+    "status": "Operationally remediated for this agent environment; historical deviation documented.",
+    "historical_note": "H1 R12/R14 were executed with the pre-existing user-owned, admin-capable GitHub CLI credential after explicit human authorization, contrary to the plan credential boundary that agents have no write/merge credentials.",
+    "local_cli_remediation": {
+      "command": "gh auth logout --hostname github.com --user camiloavilacm",
+      "result": "PASS; local credential removed; subsequent gh auth status reported no logged-in GitHub hosts."
+    },
+    "chatgpt_github_app": {
+      "permission_mode": "ask_before_writes",
+      "result": "PASS; read operations remain available and writes require explicit user approval."
+    },
+    "limitation": "Local gh logout does not revoke the GitHub CLI OAuth grant globally; that grant remains revocable in GitHub settings and was not removed because GitHub states global revocation affects CLI-generated tokens on all devices."
   }
 }

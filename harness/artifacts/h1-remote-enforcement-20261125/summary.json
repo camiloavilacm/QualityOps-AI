@@ -1,0 +1,94 @@
+{
+  "task": "V7-H1 remote protection verification",
+  "repository": "camiloavilacm/QualityOps-AI",
+  "recorded_date": "2026-11-25",
+  "main_sha_at_test": "d4700b0969c7f943e89ef73c87befcf74cbb24ff",
+  "ruleset": {
+    "id": 28085830,
+    "name": "QualityOps AI main verification",
+    "target": "branch",
+    "enforcement": "active",
+    "target_refs_after_cleanup": [
+      "refs/heads/main"
+    ],
+    "rules": [
+      {
+        "type": "pull_request",
+        "required_approving_review_count": 0
+      },
+      {
+        "type": "required_status_checks",
+        "strict_required_status_checks_policy": true,
+        "required_status_checks": [
+          {
+            "context": "python-contracts-and-eval",
+            "integration_id": 15368
+          },
+          {
+            "context": "frontend-e2e",
+            "integration_id": 15368
+          },
+          {
+            "context": "frontend-webmcp",
+            "integration_id": 15368
+          }
+        ]
+      }
+    ],
+    "bypass_actors": [],
+    "current_user_can_bypass": "never",
+    "source_application": {
+      "id": 15368,
+      "name": "GitHub Actions"
+    },
+    "readback": "PASS"
+  },
+  "R14": {
+    "result": "PASS",
+    "target_branch": "h1-disposable-target-2026-11-25",
+    "verifier_base_sha": "6ea930c18214ed3bda95b9d10c4b9b3a5060daf5",
+    "rejected_probe_commit": "aadf3139efe82ab8e7a470968c5ea76db0c54517",
+    "observed_rejection": [
+      "GH013 repository rule violations",
+      "Changes must be made through a pull request",
+      "3 of 3 required status checks are expected"
+    ],
+    "cleanup": "target branch deleted"
+  },
+  "R12": {
+    "result": "PASS",
+    "pull_request": 8,
+    "head_branch": "h1/disposable-r12-failing-check",
+    "head_sha": "f1d7237adec2e450851bb115e70ce2ae62a3cd4a",
+    "workflow_run_id": 45640985324,
+    "required_check_results": {
+      "python-contracts-and-eval": "FAIL",
+      "frontend-e2e": "FAIL",
+      "frontend-webmcp": "FAIL"
+    },
+    "merge_attempt": "gh pr merge 8 --merge",
+    "observed_rejection": "base branch policy prohibits the merge",
+    "merged": false,
+    "cleanup": "PR closed; head and target branches deleted"
+  },
+  "cleanup_verified": {
+    "ruleset_targets_only_main": true,
+    "temporary_remote_branches_absent": true,
+    "pull_request_closed_unmerged": true,
+    "temporary_worktrees_removed": true,
+    "main_head_unchanged": true
+  },
+  "limitations": [
+    "The direct GET branch-protection endpoint continues to report 404 because the configured control is a ruleset; the ruleset endpoint is authoritative for this configuration.",
+    "A disposable branch in the existing repository was used as the remote test target; production main was not pushed to or merged into."
+  ],
+  "credential_boundary": {
+    "historical_note": "H1 remote enforcement tests ran with the pre-existing user-owned admin-capable GitHub CLI credential after the user explicitly authorized the remote tests.",
+    "local_cli_remediation": {
+      "command": "gh auth logout --hostname github.com --user camiloavilacm",
+      "result": "PASS; local credential removed. Subsequent gh auth status reported no logged-in GitHub hosts."
+    },
+    "chatgpt_github_app_permission": "ask_before_writes; reads remain available and writes require explicit user approval.",
+    "server_side_revocation": "NOT RUN. gh auth logout is local-only; globally revoking the GitHub CLI OAuth app would affect CLI tokens across all devices."
+  }
+}
