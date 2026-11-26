@@ -1,0 +1,16 @@
+{
+  "agreement": {
+    "count": 0,
+    "denominator": 0,
+    "rate": null
+  },
+  "calibration_version": "1.0.0",
+  "disagreements": null,
+  "grader_version": "1.2.0",
+  "human_judgments": 0,
+  "packet_sha256": "5a454dbe5983f1499373daac9bd0dc28ca1f8cd7bbd79226c51317db502d0f7e",
+  "pending_human": 6,
+  "review_complete": false,
+  "total": 6,
+  "unresolved": null
+}
