@@ -1,0 +1,11 @@
+3a08e822b30eb5f9678a565bee38ffd2d9ea9c9cf8704974a242c429fe60f8d2  harness/artifacts/playwright-dashboard-exercise-20261126/traces/01-baseline/mixed-campaign-mixed-campa-f4862-th-both-independent-reasons-chromium/trace.zip
+e8ea20aee02baa7bc048eb5d340d4e55e8423c5263311b5f523f6aeed061c48f  harness/artifacts/playwright-dashboard-exercise-20261126/traces/02-renamed-original-fails/mixed-campaign-mixed-campa-f4862-th-both-independent-reasons-chromium/trace.zip
+44b22526ccc77a891c6d911caf298bf6fc6572e8e1ebc1b947d6ca8ee43317c5  harness/artifacts/playwright-dashboard-exercise-20261126/traces/03-renamed-healed-passes/mixed-campaign-mixed-campa-f4862-th-both-independent-reasons-chromium/trace.zip
+0c9988b4c89d40859c60e2024fcec0e48ecf161084daa672371cb7a986ed9265  harness/artifacts/playwright-dashboard-exercise-20261126/traces/04-healed-baseline-passes/mixed-campaign-mixed-campa-f4862-th-both-independent-reasons-chromium/trace.zip
+bcc1d4df277153a6903899db6392ac23920be5d83f46fb8309f4b34f7d8fc206  harness/artifacts/playwright-dashboard-exercise-20261126/traces/05-dropped-reason-regression/mixed-campaign-mixed-campa-f4862-th-both-independent-reasons-chromium/trace.zip
+4738867245df4f18eecacab0f255e5a6a9c2037268991470f7ef703ff9461d1f  harness/artifacts/playwright-dashboard-exercise-20261126/logs/02-build-renamed.log
+bafa60348c86bc8d8a1990213ec8b0a331902fb925a459a958c3966cae2256ee  harness/artifacts/playwright-dashboard-exercise-20261126/logs/04-build-healed-baseline.log
+5d27c74030899b7e0db9ee57a5c1636458fb3a4076294be861de3483d76357db  harness/artifacts/playwright-dashboard-exercise-20261126/logs/05-build-dropped-reason.log
+82f643cea28d67706bb6df00af7766e30be8d4f8abbd6abf101d5225a7e3c9bd  harness/artifacts/playwright-dashboard-exercise-20261126/logs/06-build-restored.log
+9c449230b0eaa59bc4bf4e51703af32d838b7f2e80a4a862b28f5b9eac1aabc6  harness/artifacts/playwright-dashboard-exercise-20261126/logs/build-baseline.log
+e26d38128ce1dc22d5f48a090bb3b5b7bebfdcbcbf65c27bf65796a21cfe89d5  harness/artifacts/playwright-dashboard-exercise-20261126/summary.json

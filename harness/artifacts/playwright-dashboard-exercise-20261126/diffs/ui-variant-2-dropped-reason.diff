@@ -1,0 +1,11 @@
+--- exercise/artifacts/main-baseline.tsx	2026-11-26 12:03:59
++++ src/main.tsx	2026-11-26 12:03:59
+@@ -208,7 +208,7 @@
+           <section className="panel" aria-labelledby="reasons">
+             <h2 id="reasons">Decision reasons</h2>
+             <ul className="reason-list">
+-              {gate.reasons.map((reason) => (
++              {gate.reasons.filter((reason) => reason.code !== 'INSUFFICIENT_EVIDENCE').map((reason) => (
+                 <li key={`${reason.execution_id}:${reason.code}`}>
+                   <div className="reason-main">
+                     <span className={`reason-marker ${reason.code.toLowerCase()}`} aria-hidden="true" />

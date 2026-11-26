@@ -1,5 +1,29 @@
 # Dashboard test review record
 
+## Current main replay (2026-11-26)
+
+This replay fulfills the mixed-campaign Planner/Generator/Healer exercise against the current merged `main` snapshot. Dashboard source commit: `a85de9faab17d86450ac792a44fc9a86d37d4a66`; tree: `c47bc2700dd4a9130698faa097be740e6486e13a`. The sanitized campaign `fixture-mixed` source digest is `1bdda5cadd7c835f08123d29af8c56eb51c7356cdd9153bd34c865c0c84f0662`; the displayed showcase export digest is `98f266bcc81ebfe35989d90a626ff71b396990b28f761c59b66829610cafe739`.
+
+The criterion required navigating from the dashboard list to `fixture-mixed`, confirming `BLOCKED`, and retaining both `REQUIRED_FAILURE` for execution `x` and `INSUFFICIENT_EVIDENCE` for execution `y`. The plan, generated spec candidate, UI variants, locator repair, logs, Playwright traces, and digest manifest are in [the evidence packet](artifacts/playwright-dashboard-exercise-20261126/summary.json). The browser environment was Node `v26.12.0`, npm `11.20.0`, `@playwright/test` `1.65.1`, and Chromium `159.0.8154.6` on macOS arm64.
+
+The test ran once per case with `--retries=0` and one worker. The baseline generated spec passed with both reason assertions and the two-reason count. Renaming the visible control from “Mixed campaign” to “Combined campaign” made the original locator fail; changing only the locator to the unique accessible name containing `fixture-mixed` passed on both the renamed dashboard and the restored baseline. A second disposable UI variant removed the `INSUFFICIENT_EVIDENCE` reason while preserving `BLOCKED` and the confirmed failure for `x`; the unchanged test failed on the missing-reason assertion on its first attempt. No repair was applied to hide that product regression.
+
+**Independent review: PASS.** The read-only reviewer `/root/playwright_exercise_review` inspected commit `a85de9faab17d86450ac792a44fc9a86d37d4a66`, tree `c47bc2700dd4a9130698faa097be740e6486e13a`, the five browser traces, the locator-only diff, and the updated digest manifest. The follow-up review verified all five build logs and all 11 manifest entries. The reviewer confirmed both gate-reason assertions remain unchanged, the locator repair targets the intended unique control, and the known dropped-reason regression fails on `INSUFFICIENT_EVIDENCE` with zero retries.
+
+**Workflow and limitations:** This session authored the Planner Markdown, generated spec candidate, and Healer locator proposal manually while following the configured workflow, then ran them with the installed `@playwright/test` CLI. The dedicated Playwright Test Agent MCP actions were unavailable and were not invoked. The user approved the locator repair on 2026-11-26. The exact `/fixture-mixed/i` locator already exists in `frontend/tests/mixed-campaign.spec.ts` on the reviewed source revision, so no frontend edit was needed. The full generated spec remains an exercise artifact and was not promoted. The browser run was a host development exercise, not a new isolated-container gate acceptance. A preliminary setup run was blocked by the missing local Chromium binary and selected the repository spec before the disposable generated spec; it is retained under the packet’s `setup/` path and excluded from the five scenario outcomes above.
+
+The matched comparison from 2026-11-26 is recorded in the next section. The older CLI/MCP/WebMCP table below remains historical evidence from the earlier dashboard revision.
+
+## Matched CLI/MCP/WebMCP comparison (2026-11-26)
+
+The comparison used the same current-main dashboard revision `a85de9faab17d86450ac792a44fc9a86d37d4a66`, the same sanitized `fixture-mixed` data (`mixed-campaign.json` SHA-256 `1bdda5cadd7c835f08123d29af8c56eb51c7356cdd9153bd34c865c0c84f0662`; displayed export SHA-256 `98f266bcc81ebfe35989d90a626ff71b396990b28f761c59b66829610cafe739`), a fresh isolated browser context, a 1280x800 viewport, and initial route `/`. All interfaces used Google Chrome for Testing `159.0.8154.6`; CLI was `@playwright/cli@0.1.25`; Playwright MCP was `@playwright/mcp@0.0.86` backed by Playwright `1.66.0-alpha-2026-11-18`; the native/adapter test suite used `@playwright/test@1.65.1`.
+
+**Results:** CLI navigation and Playwright MCP navigation both selected `fixture-mixed` and observed the same route, `BLOCKED` decision, `REQUIRED_FAILURE` for execution `x`, and `INSUFFICIENT_EVIDENCE` for execution `y`. Both interfaces discovered the recorded campaign summary tool. Valid `get_campaign_summary({campaign_id:"fixture-mixed"})` results matched the displayed summary and preserved both reason pairs. Unknown campaign input was rejected. The WebMCP browser suite passed all three native/adapter cases with no skips, unexpected results, or flaky results. CLI and MCP token counts are **unmeasured** because neither interface exposed model token telemetry; WebMCP made no model call.
+
+**Independent review: PASS.** `/root/playwright_exercise_review` independently ran the comparison verifier, confirmed the DOM/tool agreement and invalid-input rejection, checked all 36 evidence hashes, and confirmed the token fields are honestly marked. Reviewed source commit `a85de9faab17d86450ac792a44fc9a86d37d4a66`, tree `c47bc2700dd4a9130698faa097be740e6486e13a`.
+
+The complete command and response packet is [here](artifacts/playwright-interface-comparison-20261126/summary.json). Package manifests, tool transcripts, snapshots, WebMCP test report, verifier and checksum manifest are included. This was a host development run using the pinned Playwright alpha runtime; it is not an isolated-container acceptance run.
+
 Completed in the disposable exercise workspace `/Users/camiloavila/Documents/qualityops-ai-playwright-exercise`. The lead supplied the sanitized C1 dashboard checkout (`b7a61e99a4112ed5dd4022de7a356d83a47e6f32`). The read-only independent reviewer recorded the verdicts below. Human owner approval is required before accepting any generated test or repair into a tracked branch.
 
 | Run input | Recorded value |
@@ -31,9 +55,9 @@ npx --no-install playwright test "${QUALITYOPS_TEST_PATH}" \
 ### Independent Reviewer Verdicts
 
 - **Planner Plan (`exercise/specs/mixed-campaign-plan.md`):** **PASS** — Matches the exact criterion, pins revision, fixture SHA-256, URL, and clean browser context.
-- **Variant 1 — Renamed Accessible Control (`healer-proposal-1-locator-repair.diff`):** **ACCEPT (pending human approval)** — Changes only line 7 from `getByRole('link', { name: /Mixed campaign/i })` to `getByRole('link', { name: /fixture-mixed/i })`. Verified to uniquely target `<a className="campaign-card" href="?campaign=fixture-mixed">`, confirm navigation via `toHaveURL(/\?campaign=fixture-mixed$/)`, and preserve all three required assertions plus `toHaveCount(2)` untouched. Passes on first attempt (`--retries=0`) against both Variant 1 and the restored baseline UI.
+- **Variant 1 — Renamed Accessible Control (`healer-proposal-1-locator-repair.diff`):** **ACCEPT (human-approved 2026-11-26)** — Changes only line 7 from `getByRole('link', { name: /Mixed campaign/i })` to `getByRole('link', { name: /fixture-mixed/i })`. Verified to uniquely target `<a className="campaign-card" href="?campaign=fixture-mixed">`, confirm navigation via `toHaveURL(/\?campaign=fixture-mixed$/)`, and preserve all three required assertions plus `toHaveCount(2)` untouched. Passes on first attempt (`--retries=0`) against both Variant 1 and the restored baseline UI. The same locator is already present in the current main test.
 - **Variant 2 — Missing-Evidence Reason Dropped (`ui-variant-2-dropped-reason.diff`):** **RETAIN FAILURE AS PRODUCT REGRESSION** — Caught on first attempt (`--retries=0`) directly on the `INSUFFICIENT_EVIDENCE` assertion (`element(s) not found`). No assertion was weakened or deleted, the test was not skipped, and retries were not increased. Any Healer proposal that deletes the assertion, skips the test, or raises retries is **REJECTED**.
-- **Human decision:** *Pending human owner approval.*
+- **Human decision:** *Locator-only repair approved by the human owner on 2026-11-26. The dropped-reason product regression remains rejected as a test-healing target.*
 
 ## Matched browser runs
 
