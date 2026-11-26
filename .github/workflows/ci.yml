@@ -55,6 +55,9 @@ jobs:
       - name: Run B1 offline evaluation and grader tests
         run: python -B -m unittest discover -s evaluators -p test_evaluate.py -v
 
+      - name: Verify offline grader calibration and blind-review separation
+        run: python -B -m unittest discover -s evaluators -p test_calibrate.py -v
+
       - name: Run Stage 2 vertical-slice integration tests
         run: python -B -m unittest -v tests/test_vertical_slice.py
 
@@ -62,6 +65,11 @@ jobs:
         run: |
           python -B frontend/scripts/export_mixed.py --check
           python -B frontend/scripts/export_showcase.py --check
+
+      - name: Reconcile published execution reasons with fixture observations
+        run: |
+          python -B -m harness.sql_audit
+          (cd harness && python -B -m unittest -v test_checks.SqlAuditTests)
 
       - name: Record sanitized export digests
         run: sha256sum frontend/src/mixed-campaign.json frontend/src/showcase-export.json

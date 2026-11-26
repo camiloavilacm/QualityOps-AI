@@ -2,6 +2,7 @@ import json
 import shutil
 import subprocess
 import socket
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -86,6 +87,51 @@ class ContainerPolicyTests(unittest.TestCase):
         self.assertEqual(json.loads(profile)['defaultAction'], 'SCMP_ACT_ERRNO')
         tampered = profile.replace(b'SCMP_ACT_ERRNO', b'SCMP_ACT_ALLOW')
         self.assertNotEqual(hashlib.sha256(tampered).hexdigest(), policy['seccomp_sha256'])
+
+
+class SqlAuditTests(unittest.TestCase):
+    def run_audit(self, *args):
+        return subprocess.run([sys.executable, "-B", "-m", "harness.sql_audit", *args],
+                              cwd=ROOT, capture_output=True, text=True)
+
+    def test_published_coverage(self):
+        result = self.run_audit()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        for row in ("fixture-mixed/x complete failed REQUIRED_FAILURE",
+                    "fixture-mixed/y absent - INSUFFICIENT_EVIDENCE",
+                    "fixture-partial/y partial passed INSUFFICIENT_EVIDENCE"):
+            self.assertIn(f"PASS {row} expected=1 published=1", result.stdout)
+
+    def test_invalid_reason_and_duplicate_campaign(self):
+        for field in ("execution_id", "code", "duplicate campaign"):
+            with self.subTest(field=field), tempfile.TemporaryDirectory() as tmp:
+                export = load(ROOT / "frontend/src/showcase-export.json")
+                mixed = next(c for c in export["campaigns"] if c["id"] == "fixture-mixed")
+                if field == "duplicate campaign":
+                    export["campaigns"].append(dict(mixed, gate=None))
+                else:
+                    mixed["gate"]["reasons"].append({"code": "REQUIRED_FAILURE",
+                                                    "execution_id": "x", field: None})
+                path = Path(tmp) / "export.json"
+                path.write_text(json.dumps(export))
+                result = self.run_audit("--export", path)
+                self.assertEqual(result.returncode, 1, result.stdout)
+                self.assertIn("fixture-mixed", result.stderr)
+
+    def test_missing_and_duplicate_published_reason(self):
+        for count in (0, 2):
+            with self.subTest(count=count), tempfile.TemporaryDirectory() as tmp:
+                export = load(ROOT / "frontend/src/showcase-export.json")
+                gate = next(c["gate"] for c in export["campaigns"] if c["id"] == "fixture-mixed")
+                reason = next(r for r in gate["reasons"] if r["execution_id"] == "y")
+                gate["reasons"].remove(reason)
+                gate["reasons"].extend([reason] * count)
+                path = Path(tmp) / "export.json"
+                path.write_text(json.dumps(export))
+                result = self.run_audit("--export", path)
+                self.assertEqual(result.returncode, 1, result.stderr)
+                self.assertIn("FAIL fixture-mixed/y absent - INSUFFICIENT_EVIDENCE "
+                              f"expected=1 published={count}", result.stdout)
 
 
 class ExecutionTests(unittest.TestCase):
