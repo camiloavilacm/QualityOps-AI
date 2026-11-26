@@ -30,3 +30,29 @@ The legacy sample establishes requirement provenance only. Discovery runs legacy
 Review the initial inventory with git status --short --untracked-files=all. The local Finder metadata and pre-existing nested checkout at the repository root are excluded from untracked scope enumeration. Tracked changes still count everywhere. Scope mode includes all other untracked files, even ignored build outputs. After the human-approved initial commit, obtain its full SHA with git rev-parse HEAD and run the documented scope command with owner reviewer on the clean checkout. Scope-mode output is written outside the checkout.
 
 The fixture policy supplies the mandatory matrix. The reviewed synthetic receipt table in harness/source-receipts.json stands in for separately authenticated source records. It is keyed by campaign and execution and binds exact artifact bytes. A digest supplied only by the evidence producer establishes internal consistency. Real source authentication and replay are implementation acceptance criteria.
+
+## SQL reconciliation of published execution reasons
+
+From the repository root, run the audit and its disposable-copy controls with the
+Python environment used for the contract tests.
+
+```sh
+python -B -m harness.sql_audit
+(cd harness && python -B -m unittest -v test_checks.SqlAuditTests)
+```
+
+The audit covers the four synthetic gate records in the showcase export. It verifies
+the fixture bytes and uses independent source receipts before loading a temporary
+in-memory SQLite database. A left join preserves required slots with no observation.
+In the mixed campaign, execution `x` has a confirmed failure and `y` has no row.
+In the partial campaign, `y` has a recorded pass with incomplete evidence. Both
+forms of insufficient evidence require a published reason. The query reconciles
+reason codes and counts by execution. The release gate owns the decision.
+
+The controls removed or duplicated the published reason for mixed execution `y`
+in separate copies. Both commands exited 1 with the following discrepancy lines.
+
+```text
+FAIL fixture-mixed/y absent - INSUFFICIENT_EVIDENCE expected=1 published=0
+FAIL fixture-mixed/y absent - INSUFFICIENT_EVIDENCE expected=1 published=2
+```
