@@ -30,7 +30,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Configure AWS credentials via GitHub OIDC
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{ vars.AWS_LIVE_EVAL_ROLE_ARN }}
           aws-region: eu-west-1
@@ -129,7 +129,7 @@ jobs:
           PYEOF
 
       - name: Upload live evaluation artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: live-bedrock-evaluation-${{ github.run_id }}
           path: live-eval-artifacts/
