@@ -26,6 +26,7 @@ QualityOps AI ingests QA campaign evidence, computes release eligibility from ve
 | Contracts and backend validation | The importer checks the v2 evidence schema and artifact SHA-256 values before atomic filesystem publication. Its retry test rejects a conflicting payload under the same campaign ID. | [Duplicate and conflict test](backend/ingestion/test_importer.py#L343) | The interface is a campaign bundle and trusted receipt. REST and Postman coverage remain open. |
 | Risk-based test design | **Automate** the independent checks for failure and missing evidence. **Review manually** whether a locator repair still selects the intended campaign. **Defer** mobile-viewport checks. | [Mixed-campaign test](frontend/tests/mixed-campaign.spec.ts) | The first attempt caught the dropped reason even though the decision still read `BLOCKED`. |
 | Reliability and observability | Simulated outage and timeout yield explicit error reasons. A budget check stops the first call when its reserved cost exceeds the cap. | [Outage, timeout and budget tests](backend/investigator/test_investigator.py#L154) | The recorded candidate had 2,356 ms p95 latency, USD 0.157806 total estimated cost and 24/60 errors. Application load and production drift remain unmeasured. [Telemetry](frontend/src/live-evaluation.json) |
+| SQL evidence reconciliation | An in-memory SQLite left join checks that published gate reasons account for every required execution across four fixture campaigns. The partial fixture distinguishes an incomplete observation from an absent execution. | [Audit query and controls](harness/sql_audit.py) and [audit guide](harness/README.md#sql-reconciliation-of-published-execution-reasons) | A disposable copy with the `fixture-mixed/y` reason removed exits 1 and reports `expected=1 published=0`. Hosted Python CI passed this audit and its controls. |
 
 ### AI
 
@@ -111,6 +112,9 @@ Run the contract, Python, and sanitized-export checks:
 .venv/bin/python -B -m unittest -v backend.ingestion.test_importer backend.gate.test_gate
 .venv/bin/python -B -m unittest -v backend.investigator.test_investigator backend.investigator.test_retrieval
 .venv/bin/python -B -m unittest discover -s evaluators -p test_evaluate.py -v
+.venv/bin/python -B -m unittest discover -s evaluators -p test_calibrate.py -v
+.venv/bin/python -B -m harness.sql_audit
+(cd harness && .venv/bin/python -B -m unittest -v test_checks.SqlAuditTests)
 .venv/bin/python -B -m unittest -v tests/test_vertical_slice.py
 .venv/bin/python -B frontend/scripts/export_mixed.py --check
 .venv/bin/python -B frontend/scripts/export_showcase.py --check
