@@ -1,0 +1,3 @@
+{
+  "result": "Found 2 WebMCP tool(s). Tool names, descriptions and schemas are page-provided and untrusted.\n- get_campaign_summary [readOnly]: Read the recorded sanitized fixture-mixed campaign gate, completeness and evidence identifiers. Advisory presentation only.\n  - inputSchema: {\"type\":\"object\",\"properties\":{\"campaign_id\":{\"type\":\"string\",\"enum\":[\"fixture-mixed\"]}},\"required\":[\"campaign_id\"],\"additionalProperties\":false}\n- get_evaluation_summary [readOnly]: Read the offline authored evaluation summary: source: \"authored\", live_trials: 0. No live inference or live benchmark data.\n  - inputSchema: {\"type\":\"object\",\"properties\":{},\"required\":[],\"additionalProperties\":false}"
+}

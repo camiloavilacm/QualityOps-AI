@@ -1,0 +1,49 @@
+
+> qualityops-dashboard@0.1.0 test:e2e
+> playwright test --project=chromium tests/mixed-campaign.spec.ts --trace=on --retries=0
+
+[WebServer] (node:64592) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:64593) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium] › tests/mixed-campaign.spec.ts:3:1 › mixed campaign displays BLOCKED with both independent reasons (5.5s)
+
+
+  1) [chromium] › tests/mixed-campaign.spec.ts:3:1 › mixed campaign displays BLOCKED with both independent reasons 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('region', { name: 'Decision reasons' }).getByRole('listitem').filter({ hasText: 'INSUFFICIENT_EVIDENCE' })
+    Expected substring: "Insufficient evidence"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" getByRole('region', { name: 'Decision reasons' }).getByRole('listitem').filter({ hasText: 'INSUFFICIENT_EVIDENCE' }) with timeout 5000ms
+      - waiting for getByRole('region', { name: 'Decision reasons' }).getByRole('listitem').filter({ hasText: 'INSUFFICIENT_EVIDENCE' })
+
+
+      15 |
+      16 |   const missing = reasons.filter({ hasText: 'INSUFFICIENT_EVIDENCE' })
+    > 17 |   await expect(missing).toContainText('Insufficient evidence')
+         |                         ^
+      18 |   await expect(missing).toContainText('Execution y')
+      19 |   await expect(reasons).toHaveCount(2)
+      20 | })
+        at /private/tmp/qualityops-dashboard-exercise-20261126/source/frontend/tests/mixed-campaign.spec.ts:17:25
+
+    Error Context: exercise/artifacts/traces/05-dropped-reason-regression/mixed-campaign-mixed-campa-f4862-th-both-independent-reasons-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    exercise/artifacts/traces/05-dropped-reason-regression/mixed-campaign-mixed-campa-f4862-th-both-independent-reasons-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace exercise/artifacts/traces/05-dropped-reason-regression/mixed-campaign-mixed-campa-f4862-th-both-independent-reasons-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium] › tests/mixed-campaign.spec.ts:3:1 › mixed campaign displays BLOCKED with both independent reasons 

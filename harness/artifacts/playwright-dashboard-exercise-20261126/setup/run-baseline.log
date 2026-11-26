@@ -1,0 +1,38 @@
+
+> qualityops-dashboard@0.1.0 test:e2e
+> playwright test --project=chromium tests/mixed-campaign.spec.ts --trace=on --retries=0
+
+[WebServer] (node:63302) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:63304) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium] › tests/mixed-campaign.spec.ts:3:1 › mixed campaign displays BLOCKED with confirmed failure for x and missing evidence for y (7ms)
+
+
+  1) [chromium] › tests/mixed-campaign.spec.ts:3:1 › mixed campaign displays BLOCKED with confirmed failure for x and missing evidence for y 
+
+    Error: browserType.launch: Executable doesn't exist at /Users/camiloavila/Library/Caches/ms-playwright/chromium-1255/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: exercise/artifacts/traces/baseline/mixed-campaign-mixed-campa-097e8--and-missing-evidence-for-y-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    exercise/artifacts/traces/baseline/mixed-campaign-mixed-campa-097e8--and-missing-evidence-for-y-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace exercise/artifacts/traces/baseline/mixed-campaign-mixed-campa-097e8--and-missing-evidence-for-y-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium] › tests/mixed-campaign.spec.ts:3:1 › mixed campaign displays BLOCKED with confirmed failure for x and missing evidence for y 

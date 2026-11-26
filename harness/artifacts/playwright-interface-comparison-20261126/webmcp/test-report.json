@@ -1,0 +1,326 @@
+{
+  "config": {
+    "argv": [
+      "/usr/local/bin/node",
+      "/private/tmp/qualityops-dashboard-exercise-20261126/source/frontend/node_modules/.bin/playwright",
+      "test",
+      "--project=chromium-webmcp",
+      "--reporter=json",
+      "--retries=0"
+    ],
+    "configFile": "/private/tmp/qualityops-dashboard-exercise-20261126/source/frontend/playwright.config.ts",
+    "rootDir": "/private/tmp/qualityops-dashboard-exercise-20261126/source/frontend/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": true,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 240000,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/private/tmp/qualityops-interface-comparison-20261126/webmcp/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/private/tmp/qualityops-dashboard-exercise-20261126/source/frontend/tests",
+        "testIgnore": [
+          "/meta\\//",
+          "/webmcp\\.spec\\.ts$/"
+        ],
+        "testMatch": [
+          "/(?:seed|mixed-campaign|dashboard-flows)\\.spec\\.ts$/"
+        ],
+        "timeout": 20000
+      },
+      {
+        "outputDir": "/private/tmp/qualityops-interface-comparison-20261126/webmcp/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium-guard-meta",
+        "name": "chromium-guard-meta",
+        "testDir": "/private/tmp/qualityops-dashboard-exercise-20261126/source/frontend/tests",
+        "testIgnore": [
+          "/webmcp/"
+        ],
+        "testMatch": [
+          "/meta\\/guard-verification\\.spec\\.ts$/"
+        ],
+        "timeout": 20000
+      },
+      {
+        "outputDir": "/private/tmp/qualityops-interface-comparison-20261126/webmcp/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium-webmcp",
+        "name": "chromium-webmcp",
+        "testDir": "/private/tmp/qualityops-dashboard-exercise-20261126/source/frontend/tests",
+        "testIgnore": [
+          "/meta\\//"
+        ],
+        "testMatch": [
+          "/tests\\/webmcp\\.spec\\.ts$/"
+        ],
+        "timeout": 20000
+      },
+      {
+        "outputDir": "/private/tmp/qualityops-interface-comparison-20261126/webmcp/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium-webmcp-lifecycle",
+        "name": "chromium-webmcp-lifecycle",
+        "testDir": "/private/tmp/qualityops-dashboard-exercise-20261126/source/frontend/tests",
+        "testIgnore": [
+          "/guard-verification/"
+        ],
+        "testMatch": [
+          "/meta\\/webmcp-lifecycle\\.spec\\.ts$/"
+        ],
+        "timeout": 20000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/private/tmp/qualityops-interface-comparison-20261126/webmcp/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "chromium-webmcp",
+        "testDir": "/private/tmp/qualityops-dashboard-exercise-20261126/source/frontend/tests",
+        "snapshotDir": "/private/tmp/qualityops-dashboard-exercise-20261126/source/frontend/tests",
+        "testIgnore": [
+          {}
+        ],
+        "testMatch": {},
+        "timeout": 20000,
+        "use": {
+          "baseURL": "http://127.0.0.1:4183",
+          "actionTimeout": 5000,
+          "trace": "retain-on-failure",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/159.0.8154.6 Safari/537.36",
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          },
+          "screen": {
+            "width": 1920,
+            "height": 1080
+          },
+          "deviceScaleFactor": 1,
+          "isMobile": false,
+          "hasTouch": false,
+          "defaultBrowserType": "chromium",
+          "channel": "chromium",
+          "launchOptions": {
+            "chromiumSandbox": true,
+            "args": [
+              "--enable-features=WebMCP"
+            ]
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "chromium-webmcp"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.65.1",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run preview -- --port 4183",
+      "url": "http://127.0.0.1:4183",
+      "reuseExistingServer": false,
+      "timeout": 30000
+    }
+  },
+  "suites": [
+    {
+      "title": "webmcp.spec.ts",
+      "file": "webmcp.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "MCP-001 discovers exact native and adapter read-only tool contracts after initialization",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 20000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-webmcp",
+              "projectName": "chromium-webmcp",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 660,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-26T14:11:31.151Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "webmcp-discovery",
+                      "contentType": "application/json",
+                      "body": "eyJuYXRpdmVfdG9vbHMiOlt7Im5hbWUiOiJnZXRfY2FtcGFpZ25fc3VtbWFyeSIsImRlc2NyaXB0aW9uIjoiUmVhZCB0aGUgcmVjb3JkZWQgc2FuaXRpemVkIGZpeHR1cmUtbWl4ZWQgY2FtcGFpZ24gZ2F0ZSwgY29tcGxldGVuZXNzIGFuZCBldmlkZW5jZSBpZGVudGlmaWVycy4gQWR2aXNvcnkgcHJlc2VudGF0aW9uIG9ubHkuIiwiaW5wdXRTY2hlbWEiOnsidHlwZSI6Im9iamVjdCIsInByb3BlcnRpZXMiOnsiY2FtcGFpZ25faWQiOnsidHlwZSI6InN0cmluZyIsImVudW0iOlsiZml4dHVyZS1taXhlZCJdfX0sInJlcXVpcmVkIjpbImNhbXBhaWduX2lkIl0sImFkZGl0aW9uYWxQcm9wZXJ0aWVzIjpmYWxzZX0sImFubm90YXRpb25zIjp7InJlYWRPbmx5SGludCI6dHJ1ZSwiY29uc2VxdWVudGlhbEhpbnQiOmZhbHNlLCJ1bnRydXN0ZWRDb250ZW50SGludCI6ZmFsc2V9fSx7Im5hbWUiOiJnZXRfZXZhbHVhdGlvbl9zdW1tYXJ5IiwiZGVzY3JpcHRpb24iOiJSZWFkIHRoZSBvZmZsaW5lIGF1dGhvcmVkIGV2YWx1YXRpb24gc3VtbWFyeTogc291cmNlOiBcImF1dGhvcmVkXCIsIGxpdmVfdHJpYWxzOiAwLiBObyBsaXZlIGluZmVyZW5jZSBvciBsaXZlIGJlbmNobWFyayBkYXRhLiIsImlucHV0U2NoZW1hIjp7InR5cGUiOiJvYmplY3QiLCJwcm9wZXJ0aWVzIjp7fSwicmVxdWlyZWQiOltdLCJhZGRpdGlvbmFsUHJvcGVydGllcyI6ZmFsc2V9LCJhbm5vdGF0aW9ucyI6eyJyZWFkT25seUhpbnQiOnRydWUsImNvbnNlcXVlbnRpYWxIaW50IjpmYWxzZSwidW50cnVzdGVkQ29udGVudEhpbnQiOmZhbHNlfX1dLCJhZGFwdGVyX3Rvb2xzIjpbeyJuYW1lIjoiZ2V0X2NhbXBhaWduX3N1bW1hcnkiLCJkZXNjcmlwdGlvbiI6IlJlYWQgdGhlIHJlY29yZGVkIHNhbml0aXplZCBmaXh0dXJlLW1peGVkIGNhbXBhaWduIGdhdGUsIGNvbXBsZXRlbmVzcyBhbmQgZXZpZGVuY2UgaWRlbnRpZmllcnMuIEFkdmlzb3J5IHByZXNlbnRhdGlvbiBvbmx5LiIsImlucHV0U2NoZW1hIjp7InR5cGUiOiJvYmplY3QiLCJwcm9wZXJ0aWVzIjp7ImNhbXBhaWduX2lkIjp7InR5cGUiOiJzdHJpbmciLCJlbnVtIjpbImZpeHR1cmUtbWl4ZWQiXX19LCJyZXF1aXJlZCI6WyJjYW1wYWlnbl9pZCJdLCJhZGRpdGlvbmFsUHJvcGVydGllcyI6ZmFsc2V9LCJhbm5vdGF0aW9ucyI6eyJyZWFkT25seSI6dHJ1ZX19LHsibmFtZSI6ImdldF9ldmFsdWF0aW9uX3N1bW1hcnkiLCJkZXNjcmlwdGlvbiI6IlJlYWQgdGhlIG9mZmxpbmUgYXV0aG9yZWQgZXZhbHVhdGlvbiBzdW1tYXJ5OiBzb3VyY2U6IFwiYXV0aG9yZWRcIiwgbGl2ZV90cmlhbHM6IDAuIE5vIGxpdmUgaW5mZXJlbmNlIG9yIGxpdmUgYmVuY2htYXJrIGRhdGEuIiwiaW5wdXRTY2hlbWEiOnsidHlwZSI6Im9iamVjdCIsInByb3BlcnRpZXMiOnt9LCJyZXF1aXJlZCI6W10sImFkZGl0aW9uYWxQcm9wZXJ0aWVzIjpmYWxzZX0sImFubm90YXRpb25zIjp7InJlYWRPbmx5Ijp0cnVlfX1dfQ=="
+                    },
+                    {
+                      "name": "guard-diagnostics",
+                      "contentType": "application/json",
+                      "body": "eyJjb2RlcyI6W119"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "7f3f65a13ac5a2340f2f-ebaa841d335743255987",
+          "file": "webmcp.spec.ts",
+          "line": 61,
+          "column": 1
+        },
+        {
+          "title": "MCP-002 preserves the displayed mixed campaign and rejects invalid summary arguments without state changes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 20000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-webmcp",
+              "projectName": "chromium-webmcp",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 280,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-26T14:11:32.568Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "webmcp-campaign",
+                      "contentType": "application/json",
+                      "body": "eyJuYXRpdmVfcmVzdWx0Ijp7ImNvbnRlbnQiOlt7InR5cGUiOiJ0ZXh0IiwidGV4dCI6IntcImNhbXBhaWduX2lkXCI6XCJmaXh0dXJlLW1peGVkXCIsXCJnYXRlXCI6e1wiY2FtcGFpZ25faWRcIjpcImZpeHR1cmUtbWl4ZWRcIixcImRlY2lzaW9uXCI6XCJCTE9DS0VEXCIsXCJldmFsdWF0ZWRfYXRcIjpcIjIwMjYtMTEtMTlUMDA6MDA6MDBaXCIsXCJldmlkZW5jZV9zaGEyNTZcIjpcIjA1MTFkNDNkOTdlODBhNmZmZTA4NDliNGM4NDAwNGEzN2U0Mzc4NGFhMDQ2YjQ3ODA0YzhlYjk4Y2Q2Zjc5NmNcIixcInBvbGljeV9zaGEyNTZcIjpcImRjZDRjZjYyMmNmZGZkM2Y3ODQyYzY5ZWZmNjAxZjlkMTkxNTc3YTMxZWZlNjdlYWY5MWQ2NTI4ODZjN2MxYWVcIixcInBvbGljeV92ZXJzaW9uXCI6XCJtYW5kYXRvcnktdjJcIixcInJlYXNvbnNcIjpbe1wiYXJ0aWZhY3RfaWRzXCI6W1wieFwiXSxcImNvZGVcIjpcIlJFUVVJUkVEX0ZBSUxVUkVcIixcImV4ZWN1dGlvbl9pZFwiOlwieFwifSx7XCJhcnRpZmFjdF9pZHNcIjpbXSxcImNvZGVcIjpcIklOU1VGRklDSUVOVF9FVklERU5DRVwiLFwiZXhlY3V0aW9uX2lkXCI6XCJ5XCJ9XSxcInNjaGVtYV92ZXJzaW9uXCI6XCIyLjAuMC1kcmFmdC4xXCJ9LFwiY29tcGxldGVuZXNzXCI6XCJwYXJ0aWFsXCIsXCJldmlkZW5jZV9pZHNcIjpbXCJ4XCJdfSJ9XSwiaXNFcnJvciI6ZmFsc2V9LCJhZGFwdGVyX3Jlc3VsdCI6eyJjb250ZW50IjpbeyJ0eXBlIjoidGV4dCIsInRleHQiOiJ7XCJjYW1wYWlnbl9pZFwiOlwiZml4dHVyZS1taXhlZFwiLFwiZ2F0ZVwiOntcImNhbXBhaWduX2lkXCI6XCJmaXh0dXJlLW1peGVkXCIsXCJkZWNpc2lvblwiOlwiQkxPQ0tFRFwiLFwiZXZhbHVhdGVkX2F0XCI6XCIyMDI2LTExLTE5VDAwOjAwOjAwWlwiLFwiZXZpZGVuY2Vfc2hhMjU2XCI6XCIwNTExZDQzZDk3ZTgwYTZmZmUwODQ5YjRjODQwMDRhMzdlNDM3ODRhYTA0NmI0NzgwNGM4ZWI5OGNkNmY3OTZjXCIsXCJwb2xpY3lfc2hhMjU2XCI6XCJkY2Q0Y2Y2MjJjZmRmZDNmNzg0MmM2OWVmZjYwMWY5ZDE5MTU3N2EzMWVmZTY3ZWFmOTFkNjUyODg2YzdjMWFlXCIsXCJwb2xpY3lfdmVyc2lvblwiOlwibWFuZGF0b3J5LXYyXCIsXCJyZWFzb25zXCI6W3tcImFydGlmYWN0X2lkc1wiOltcInhcIl0sXCJjb2RlXCI6XCJSRVFVSVJFRF9GQUlMVVJFXCIsXCJleGVjdXRpb25faWRcIjpcInhcIn0se1wiYXJ0aWZhY3RfaWRzXCI6W10sXCJjb2RlXCI6XCJJTlNVRkZJQ0lFTlRfRVZJREVOQ0VcIixcImV4ZWN1dGlvbl9pZFwiOlwieVwifV0sXCJzY2hlbWFfdmVyc2lvblwiOlwiMi4wLjAtZHJhZnQuMVwifSxcImNvbXBsZXRlbmVzc1wiOlwicGFydGlhbFwiLFwiZXZpZGVuY2VfaWRzXCI6W1wieFwiXX0ifV0sImlzRXJyb3IiOmZhbHNlfSwic3RhdGVfYmVmb3JlIjp7InVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6NDE4My8/Y2FtcGFpZ249Zml4dHVyZS1taXhlZCIsImRvbV9zaGEyNTYiOiI3ZTM2NTg4Njc4MDA0NmViMjNlNTUxMjE5YTAwN2U4YWI1ZGIzY2NhZmQ1ZTNjZDBmMzA3OTBlYjVkZDM2ZTRlIiwibG9jYWxfc3RvcmFnZV9zaGEyNTYiOiI0ZjUzY2RhMThjMmJhYTBjMDM1NGJiNWY5YTNlY2JlNWVkMTJhYjRkOGUxMWJhODczYzJmMTExNjEyMDJiOTQ1Iiwic2Vzc2lvbl9zdG9yYWdlX3NoYTI1NiI6IjRmNTNjZGExOGMyYmFhMGMwMzU0YmI1ZjlhM2VjYmU1ZWQxMmFiNGQ4ZTExYmE4NzNjMmYxMTE2MTIwMmI5NDUiLCJyZWNvcmRlZF9zdGF0ZV9zaGEyNTYiOiIyY2RlMjE4NTBlODA3ZmM1MmU4ZmNjYTQzZjQ3YWFiZTBlOGQ0MWYwYTA5NjJmYjBmMmQwZWU0YzI3YjRlODE1In0sInN0YXRlX2FmdGVyIjp7InVybCI6Imh0dHA6Ly8xMjcuMC4wLjE6NDE4My8/Y2FtcGFpZ249Zml4dHVyZS1taXhlZCIsImRvbV9zaGEyNTYiOiI3ZTM2NTg4Njc4MDA0NmViMjNlNTUxMjE5YTAwN2U4YWI1ZGIzY2NhZmQ1ZTNjZDBmMzA3OTBlYjVkZDM2ZTRlIiwibG9jYWxfc3RvcmFnZV9zaGEyNTYiOiI0ZjUzY2RhMThjMmJhYTBjMDM1NGJiNWY5YTNlY2JlNWVkMTJhYjRkOGUxMWJhODczYzJmMTExNjEyMDJiOTQ1Iiwic2Vzc2lvbl9zdG9yYWdlX3NoYTI1NiI6IjRmNTNjZGExOGMyYmFhMGMwMzU0YmI1ZjlhM2VjYmU1ZWQxMmFiNGQ4ZTExYmE4NzNjMmYxMTE2MTIwMmI5NDUiLCJyZWNvcmRlZF9zdGF0ZV9zaGEyNTYiOiIyY2RlMjE4NTBlODA3ZmM1MmU4ZmNjYTQzZjQ3YWFiZTBlOGQ0MWYwYTA5NjJmYjBmMmQwZWU0YzI3YjRlODE1In19"
+                    },
+                    {
+                      "name": "guard-diagnostics",
+                      "contentType": "application/json",
+                      "body": "eyJjb2RlcyI6W119"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "7f3f65a13ac5a2340f2f-43fcc0d7913140614faa",
+          "file": "webmcp.spec.ts",
+          "line": 105,
+          "column": 1
+        },
+        {
+          "title": "MCP-003 returns only the authored zero-live-trial evaluation and preserves observed state",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 20000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-webmcp",
+              "projectName": "chromium-webmcp",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 472,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-26T14:11:32.880Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "webmcp-evaluation",
+                      "contentType": "application/json",
+                      "body": "eyJuYXRpdmVfcmVzdWx0Ijp7ImNvbnRlbnQiOlt7InR5cGUiOiJ0ZXh0IiwidGV4dCI6IntcImJhc2VsaW5lX21ldHJpY3NcIjp7XCJjaXRhdGlvbl92YWxpZGl0eVwiOntcImNvdW50XCI6MjQsXCJkZW5vbWluYXRvclwiOjI0LFwicmF0ZVwiOjF9LFwiY2xhaW1fc3VwcG9ydFwiOntcImNvdW50XCI6MTMsXCJkZW5vbWluYXRvclwiOjE0LFwicmF0ZVwiOjAuOTI4NTcxNDI4NTcxNDI4Nn0sXCJjb3JyZWN0X2Fic3RlbnRpb25cIjp7XCJjb3VudFwiOjQsXCJkZW5vbWluYXRvclwiOjUsXCJyYXRlXCI6MC44fSxcImRpYWdub3Npc19hY2N1cmFjeVwiOntcImNvdW50XCI6MTMsXCJkZW5vbWluYXRvclwiOjE1LFwicmF0ZVwiOjAuODY2NjY2NjY2NjY2NjY2N30sXCJpbnZhbGlkX291dHB1dFwiOntcImNvdW50XCI6MSxcImRlbm9taW5hdG9yXCI6MjAsXCJyYXRlXCI6MC4wNX0sXCJwYXNzQDNcIjp7XCJjb3VudFwiOjAsXCJkZW5vbWluYXRvclwiOjAsXCJyYXRlXCI6bnVsbH0sXCJwYXNzXjNcIjp7XCJjb3VudFwiOjAsXCJkZW5vbWluYXRvclwiOjAsXCJyYXRlXCI6bnVsbH0sXCJzYWZldHlfdmlvbGF0aW9uXCI6e1wiY291bnRcIjowLFwiZGVub21pbmF0b3JcIjoyMCxcInJhdGVcIjowfX0sXCJiYXNlbGluZV9ydW5faWRcIjpcImF1dGhvcmVkLWJhc2VsaW5lXCIsXCJjYW5kaWRhdGVfbWV0cmljc1wiOntcImNpdGF0aW9uX3ZhbGlkaXR5XCI6e1wiY291bnRcIjoyNSxcImRlbm9taW5hdG9yXCI6MjUsXCJyYXRlXCI6MX0sXCJjbGFpbV9zdXBwb3J0XCI6e1wiY291bnRcIjoxNSxcImRlbm9taW5hdG9yXCI6MTUsXCJyYXRlXCI6MX0sXCJjb3JyZWN0X2Fic3RlbnRpb25cIjp7XCJjb3VudFwiOjUsXCJkZW5vbWluYXRvclwiOjUsXCJyYXRlXCI6MX0sXCJkaWFnbm9zaXNfYWNjdXJhY3lcIjp7XCJjb3VudFwiOjE1LFwiZGVub21pbmF0b3JcIjoxNSxcInJhdGVcIjoxfSxcImludmFsaWRfb3V0cHV0XCI6e1wiY291bnRcIjowLFwiZGVub21pbmF0b3JcIjoyMCxcInJhdGVcIjowfSxcInBhc3NAM1wiOntcImNvdW50XCI6MCxcImRlbm9taW5hdG9yXCI6MCxcInJhdGVcIjpudWxsfSxcInBhc3NeM1wiOntcImNvdW50XCI6MCxcImRlbm9taW5hdG9yXCI6MCxcInJhdGVcIjpudWxsfSxcInNhZmV0eV92aW9sYXRpb25cIjp7XCJjb3VudFwiOjAsXCJkZW5vbWluYXRvclwiOjIwLFwicmF0ZVwiOjB9fSxcImNhbmRpZGF0ZV9ydW5faWRcIjpcImF1dGhvcmVkLWNhbmRpZGF0ZVwiLFwiY2FzZV9jb3VudFwiOjIwLFwiY2hlY2tzXCI6e1wiY2l0YXRpb25fdmFsaWRpdHlcIjp7XCJsaW1pdFwiOjEsXCJvYnNlcnZlZFwiOjEsXCJvcGVyYXRvclwiOlwiPT1cIixcInN0YXR1c1wiOlwicGFzc1wifSxcImNvcnJlY3RfYWJzdGVudGlvblwiOntcImxpbWl0XCI6MSxcIm9ic2VydmVkXCI6MSxcIm9wZXJhdG9yXCI6XCI9PVwiLFwic3RhdHVzXCI6XCJwYXNzXCJ9LFwiZGlhZ25vc2lzX2FjY3VyYWN5XCI6e1wibGltaXRcIjowLjgsXCJvYnNlcnZlZFwiOjEsXCJvcGVyYXRvclwiOlwiPj1cIixcInN0YXR1c1wiOlwicGFzc1wifSxcImludmFsaWRfb3V0cHV0XCI6e1wibGltaXRcIjowLFwib2JzZXJ2ZWRcIjowLFwib3BlcmF0b3JcIjpcIj09XCIsXCJzdGF0dXNcIjpcInBhc3NcIn0sXCJub19yZWdyZXNzaW9uX2NsYWltX3N1cHBvcnRcIjp7XCJsaW1pdFwiOjAuOTI4NTcxNDI4NTcxNDI4NixcIm9ic2VydmVkXCI6MSxcIm9wZXJhdG9yXCI6XCI+PVwiLFwic3RhdHVzXCI6XCJwYXNzXCJ9LFwibm9fcmVncmVzc2lvbl9jb3JyZWN0X2Fic3RlbnRpb25cIjp7XCJsaW1pdFwiOjAuOCxcIm9ic2VydmVkXCI6MSxcIm9wZXJhdG9yXCI6XCI+PVwiLFwic3RhdHVzXCI6XCJwYXNzXCJ9LFwibm9fcmVncmVzc2lvbl9kaWFnbm9zaXNfYWNjdXJhY3lcIjp7XCJsaW1pdFwiOjAuODY2NjY2NjY2NjY2NjY2NyxcIm9ic2VydmVkXCI6MSxcIm9wZXJhdG9yXCI6XCI+PVwiLFwic3RhdHVzXCI6XCJwYXNzXCJ9LFwicDk1X2xhdGVuY3lfbXNcIjp7XCJjb3VudFwiOjAsXCJkZW5vbWluYXRvclwiOjIwLFwibGltaXRcIjoyMDAwMCxcIm1lYXN1cmVkX3A5NVwiOm51bGwsXCJvYnNlcnZlZFwiOm51bGwsXCJvcGVyYXRvclwiOlwiPFwiLFwic3RhdHVzXCI6XCJpbmRldGVybWluYXRlXCJ9LFwicGVyX3RyaWFsX2Nvc3RfdXNkXCI6e1wiY291bnRcIjowLFwiZGVub21pbmF0b3JcIjoyMCxcImxpbWl0XCI6MC4xLFwibWVhc3VyZWRfbWF4XCI6bnVsbCxcIm9ic2VydmVkXCI6bnVsbCxcIm9wZXJhdG9yXCI6XCI8PVwiLFwic3RhdHVzXCI6XCJpbmRldGVybWluYXRlXCJ9LFwic2FmZXR5X3Zpb2xhdGlvbnNcIjp7XCJsaW1pdFwiOjAsXCJvYnNlcnZlZFwiOjAsXCJvcGVyYXRvclwiOlwiPT1cIixcInN0YXR1c1wiOlwicGFzc1wifSxcInVuc3VwcG9ydGVkX2NsYWltc1wiOntcImRlbm9taW5hdG9yXCI6MTUsXCJrbm93bl91bnN1cHBvcnRlZFwiOjAsXCJsaW1pdFwiOjAsXCJvYnNlcnZlZFwiOjAsXCJvcGVyYXRvclwiOlwiPT1cIixcInBlbmRpbmdfcmV2aWV3XCI6MCxcInN0YXR1c1wiOlwicGFzc1wifX0sXCJjb3JwdXNfdmVyc2lvblwiOlwiMS4xLjBcIixcImdyYWRlcl92ZXJzaW9uXCI6XCIxLjIuMFwiLFwibGl2ZV90cmlhbHNcIjowLFwicHJvbW90aW9uX2FsbG93ZWRcIjpmYWxzZSxcInNvdXJjZVwiOlwiYXV0aG9yZWRcIixcInRocmVzaG9sZF9zdGF0dXNcIjpcImluZGV0ZXJtaW5hdGVcIn0ifV0sImlzRXJyb3IiOmZhbHNlfSwiYWRhcHRlcl9yZXN1bHQiOnsiY29udGVudCI6W3sidHlwZSI6InRleHQiLCJ0ZXh0Ijoie1wiYmFzZWxpbmVfbWV0cmljc1wiOntcImNpdGF0aW9uX3ZhbGlkaXR5XCI6e1wiY291bnRcIjoyNCxcImRlbm9taW5hdG9yXCI6MjQsXCJyYXRlXCI6MX0sXCJjbGFpbV9zdXBwb3J0XCI6e1wiY291bnRcIjoxMyxcImRlbm9taW5hdG9yXCI6MTQsXCJyYXRlXCI6MC45Mjg1NzE0Mjg1NzE0Mjg2fSxcImNvcnJlY3RfYWJzdGVudGlvblwiOntcImNvdW50XCI6NCxcImRlbm9taW5hdG9yXCI6NSxcInJhdGVcIjowLjh9LFwiZGlhZ25vc2lzX2FjY3VyYWN5XCI6e1wiY291bnRcIjoxMyxcImRlbm9taW5hdG9yXCI6MTUsXCJyYXRlXCI6MC44NjY2NjY2NjY2NjY2NjY3fSxcImludmFsaWRfb3V0cHV0XCI6e1wiY291bnRcIjoxLFwiZGVub21pbmF0b3JcIjoyMCxcInJhdGVcIjowLjA1fSxcInBhc3NAM1wiOntcImNvdW50XCI6MCxcImRlbm9taW5hdG9yXCI6MCxcInJhdGVcIjpudWxsfSxcInBhc3NeM1wiOntcImNvdW50XCI6MCxcImRlbm9taW5hdG9yXCI6MCxcInJhdGVcIjpudWxsfSxcInNhZmV0eV92aW9sYXRpb25cIjp7XCJjb3VudFwiOjAsXCJkZW5vbWluYXRvclwiOjIwLFwicmF0ZVwiOjB9fSxcImJhc2VsaW5lX3J1bl9pZFwiOlwiYXV0aG9yZWQtYmFzZWxpbmVcIixcImNhbmRpZGF0ZV9tZXRyaWNzXCI6e1wiY2l0YXRpb25fdmFsaWRpdHlcIjp7XCJjb3VudFwiOjI1LFwiZGVub21pbmF0b3JcIjoyNSxcInJhdGVcIjoxfSxcImNsYWltX3N1cHBvcnRcIjp7XCJjb3VudFwiOjE1LFwiZGVub21pbmF0b3JcIjoxNSxcInJhdGVcIjoxfSxcImNvcnJlY3RfYWJzdGVudGlvblwiOntcImNvdW50XCI6NSxcImRlbm9taW5hdG9yXCI6NSxcInJhdGVcIjoxfSxcImRpYWdub3Npc19hY2N1cmFjeVwiOntcImNvdW50XCI6MTUsXCJkZW5vbWluYXRvclwiOjE1LFwicmF0ZVwiOjF9LFwiaW52YWxpZF9vdXRwdXRcIjp7XCJjb3VudFwiOjAsXCJkZW5vbWluYXRvclwiOjIwLFwicmF0ZVwiOjB9LFwicGFzc0AzXCI6e1wiY291bnRcIjowLFwiZGVub21pbmF0b3JcIjowLFwicmF0ZVwiOm51bGx9LFwicGFzc14zXCI6e1wiY291bnRcIjowLFwiZGVub21pbmF0b3JcIjowLFwicmF0ZVwiOm51bGx9LFwic2FmZXR5X3Zpb2xhdGlvblwiOntcImNvdW50XCI6MCxcImRlbm9taW5hdG9yXCI6MjAsXCJyYXRlXCI6MH19LFwiY2FuZGlkYXRlX3J1bl9pZFwiOlwiYXV0aG9yZWQtY2FuZGlkYXRlXCIsXCJjYXNlX2NvdW50XCI6MjAsXCJjaGVja3NcIjp7XCJjaXRhdGlvbl92YWxpZGl0eVwiOntcImxpbWl0XCI6MSxcIm9ic2VydmVkXCI6MSxcIm9wZXJhdG9yXCI6XCI9PVwiLFwic3RhdHVzXCI6XCJwYXNzXCJ9LFwiY29ycmVjdF9hYnN0ZW50aW9uXCI6e1wibGltaXRcIjoxLFwib2JzZXJ2ZWRcIjoxLFwib3BlcmF0b3JcIjpcIj09XCIsXCJzdGF0dXNcIjpcInBhc3NcIn0sXCJkaWFnbm9zaXNfYWNjdXJhY3lcIjp7XCJsaW1pdFwiOjAuOCxcIm9ic2VydmVkXCI6MSxcIm9wZXJhdG9yXCI6XCI+PVwiLFwic3RhdHVzXCI6XCJwYXNzXCJ9LFwiaW52YWxpZF9vdXRwdXRcIjp7XCJsaW1pdFwiOjAsXCJvYnNlcnZlZFwiOjAsXCJvcGVyYXRvclwiOlwiPT1cIixcInN0YXR1c1wiOlwicGFzc1wifSxcIm5vX3JlZ3Jlc3Npb25fY2xhaW1fc3VwcG9ydFwiOntcImxpbWl0XCI6MC45Mjg1NzE0Mjg1NzE0Mjg2LFwib2JzZXJ2ZWRcIjoxLFwib3BlcmF0b3JcIjpcIj49XCIsXCJzdGF0dXNcIjpcInBhc3NcIn0sXCJub19yZWdyZXNzaW9uX2NvcnJlY3RfYWJzdGVudGlvblwiOntcImxpbWl0XCI6MC44LFwib2JzZXJ2ZWRcIjoxLFwib3BlcmF0b3JcIjpcIj49XCIsXCJzdGF0dXNcIjpcInBhc3NcIn0sXCJub19yZWdyZXNzaW9uX2RpYWdub3Npc19hY2N1cmFjeVwiOntcImxpbWl0XCI6MC44NjY2NjY2NjY2NjY2NjY3LFwib2JzZXJ2ZWRcIjoxLFwib3BlcmF0b3JcIjpcIj49XCIsXCJzdGF0dXNcIjpcInBhc3NcIn0sXCJwOTVfbGF0ZW5jeV9tc1wiOntcImNvdW50XCI6MCxcImRlbm9taW5hdG9yXCI6MjAsXCJsaW1pdFwiOjIwMDAwLFwibWVhc3VyZWRfcDk1XCI6bnVsbCxcIm9ic2VydmVkXCI6bnVsbCxcIm9wZXJhdG9yXCI6XCI8XCIsXCJzdGF0dXNcIjpcImluZGV0ZXJtaW5hdGVcIn0sXCJwZXJfdHJpYWxfY29zdF91c2RcIjp7XCJjb3VudFwiOjAsXCJkZW5vbWluYXRvclwiOjIwLFwibGltaXRcIjowLjEsXCJtZWFzdXJlZF9tYXhcIjpudWxsLFwib2JzZXJ2ZWRcIjpudWxsLFwib3BlcmF0b3JcIjpcIjw9XCIsXCJzdGF0dXNcIjpcImluZGV0ZXJtaW5hdGVcIn0sXCJzYWZldHlfdmlvbGF0aW9uc1wiOntcImxpbWl0XCI6MCxcIm9ic2VydmVkXCI6MCxcIm9wZXJhdG9yXCI6XCI9PVwiLFwic3RhdHVzXCI6XCJwYXNzXCJ9LFwidW5zdXBwb3J0ZWRfY2xhaW1zXCI6e1wiZGVub21pbmF0b3JcIjoxNSxcImtub3duX3Vuc3VwcG9ydGVkXCI6MCxcImxpbWl0XCI6MCxcIm9ic2VydmVkXCI6MCxcIm9wZXJhdG9yXCI6XCI9PVwiLFwicGVuZGluZ19yZXZpZXdcIjowLFwic3RhdHVzXCI6XCJwYXNzXCJ9fSxcImNvcnB1c192ZXJzaW9uXCI6XCIxLjEuMFwiLFwiZ3JhZGVyX3ZlcnNpb25cIjpcIjEuMi4wXCIsXCJsaXZlX3RyaWFsc1wiOjAsXCJwcm9tb3Rpb25fYWxsb3dlZFwiOmZhbHNlLFwic291cmNlXCI6XCJhdXRob3JlZFwiLFwidGhyZXNob2xkX3N0YXR1c1wiOlwiaW5kZXRlcm1pbmF0ZVwifSJ9XSwiaXNFcnJvciI6ZmFsc2V9LCJzdGF0ZV9iZWZvcmUiOnsidXJsIjoiaHR0cDovLzEyNy4wLjAuMTo0MTgzLz92aWV3PWV2YWx1YXRpb24iLCJkb21fc2hhMjU2IjoiNTFiNDlkODdiNzlmZjk5MTU1NGRiMTcwOGIxNTdmNDcwZGFhOGRjNDAzNjcwMzU1NGNhY2FkNmIyNzk3ZmZmMSIsImxvY2FsX3N0b3JhZ2Vfc2hhMjU2IjoiNGY1M2NkYTE4YzJiYWEwYzAzNTRiYjVmOWEzZWNiZTVlZDEyYWI0ZDhlMTFiYTg3M2MyZjExMTYxMjAyYjk0NSIsInNlc3Npb25fc3RvcmFnZV9zaGEyNTYiOiI0ZjUzY2RhMThjMmJhYTBjMDM1NGJiNWY5YTNlY2JlNWVkMTJhYjRkOGUxMWJhODczYzJmMTExNjEyMDJiOTQ1IiwicmVjb3JkZWRfc3RhdGVfc2hhMjU2IjoiMmNkZTIxODUwZTgwN2ZjNTJlOGZjY2E0M2Y0N2FhYmUwZThkNDFmMGEwOTYyZmIwZjJkMGVlNGMyN2I0ZTgxNSJ9LCJzdGF0ZV9hZnRlciI6eyJ1cmwiOiJodHRwOi8vMTI3LjAuMC4xOjQxODMvP3ZpZXc9ZXZhbHVhdGlvbiIsImRvbV9zaGEyNTYiOiI1MWI0OWQ4N2I3OWZmOTkxNTU0ZGIxNzA4YjE1N2Y0NzBkYWE4ZGM0MDM2NzAzNTU0Y2FjYWQ2YjI3OTdmZmYxIiwibG9jYWxfc3RvcmFnZV9zaGEyNTYiOiI0ZjUzY2RhMThjMmJhYTBjMDM1NGJiNWY5YTNlY2JlNWVkMTJhYjRkOGUxMWJhODczYzJmMTExNjEyMDJiOTQ1Iiwic2Vzc2lvbl9zdG9yYWdlX3NoYTI1NiI6IjRmNTNjZGExOGMyYmFhMGMwMzU0YmI1ZjlhM2VjYmU1ZWQxMmFiNGQ4ZTExYmE4NzNjMmYxMTE2MTIwMmI5NDUiLCJyZWNvcmRlZF9zdGF0ZV9zaGEyNTYiOiIyY2RlMjE4NTBlODA3ZmM1MmU4ZmNjYTQzZjQ3YWFiZTBlOGQ0MWYwYTA5NjJmYjBmMmQwZWU0YzI3YjRlODE1In19"
+                    },
+                    {
+                      "name": "guard-diagnostics",
+                      "contentType": "application/json",
+                      "body": "eyJjb2RlcyI6W119"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "7f3f65a13ac5a2340f2f-9f1ec63df7bdcb6810c1",
+          "file": "webmcp.spec.ts",
+          "line": 149,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-26T14:11:29.618Z",
+    "duration": 3818.4299999999994,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

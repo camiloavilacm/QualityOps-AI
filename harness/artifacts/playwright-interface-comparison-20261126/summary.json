@@ -1,0 +1,142 @@
+{
+  "task": "Matched Playwright CLI, MCP, and WebMCP comparison for fixture-mixed",
+  "status": "COMPARISON_PASS_INDEPENDENTLY_REVIEWED",
+  "dashboard_revision": "a85de9faab17d86450ac792a44fc9a86d37d4a66",
+  "dashboard_tree": "c47bc2700dd4a9130698faa097be740e6486e13a",
+  "fixture": {
+    "campaign_id": "fixture-mixed",
+    "mixed_campaign_sha256": "1bdda5cadd7c835f08123d29af8c56eb51c7356cdd9153bd34c865c0c84f0662",
+    "showcase_export_sha256": "98f266bcc81ebfe35989d90a626ff71b396990b28f761c59b66829610cafe739",
+    "expected_decision": "BLOCKED",
+    "expected_reason_pairs": [
+      {
+        "code": "REQUIRED_FAILURE",
+        "execution_id": "x"
+      },
+      {
+        "code": "INSUFFICIENT_EVIDENCE",
+        "execution_id": "y"
+      }
+    ]
+  },
+  "environment": {
+    "platform": "macOS arm64",
+    "node": "v26.12.0",
+    "npm": "11.20.0",
+    "playwright_cli": "@playwright/cli 0.1.25",
+    "playwright_mcp": "@playwright/mcp 0.0.86",
+    "cli_and_mcp_playwright_runtime": "1.66.0-alpha-2026-11-18",
+    "project_test_runtime": "@playwright/test 1.65.1",
+    "browser": "Google Chrome for Testing 159.0.8154.6",
+    "browser_executable_sha_or_version_pin": "Exact local executable configured in both CLI and MCP JSON configs; package/browser versions recorded above.",
+    "viewport": "1280x800",
+    "initial_route": "http://127.0.0.1:4183/",
+    "browser_state": "Fresh isolated in-memory context for each CLI/MCP/WebMCP run; no stored cookies or campaign state.",
+    "model": "None; no model inference was invoked."
+  },
+  "success_criterion": "Open fixture-mixed from the campaign list, confirm the URL and displayed BLOCKED decision, and confirm both reason-code/execution pairs. Discover the recorded summary tool, compare its valid result to the displayed campaign, and confirm an unknown campaign is rejected without modifying the page.",
+  "results": {
+    "playwright_cli": {
+      "result": "PASS",
+      "actions": [
+        "open /",
+        "snapshot",
+        "click Mixed campaign",
+        "snapshot",
+        "evaluate route/decision/reasons"
+      ],
+      "observed_route": "/?campaign=fixture-mixed",
+      "decision": "BLOCKED",
+      "reason_pairs": [
+        {
+          "code": "REQUIRED_FAILURE",
+          "execution_id": "x"
+        },
+        {
+          "code": "INSUFFICIENT_EVIDENCE",
+          "execution_id": "y"
+        }
+      ],
+      "token_usage": "UNMEASURED; CLI does not expose model token telemetry."
+    },
+    "playwright_mcp": {
+      "result": "PASS",
+      "server": "Playwright 1.66.0-alpha-2026-11-18",
+      "initial_core_tool_count": 25,
+      "actions": [
+        "browser_navigate /",
+        "browser_snapshot",
+        "browser_click campaign link",
+        "browser_snapshot",
+        "browser_evaluate route/decision/reasons"
+      ],
+      "observed_route": "/?campaign=fixture-mixed",
+      "decision": "BLOCKED",
+      "reason_pairs": [
+        {
+          "code": "REQUIRED_FAILURE",
+          "execution_id": "x"
+        },
+        {
+          "code": "INSUFFICIENT_EVIDENCE",
+          "execution_id": "y"
+        }
+      ],
+      "token_usage": "UNMEASURED; direct MCP tool calls expose no model token telemetry."
+    },
+    "webmcp": {
+      "result": "PASS",
+      "discovered_tools": [
+        "get_campaign_summary",
+        "get_evaluation_summary"
+      ],
+      "valid_call": "get_campaign_summary({campaign_id:'fixture-mixed'}) returned BLOCKED with REQUIRED_FAILURE/x and INSUFFICIENT_EVIDENCE/y; completeness partial; evidence_ids ['x'].",
+      "invalid_call": "get_campaign_summary({campaign_id:'unknown-campaign'}) rejected with Invalid arguments.",
+      "display_agreement": "PASS; CLI and MCP DOM observations match the summary gate and reason/execution pairs.",
+      "token_usage": "NOT APPLICABLE; WebMCP handler made no model call."
+    },
+    "native_and_adapter_webmcp_suite": {
+      "command": "npm run test:webmcp -- --reporter=json --retries=0",
+      "result": "PASS",
+      "expected": 3,
+      "passed": 3,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0,
+      "cases": [
+        "MCP-001 discovers exact native and adapter read-only tool contracts after initialization",
+        "MCP-002 preserves the displayed mixed campaign and rejects invalid summary arguments without state changes",
+        "MCP-003 returns only the authored zero-live-trial evaluation and preserves observed state"
+      ]
+    },
+    "build": {
+      "command": "npm run build",
+      "result": "PASS"
+    }
+  },
+  "raw_evidence": {
+    "cli": "cli/",
+    "mcp": "mcp/transcript.json",
+    "webmcp": "webmcp/test-report.json and webmcp/run.log",
+    "field_comparison": "comparison-check.json",
+    "checksum_manifest": "evidence-sha256.txt"
+  },
+  "limitations": [
+    "Token use is unmeasured for CLI and MCP because these local browser interfaces expose no model usage telemetry.",
+    "This is a host development comparison, not a new isolated-container gate acceptance.",
+    "MCP package uses a pinned alpha Playwright runtime as specified by @playwright/mcp 0.0.86."
+  ],
+  "independent_review": {
+    "result": "PASS",
+    "reviewer": "/root/playwright_exercise_review (read-only)",
+    "reviewed_commit": "a85de9faab17d86450ac792a44fc9a86d37d4a66",
+    "reviewed_tree": "c47bc2700dd4a9130698faa097be740e6486e13a",
+    "findings": "The provided verify_comparison.py passed; CLI/MCP and WebMCP summaries match the displayed state; invalid campaign rejected; native/adapter report 3 passes with zero skips/unexpected/flaky; package/browser pins and frontend lock hash verified; token use correctly marked unmeasured; 36 manifest entries matched."
+  },
+  "source_dependencies": {
+    "frontend_package_lock_sha256": "e4d54d2d6f07de39643b509bfbc952b0922619dce424a5107946a8a4498cf04b",
+    "cli_package_lock": "cli/package-lock.json",
+    "mcp_package_lock": "mcp/package-lock.json",
+    "dependency_installation": "The CLI and MCP packages were installed into task-scoped temporary workspaces from exact pinned versions. The repository package.json and package-lock.json were not changed."
+  }
+}
