@@ -1,0 +1,431 @@
+{
+  "webmcpTools": [
+    {
+      "name": "get_campaign_summary",
+      "description": "Read the recorded sanitized fixture-mixed campaign gate, completeness and evidence identifiers. Advisory presentation only.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "campaign_id": {
+            "type": "string",
+            "enum": [
+              "fixture-mixed"
+            ]
+          }
+        },
+        "required": [
+          "campaign_id"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnly": true
+      }
+    },
+    {
+      "name": "get_evaluation_summary",
+      "description": "Read the offline authored evaluation summary: source: \"authored\", live_trials: 0. No live inference or live benchmark data.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnly": true
+      }
+    }
+  ],
+  "snapshot": [
+    {
+      "role": "generic",
+      "ref": "e2",
+      "children": [
+        {
+          "role": "banner",
+          "ref": "e3",
+          "children": [
+            {
+              "role": "generic",
+              "ref": "e4",
+              "children": [
+                {
+                  "role": "link",
+                  "name": "QualityOps AI",
+                  "ref": "e5",
+                  "cursor": "pointer",
+                  "url": "./",
+                  "children": [
+                    {
+                      "role": "generic",
+                      "ref": "e6",
+                      "ariaHidden": true,
+                      "text": "Q"
+                    },
+                    "QualityOps AI"
+                  ]
+                },
+                {
+                  "role": "navigation",
+                  "name": "Primary",
+                  "ref": "e7",
+                  "children": [
+                    {
+                      "role": "link",
+                      "name": "Campaigns",
+                      "ref": "e8",
+                      "cursor": "pointer",
+                      "url": "./"
+                    },
+                    {
+                      "role": "link",
+                      "name": "Evaluation",
+                      "ref": "e9",
+                      "cursor": "pointer",
+                      "url": "?view=evaluation"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "role": "main",
+          "ref": "e10",
+          "children": [
+            {
+              "role": "region",
+              "name": "Campaigns",
+              "ref": "e11",
+              "children": [
+                {
+                  "role": "heading",
+                  "name": "Campaigns",
+                  "level": 1,
+                  "ref": "e12"
+                },
+                {
+                  "role": "paragraph",
+                  "ref": "e13",
+                  "text": "Inspect deterministic release gate decisions, sanitized evidence, and read-only offline investigations."
+                },
+                {
+                  "role": "generic",
+                  "ref": "e14",
+                  "children": [
+                    {
+                      "role": "link",
+                      "name": "Mixed campaign fixture-mixed Confirmed required failure on x plus missing evidence on y. Gate: BLOCKED Investigation: ABSENT",
+                      "ref": "e15",
+                      "cursor": "pointer",
+                      "url": "?campaign=fixture-mixed",
+                      "children": [
+                        {
+                          "role": "generic",
+                          "ref": "e16",
+                          "children": [
+                            {
+                              "role": "strong",
+                              "ref": "e17",
+                              "text": "Mixed campaign"
+                            },
+                            {
+                              "role": "code",
+                              "ref": "e18",
+                              "text": "fixture-mixed"
+                            },
+                            {
+                              "role": "paragraph",
+                              "ref": "e19",
+                              "text": "Confirmed required failure on x plus missing evidence on y."
+                            },
+                            {
+                              "role": "generic",
+                              "ref": "e20",
+                              "children": [
+                                {
+                                  "role": "generic",
+                                  "ref": "e21",
+                                  "text": "Gate: BLOCKED"
+                                },
+                                {
+                                  "role": "generic",
+                                  "ref": "e22",
+                                  "text": "Investigation: ABSENT"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "role": "generic",
+                          "ref": "e23",
+                          "ariaHidden": true,
+                          "text": "Open campaign ↗"
+                        }
+                      ]
+                    },
+                    {
+                      "role": "link",
+                      "name": "Passing campaign fixture-pass All required executions passed with complete verified evidence. Gate: ELIGIBLE Investigation: ABSENT",
+                      "ref": "e24",
+                      "cursor": "pointer",
+                      "url": "?campaign=fixture-pass",
+                      "children": [
+                        {
+                          "role": "generic",
+                          "ref": "e25",
+                          "children": [
+                            {
+                              "role": "strong",
+                              "ref": "e26",
+                              "text": "Passing campaign"
+                            },
+                            {
+                              "role": "code",
+                              "ref": "e27",
+                              "text": "fixture-pass"
+                            },
+                            {
+                              "role": "paragraph",
+                              "ref": "e28",
+                              "text": "All required executions passed with complete verified evidence."
+                            },
+                            {
+                              "role": "generic",
+                              "ref": "e29",
+                              "children": [
+                                {
+                                  "role": "generic",
+                                  "ref": "e30",
+                                  "text": "Gate: ELIGIBLE"
+                                },
+                                {
+                                  "role": "generic",
+                                  "ref": "e31",
+                                  "text": "Investigation: ABSENT"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "role": "generic",
+                          "ref": "e32",
+                          "ariaHidden": true,
+                          "text": "Open campaign ↗"
+                        }
+                      ]
+                    },
+                    {
+                      "role": "link",
+                      "name": "Partial evidence campaign fixture-partial No confirmed failure, but missing execution evidence prevents eligibility. Gate: INCONCLUSIVE Investigation: INCONCLUSIVE",
+                      "ref": "e33",
+                      "cursor": "pointer",
+                      "url": "?campaign=fixture-partial",
+                      "children": [
+                        {
+                          "role": "generic",
+                          "ref": "e34",
+                          "children": [
+                            {
+                              "role": "strong",
+                              "ref": "e35",
+                              "text": "Partial evidence campaign"
+                            },
+                            {
+                              "role": "code",
+                              "ref": "e36",
+                              "text": "fixture-partial"
+                            },
+                            {
+                              "role": "paragraph",
+                              "ref": "e37",
+                              "text": "No confirmed failure, but missing execution evidence prevents eligibility."
+                            },
+                            {
+                              "role": "generic",
+                              "ref": "e38",
+                              "children": [
+                                {
+                                  "role": "generic",
+                                  "ref": "e39",
+                                  "text": "Gate: INCONCLUSIVE"
+                                },
+                                {
+                                  "role": "generic",
+                                  "ref": "e40",
+                                  "text": "Investigation: INCONCLUSIVE"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "role": "generic",
+                          "ref": "e41",
+                          "ariaHidden": true,
+                          "text": "Open campaign ↗"
+                        }
+                      ]
+                    },
+                    {
+                      "role": "link",
+                      "name": "Failing campaign (investigator outage) fixture-fail Confirmed required failure blocks release even when the AI investigator errors. Gate: BLOCKED Investigation: ERROR",
+                      "ref": "e42",
+                      "cursor": "pointer",
+                      "url": "?campaign=fixture-fail",
+                      "children": [
+                        {
+                          "role": "generic",
+                          "ref": "e43",
+                          "children": [
+                            {
+                              "role": "strong",
+                              "ref": "e44",
+                              "text": "Failing campaign (investigator outage)"
+                            },
+                            {
+                              "role": "code",
+                              "ref": "e45",
+                              "text": "fixture-fail"
+                            },
+                            {
+                              "role": "paragraph",
+                              "ref": "e46",
+                              "text": "Confirmed required failure blocks release even when the AI investigator errors."
+                            },
+                            {
+                              "role": "generic",
+                              "ref": "e47",
+                              "children": [
+                                {
+                                  "role": "generic",
+                                  "ref": "e48",
+                                  "text": "Gate: BLOCKED"
+                                },
+                                {
+                                  "role": "generic",
+                                  "ref": "e49",
+                                  "text": "Investigation: ERROR"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "role": "generic",
+                          "ref": "e50",
+                          "ariaHidden": true,
+                          "text": "Open campaign ↗"
+                        }
+                      ]
+                    },
+                    {
+                      "role": "link",
+                      "name": "Projected defect investigation c-5125ee1591d8d901 Read-only offline investigator producing cited claims against sanitized observations. Gate: PROJECTION Investigation: DIAGNOSED",
+                      "ref": "e51",
+                      "cursor": "pointer",
+                      "url": "?campaign=c-5125ee1591d8d901",
+                      "children": [
+                        {
+                          "role": "generic",
+                          "ref": "e52",
+                          "children": [
+                            {
+                              "role": "strong",
+                              "ref": "e53",
+                              "text": "Projected defect investigation"
+                            },
+                            {
+                              "role": "code",
+                              "ref": "e54",
+                              "text": "c-5125ee1591d8d901"
+                            },
+                            {
+                              "role": "paragraph",
+                              "ref": "e55",
+                              "text": "Read-only offline investigator producing cited claims against sanitized observations."
+                            },
+                            {
+                              "role": "generic",
+                              "ref": "e56",
+                              "children": [
+                                {
+                                  "role": "generic",
+                                  "ref": "e57",
+                                  "text": "Gate: PROJECTION"
+                                },
+                                {
+                                  "role": "generic",
+                                  "ref": "e58",
+                                  "text": "Investigation: DIAGNOSED"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "role": "generic",
+                          "ref": "e59",
+                          "ariaHidden": true,
+                          "text": "Open campaign ↗"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "role": "region",
+              "name": "Investigator evaluation reports",
+              "ref": "e60",
+              "children": [
+                {
+                  "role": "generic",
+                  "ref": "e61",
+                  "children": [
+                    {
+                      "role": "heading",
+                      "name": "Investigator evaluation reports",
+                      "level": 2,
+                      "ref": "e62"
+                    },
+                    {
+                      "role": "paragraph",
+                      "ref": "e63",
+                      "children": [
+                        "120 measured live Bedrock trials (eu-west-1, promotion:",
+                        {
+                          "role": "code",
+                          "ref": "e64",
+                          "text": "false"
+                        },
+                        ", status:",
+                        {
+                          "role": "code",
+                          "ref": "e65",
+                          "text": "fail"
+                        },
+                        ") + 20-case offline authored replay."
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "role": "link",
+                  "name": "Inspect baseline vs. candidate ↗",
+                  "ref": "e66",
+                  "cursor": "pointer",
+                  "url": "?view=evaluation"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

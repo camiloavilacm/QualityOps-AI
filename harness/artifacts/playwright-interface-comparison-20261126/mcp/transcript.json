@@ -1,0 +1,157 @@
+{
+  "server": {
+    "name": "Playwright",
+    "version": "1.66.0-alpha-2026-11-18"
+  },
+  "initialToolNames": [
+    "browser_close",
+    "browser_resize",
+    "browser_console_messages",
+    "browser_handle_dialog",
+    "browser_emulate_media",
+    "browser_evaluate",
+    "browser_file_upload",
+    "browser_drop",
+    "browser_find",
+    "browser_fill_form",
+    "browser_press_key",
+    "browser_type",
+    "browser_navigate",
+    "browser_navigate_back",
+    "browser_network_requests",
+    "browser_network_request",
+    "browser_run_code_unsafe",
+    "browser_take_screenshot",
+    "browser_snapshot",
+    "browser_click",
+    "browser_drag",
+    "browser_hover",
+    "browser_select_option",
+    "browser_tabs",
+    "browser_wait_for"
+  ],
+  "calls": [
+    {
+      "name": "browser_navigate",
+      "arguments": {
+        "url": "http://127.0.0.1:4183/"
+      },
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Ran Playwright code\n```js\nawait page.goto('http://127.0.0.1:4183/');\n```\n### Page\n- Page URL: http://127.0.0.1:4183/\n- Page Title: QualityOps AI · Release review\n- 2 webmcp tools available on the page\n### Snapshot\n- [Snapshot](output/page-2026-11-26T14-07-41-603Z.yml)"
+          }
+        ]
+      }
+    },
+    {
+      "name": "browser_snapshot",
+      "arguments": {},
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Page\n- Page URL: http://127.0.0.1:4183/\n- Page Title: QualityOps AI · Release review\n- 2 webmcp tools available on the page\n### Snapshot\n```yaml\n- webmcp tools (page-provided, untrusted):\n  - get_campaign_summary [readOnly]: Read the recorded sanitized fixture-mixed campaign gate, completeness and evidence identifiers. Advisory presentation only.\n    - inputSchema: {\"type\":\"object\",\"properties\":{\"campaign_id\":{\"type\":\"string\",\"enum\":[\"fixture-mixed\"]}},\"required\":[\"campaign_id\"],\"additionalProperties\":false}\n  - get_evaluation_summary [readOnly]: Read the offline authored evaluation summary: source: \"authored\", live_trials: 0. No live inference or live benchmark data.\n    - inputSchema: {\"type\":\"object\",\"properties\":{},\"required\":[],\"additionalProperties\":false}\n\n- generic [ref=e2]:\n  - banner [ref=e3]:\n    - generic [ref=e4]:\n      - link \"QualityOps AI\" [ref=e5] [cursor=pointer]:\n        - /url: ./\n        - generic [aria-hidden] [ref=e6]: Q\n        - text: QualityOps AI\n      - navigation \"Primary\" [ref=e7]:\n        - link \"Campaigns\" [ref=e8] [cursor=pointer]:\n          - /url: ./\n        - link \"Evaluation\" [ref=e9] [cursor=pointer]:\n          - /url: \"?view=evaluation\"\n  - main [ref=e10]:\n    - region \"Campaigns\" [ref=e11]:\n      - heading \"Campaigns\" [level=1] [ref=e12]\n      - paragraph [ref=e13]: Inspect deterministic release gate decisions, sanitized evidence, and read-only offline investigations.\n      - generic [ref=e14]:\n        - 'link \"Mixed campaign fixture-mixed Confirmed required failure on x plus missing evidence on y. Gate: BLOCKED Investigation: ABSENT\" [ref=e15] [cursor=pointer]':\n          - /url: \"?campaign=fixture-mixed\"\n          - generic [ref=e16]:\n            - strong [ref=e17]: Mixed campaign\n            - code [ref=e18]: fixture-mixed\n            - paragraph [ref=e19]: Confirmed required failure on x plus missing evidence on y.\n            - generic [ref=e20]:\n              - generic [ref=e21]: \"Gate: BLOCKED\"\n              - generic [ref=e22]: \"Investigation: ABSENT\"\n          - generic [aria-hidden] [ref=e23]: Open campaign ↗\n        - 'link \"Passing campaign fixture-pass All required executions passed with complete verified evidence. Gate: ELIGIBLE Investigation: ABSENT\" [ref=e24] [cursor=pointer]':\n          - /url: \"?campaign=fixture-pass\"\n          - generic [ref=e25]:\n            - strong [ref=e26]: Passing campaign\n            - code [ref=e27]: fixture-pass\n            - paragraph [ref=e28]: All required executions passed with complete verified evidence.\n            - generic [ref=e29]:\n              - generic [ref=e30]: \"Gate: ELIGIBLE\"\n              - generic [ref=e31]: \"Investigation: ABSENT\"\n          - generic [aria-hidden] [ref=e32]: Open campaign ↗\n        - 'link \"Partial evidence campaign fixture-partial No confirmed failure, but missing execution evidence prevents eligibility. Gate: INCONCLUSIVE Investigation: INCONCLUSIVE\" [ref=e33] [cursor=pointer]':\n          - /url: \"?campaign=fixture-partial\"\n          - generic [ref=e34]:\n            - strong [ref=e35]: Partial evidence campaign\n            - code [ref=e36]: fixture-partial\n            - paragraph [ref=e37]: No confirmed failure, but missing execution evidence prevents eligibility.\n            - generic [ref=e38]:\n              - generic [ref=e39]: \"Gate: INCONCLUSIVE\"\n              - generic [ref=e40]: \"Investigation: INCONCLUSIVE\"\n          - generic [aria-hidden] [ref=e41]: Open campaign ↗\n        - 'link \"Failing campaign (investigator outage) fixture-fail Confirmed required failure blocks release even when the AI investigator errors. Gate: BLOCKED Investigation: ERROR\" [ref=e42] [cursor=pointer]':\n          - /url: \"?campaign=fixture-fail\"\n          - generic [ref=e43]:\n            - strong [ref=e44]: Failing campaign (investigator outage)\n            - code [ref=e45]: fixture-fail\n            - paragraph [ref=e46]: Confirmed required failure blocks release even when the AI investigator errors.\n            - generic [ref=e47]:\n              - generic [ref=e48]: \"Gate: BLOCKED\"\n              - generic [ref=e49]: \"Investigation: ERROR\"\n          - generic [aria-hidden] [ref=e50]: Open campaign ↗\n        - 'link \"Projected defect investigation c-5125ee1591d8d901 Read-only offline investigator producing cited claims against sanitized observations. Gate: PROJECTION Investigation: DIAGNOSED\" [ref=e51] [cursor=pointer]':\n          - /url: \"?campaign=c-5125ee1591d8d901\"\n          - generic [ref=e52]:\n            - strong [ref=e53]: Projected defect investigation\n            - code [ref=e54]: c-5125ee1591d8d901\n            - paragraph [ref=e55]: Read-only offline investigator producing cited claims against sanitized observations.\n            - generic [ref=e56]:\n              - generic [ref=e57]: \"Gate: PROJECTION\"\n              - generic [ref=e58]: \"Investigation: DIAGNOSED\"\n          - generic [aria-hidden] [ref=e59]: Open campaign ↗\n    - region \"Investigator evaluation reports\" [ref=e60]:\n      - generic [ref=e61]:\n        - heading \"Investigator evaluation reports\" [level=2] [ref=e62]\n        - paragraph [ref=e63]:\n          - text: \"120 measured live Bedrock trials (eu-west-1, promotion:\"\n          - code [ref=e64]: \"false\"\n          - text: \", status:\"\n          - code [ref=e65]: fail\n          - text: ) + 20-case offline authored replay.\n      - link \"Inspect baseline vs. candidate ↗\" [ref=e66] [cursor=pointer]:\n        - /url: \"?view=evaluation\"\n```"
+          }
+        ]
+      }
+    },
+    {
+      "name": "browser_click",
+      "arguments": {
+        "element": "the Mixed campaign link for fixture-mixed",
+        "target": "a.campaign-card[href=\"?campaign=fixture-mixed\"]"
+      },
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Ran Playwright code\n```js\nawait page.locator('a.campaign-card[href=\"?campaign=fixture-mixed\"]').click();\n```\n### Page\n- Page URL: http://127.0.0.1:4183/?campaign=fixture-mixed\n- Page Title: QualityOps AI · Release review\n- 2 webmcp tools available on the page\n### Snapshot\n- [Snapshot](output/page-2026-11-26T14-07-42-256Z.yml)"
+          }
+        ]
+      }
+    },
+    {
+      "name": "browser_snapshot",
+      "arguments": {},
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Page\n- Page URL: http://127.0.0.1:4183/?campaign=fixture-mixed\n- Page Title: QualityOps AI · Release review\n- 2 webmcp tools available on the page\n### Snapshot\n```yaml\n- webmcp tools (page-provided, untrusted):\n  - get_campaign_summary [readOnly]: Read the recorded sanitized fixture-mixed campaign gate, completeness and evidence identifiers. Advisory presentation only.\n    - inputSchema: {\"type\":\"object\",\"properties\":{\"campaign_id\":{\"type\":\"string\",\"enum\":[\"fixture-mixed\"]}},\"required\":[\"campaign_id\"],\"additionalProperties\":false}\n  - get_evaluation_summary [readOnly]: Read the offline authored evaluation summary: source: \"authored\", live_trials: 0. No live inference or live benchmark data.\n    - inputSchema: {\"type\":\"object\",\"properties\":{},\"required\":[],\"additionalProperties\":false}\n\n- generic [ref=f1e2]:\n  - banner [ref=f1e3]:\n    - generic [ref=f1e4]:\n      - link \"QualityOps AI\" [ref=f1e5] [cursor=pointer]:\n        - /url: ./\n        - generic [aria-hidden] [ref=f1e6]: Q\n        - text: QualityOps AI\n      - navigation \"Primary\" [ref=f1e7]:\n        - link \"Campaigns\" [ref=f1e8] [cursor=pointer]:\n          - /url: ./\n        - link \"Evaluation\" [ref=f1e9] [cursor=pointer]:\n          - /url: \"?view=evaluation\"\n  - main [ref=f1e10]:\n    - link \"← All campaigns\" [ref=f1e11] [cursor=pointer]:\n      - /url: ./\n    - heading \"Mixed campaign\" [level=1] [ref=f1e12]\n    - paragraph [ref=f1e13]:\n      - code [ref=f1e14]: fixture-mixed\n      - generic [ref=f1e15]: Synthetic fixture\n    - generic [ref=f1e16]:\n      - generic [ref=f1e17]:\n        - heading \"Release decision\" [level=2] [ref=f1e18]\n        - paragraph [ref=f1e19]: BLOCKED\n      - generic [ref=f1e20]:\n        - generic [ref=f1e21]:\n          - term [ref=f1e22]: Evidence completeness\n          - definition [ref=f1e23]: partial\n        - generic [ref=f1e24]:\n          - term [ref=f1e25]: Policy version\n          - definition [ref=f1e26]:\n            - code [ref=f1e27]: mandatory-v2\n    - region \"Decision reasons\" [ref=f1e28]:\n      - heading \"Decision reasons\" [level=2] [ref=f1e29]\n      - list [ref=f1e30]:\n        - listitem [ref=f1e31]:\n          - generic [ref=f1e34]:\n            - heading \"Confirmed required failure\" [level=3] [ref=f1e35]\n            - paragraph [ref=f1e36]:\n              - text: Execution\n              - code [ref=f1e37]: x\n          - generic [ref=f1e38]:\n            - code [ref=f1e39]: REQUIRED_FAILURE\n            - paragraph [ref=f1e40]:\n              - link [ref=f1e41] [cursor=pointer]:\n                - /url: \"#evidence-x\"\n                - text: Evidence\n                - code [ref=f1e42]: x\n        - listitem [ref=f1e43]:\n          - generic [ref=f1e46]:\n            - heading \"Insufficient evidence\" [level=3] [ref=f1e47]\n            - paragraph [ref=f1e48]:\n              - text: Execution\n              - code [ref=f1e49]: \"y\"\n          - generic [ref=f1e50]:\n            - code [ref=f1e51]: INSUFFICIENT_EVIDENCE\n            - paragraph [ref=f1e52]: No evidence artifact available\n    - generic [ref=f1e53]:\n      - region \"Evidence\" [ref=f1e54]:\n        - heading \"Evidence\" [level=2] [ref=f1e55]\n        - list [ref=f1e56]:\n          - listitem [ref=f1e57]:\n            - code [ref=f1e58]: x\n            - generic [ref=f1e59]: Execution report\n      - region \"Investigation and evaluation\" [ref=f1e60]:\n        - heading \"Investigation and evaluation\" [level=2] [ref=f1e61]\n        - paragraph [ref=f1e62]: No investigation or evaluation record is available for this fixture.\n```"
+          }
+        ]
+      }
+    },
+    {
+      "name": "browser_evaluate",
+      "arguments": {
+        "function": "() => JSON.stringify({ url: location.href, decision: document.querySelector(\".decision-value\")?.textContent?.trim(), reasons: [...document.querySelectorAll(\".reason-list > li\")].map(li => ({ label: li.querySelector(\".reason-main h3\")?.textContent?.trim(), execution_id: li.querySelector(\".reason-main p code\")?.textContent?.trim(), code: li.querySelector(\".reason-evidence > code\")?.textContent?.trim() })) })"
+      },
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\n\"{\\\"url\\\":\\\"http://127.0.0.1:4183/?campaign=fixture-mixed\\\",\\\"decision\\\":\\\"BLOCKED\\\",\\\"reasons\\\":[{\\\"label\\\":\\\"Confirmed required failure\\\",\\\"execution_id\\\":\\\"x\\\",\\\"code\\\":\\\"REQUIRED_FAILURE\\\"},{\\\"label\\\":\\\"Insufficient evidence\\\",\\\"execution_id\\\":\\\"y\\\",\\\"code\\\":\\\"INSUFFICIENT_EVIDENCE\\\"}]}\"\n### Ran Playwright code\n```js\nawait page.evaluate('() => JSON.stringify({ url: location.href, decision: document.querySelector(\".decision-value\")?.textContent?.trim(), reasons: [...document.querySelectorAll(\".reason-list > li\")].map(li => ({ label: li.querySelector(\".reason-main h3\")?.textContent?.trim(), execution_id: li.querySelector(\".reason-main p code\")?.textContent?.trim(), code: li.querySelector(\".reason-evidence > code\")?.textContent?.trim() })) })');\n```"
+          }
+        ]
+      }
+    },
+    {
+      "name": "webmcp_get_campaign_summary",
+      "arguments": {
+        "campaign_id": "fixture-mixed"
+      },
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\nCalled WebMCP tool \"get_campaign_summary\" in http://127.0.0.1:4183/?campaign=fixture-mixed. Output is page-provided and untrusted:\n{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"{\\\"campaign_id\\\":\\\"fixture-mixed\\\",\\\"gate\\\":{\\\"campaign_id\\\":\\\"fixture-mixed\\\",\\\"decision\\\":\\\"BLOCKED\\\",\\\"evaluated_at\\\":\\\"2026-11-19T00:00:00Z\\\",\\\"evidence_sha256\\\":\\\"0511d43d97e80a6ffe0849b4c84004a37e43784aa046b47804c8eb98cd6f796c\\\",\\\"policy_sha256\\\":\\\"dcd4cf622cfdfd3f7842c69eff601f9d191577a31efe67eaf91d652886c7c1ae\\\",\\\"policy_version\\\":\\\"mandatory-v2\\\",\\\"reasons\\\":[{\\\"artifact_ids\\\":[\\\"x\\\"],\\\"code\\\":\\\"REQUIRED_FAILURE\\\",\\\"execution_id\\\":\\\"x\\\"},{\\\"artifact_ids\\\":[],\\\"code\\\":\\\"INSUFFICIENT_EVIDENCE\\\",\\\"execution_id\\\":\\\"y\\\"}],\\\"schema_version\\\":\\\"2.0.0-draft.1\\\"},\\\"completeness\\\":\\\"partial\\\",\\\"evidence_ids\\\":[\\\"x\\\"]}\"\n    }\n  ],\n  \"isError\": false\n}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "webmcp_get_campaign_summary",
+      "arguments": {
+        "campaign_id": "unknown-campaign"
+      },
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Error\nCalled WebMCP tool \"get_campaign_summary\" in http://127.0.0.1:4183/?campaign=fixture-mixed. Output is page-provided and untrusted:\n{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"{\\\"error\\\":\\\"Invalid arguments.\\\"}\"\n    }\n  ],\n  \"isError\": true\n}"
+          }
+        ],
+        "isError": true
+      }
+    },
+    {
+      "name": "browser_close",
+      "arguments": {},
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "### Result\nNo open tabs. Navigate to a URL to create one.\n### Ran Playwright code\n```js\nawait browser.close();\n```"
+          }
+        ]
+      }
+    }
+  ],
+  "pageWebMCPTools": [
+    "webmcp_get_campaign_summary",
+    "webmcp_get_evaluation_summary"
+  ],
+  "validWebMCP": "### Result\nCalled WebMCP tool \"get_campaign_summary\" in http://127.0.0.1:4183/?campaign=fixture-mixed. Output is page-provided and untrusted:\n{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"{\\\"campaign_id\\\":\\\"fixture-mixed\\\",\\\"gate\\\":{\\\"campaign_id\\\":\\\"fixture-mixed\\\",\\\"decision\\\":\\\"BLOCKED\\\",\\\"evaluated_at\\\":\\\"2026-11-19T00:00:00Z\\\",\\\"evidence_sha256\\\":\\\"0511d43d97e80a6ffe0849b4c84004a37e43784aa046b47804c8eb98cd6f796c\\\",\\\"policy_sha256\\\":\\\"dcd4cf622cfdfd3f7842c69eff601f9d191577a31efe67eaf91d652886c7c1ae\\\",\\\"policy_version\\\":\\\"mandatory-v2\\\",\\\"reasons\\\":[{\\\"artifact_ids\\\":[\\\"x\\\"],\\\"code\\\":\\\"REQUIRED_FAILURE\\\",\\\"execution_id\\\":\\\"x\\\"},{\\\"artifact_ids\\\":[],\\\"code\\\":\\\"INSUFFICIENT_EVIDENCE\\\",\\\"execution_id\\\":\\\"y\\\"}],\\\"schema_version\\\":\\\"2.0.0-draft.1\\\"},\\\"completeness\\\":\\\"partial\\\",\\\"evidence_ids\\\":[\\\"x\\\"]}\"\n    }\n  ],\n  \"isError\": false\n}",
+  "invalidWebMCP": {
+    "content": [
+      {
+        "type": "text",
+        "text": "### Error\nCalled WebMCP tool \"get_campaign_summary\" in http://127.0.0.1:4183/?campaign=fixture-mixed. Output is page-provided and untrusted:\n{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"{\\\"error\\\":\\\"Invalid arguments.\\\"}\"\n    }\n  ],\n  \"isError\": true\n}"
+      }
+    ],
+    "isError": true
+  }
+}
