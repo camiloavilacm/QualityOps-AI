@@ -1,0 +1,11 @@
+--- exercise/artifacts/showcase-export-baseline.json	2026-11-26 12:01:21
++++ src/showcase-export.json	2026-11-26 12:03:00
+@@ -35,7 +35,7 @@
+       "investigation": null,
+       "source_kind": "synthetic",
+       "summary": "Confirmed required failure on x plus missing evidence on y.",
+-      "title": "Mixed campaign"
++      "title": "Combined campaign"
+     },
+     {
+       "completeness": "complete",

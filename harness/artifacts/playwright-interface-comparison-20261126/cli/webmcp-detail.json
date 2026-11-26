@@ -1,0 +1,383 @@
+{
+  "webmcpTools": [
+    {
+      "name": "get_campaign_summary",
+      "description": "Read the recorded sanitized fixture-mixed campaign gate, completeness and evidence identifiers. Advisory presentation only.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "campaign_id": {
+            "type": "string",
+            "enum": [
+              "fixture-mixed"
+            ]
+          }
+        },
+        "required": [
+          "campaign_id"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnly": true
+      }
+    },
+    {
+      "name": "get_evaluation_summary",
+      "description": "Read the offline authored evaluation summary: source: \"authored\", live_trials: 0. No live inference or live benchmark data.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnly": true
+      }
+    }
+  ],
+  "snapshot": [
+    {
+      "role": "generic",
+      "ref": "f1e2",
+      "children": [
+        {
+          "role": "banner",
+          "ref": "f1e3",
+          "children": [
+            {
+              "role": "generic",
+              "ref": "f1e4",
+              "children": [
+                {
+                  "role": "link",
+                  "name": "QualityOps AI",
+                  "ref": "f1e5",
+                  "cursor": "pointer",
+                  "url": "./",
+                  "children": [
+                    {
+                      "role": "generic",
+                      "ref": "f1e6",
+                      "ariaHidden": true,
+                      "text": "Q"
+                    },
+                    "QualityOps AI"
+                  ]
+                },
+                {
+                  "role": "navigation",
+                  "name": "Primary",
+                  "ref": "f1e7",
+                  "children": [
+                    {
+                      "role": "link",
+                      "name": "Campaigns",
+                      "ref": "f1e8",
+                      "cursor": "pointer",
+                      "url": "./"
+                    },
+                    {
+                      "role": "link",
+                      "name": "Evaluation",
+                      "ref": "f1e9",
+                      "cursor": "pointer",
+                      "url": "?view=evaluation"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "role": "main",
+          "ref": "f1e10",
+          "children": [
+            {
+              "role": "link",
+              "name": "← All campaigns",
+              "ref": "f1e11",
+              "cursor": "pointer",
+              "url": "./"
+            },
+            {
+              "role": "heading",
+              "name": "Mixed campaign",
+              "level": 1,
+              "ref": "f1e12"
+            },
+            {
+              "role": "paragraph",
+              "ref": "f1e13",
+              "children": [
+                {
+                  "role": "code",
+                  "ref": "f1e14",
+                  "text": "fixture-mixed"
+                },
+                {
+                  "role": "generic",
+                  "ref": "f1e15",
+                  "text": "Synthetic fixture"
+                }
+              ]
+            },
+            {
+              "role": "generic",
+              "ref": "f1e16",
+              "children": [
+                {
+                  "role": "generic",
+                  "ref": "f1e17",
+                  "children": [
+                    {
+                      "role": "heading",
+                      "name": "Release decision",
+                      "level": 2,
+                      "ref": "f1e18"
+                    },
+                    {
+                      "role": "paragraph",
+                      "ref": "f1e19",
+                      "text": "BLOCKED"
+                    }
+                  ]
+                },
+                {
+                  "role": "generic",
+                  "ref": "f1e20",
+                  "children": [
+                    {
+                      "role": "generic",
+                      "ref": "f1e21",
+                      "children": [
+                        {
+                          "role": "term",
+                          "ref": "f1e22",
+                          "text": "Evidence completeness"
+                        },
+                        {
+                          "role": "definition",
+                          "ref": "f1e23",
+                          "text": "partial"
+                        }
+                      ]
+                    },
+                    {
+                      "role": "generic",
+                      "ref": "f1e24",
+                      "children": [
+                        {
+                          "role": "term",
+                          "ref": "f1e25",
+                          "text": "Policy version"
+                        },
+                        {
+                          "role": "definition",
+                          "ref": "f1e26",
+                          "children": [
+                            {
+                              "role": "code",
+                              "ref": "f1e27",
+                              "text": "mandatory-v2"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "role": "region",
+              "name": "Decision reasons",
+              "ref": "f1e28",
+              "children": [
+                {
+                  "role": "heading",
+                  "name": "Decision reasons",
+                  "level": 2,
+                  "ref": "f1e29"
+                },
+                {
+                  "role": "list",
+                  "ref": "f1e30",
+                  "children": [
+                    {
+                      "role": "listitem",
+                      "ref": "f1e31",
+                      "children": [
+                        {
+                          "role": "generic",
+                          "ref": "f1e34",
+                          "children": [
+                            {
+                              "role": "heading",
+                              "name": "Confirmed required failure",
+                              "level": 3,
+                              "ref": "f1e35"
+                            },
+                            {
+                              "role": "paragraph",
+                              "ref": "f1e36",
+                              "children": [
+                                "Execution",
+                                {
+                                  "role": "code",
+                                  "ref": "f1e37",
+                                  "text": "x"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "role": "generic",
+                          "ref": "f1e38",
+                          "children": [
+                            {
+                              "role": "code",
+                              "ref": "f1e39",
+                              "text": "REQUIRED_FAILURE"
+                            },
+                            {
+                              "role": "paragraph",
+                              "ref": "f1e40",
+                              "children": [
+                                {
+                                  "role": "link",
+                                  "ref": "f1e41",
+                                  "cursor": "pointer",
+                                  "url": "#evidence-x",
+                                  "children": [
+                                    "Evidence",
+                                    {
+                                      "role": "code",
+                                      "ref": "f1e42",
+                                      "text": "x"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "role": "listitem",
+                      "ref": "f1e43",
+                      "children": [
+                        {
+                          "role": "generic",
+                          "ref": "f1e46",
+                          "children": [
+                            {
+                              "role": "heading",
+                              "name": "Insufficient evidence",
+                              "level": 3,
+                              "ref": "f1e47"
+                            },
+                            {
+                              "role": "paragraph",
+                              "ref": "f1e48",
+                              "children": [
+                                "Execution",
+                                {
+                                  "role": "code",
+                                  "ref": "f1e49",
+                                  "text": "y"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "role": "generic",
+                          "ref": "f1e50",
+                          "children": [
+                            {
+                              "role": "code",
+                              "ref": "f1e51",
+                              "text": "INSUFFICIENT_EVIDENCE"
+                            },
+                            {
+                              "role": "paragraph",
+                              "ref": "f1e52",
+                              "text": "No evidence artifact available"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "role": "generic",
+              "ref": "f1e53",
+              "children": [
+                {
+                  "role": "region",
+                  "name": "Evidence",
+                  "ref": "f1e54",
+                  "children": [
+                    {
+                      "role": "heading",
+                      "name": "Evidence",
+                      "level": 2,
+                      "ref": "f1e55"
+                    },
+                    {
+                      "role": "list",
+                      "ref": "f1e56",
+                      "children": [
+                        {
+                          "role": "listitem",
+                          "ref": "f1e57",
+                          "children": [
+                            {
+                              "role": "code",
+                              "ref": "f1e58",
+                              "text": "x"
+                            },
+                            {
+                              "role": "generic",
+                              "ref": "f1e59",
+                              "text": "Execution report"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "role": "region",
+                  "name": "Investigation and evaluation",
+                  "ref": "f1e60",
+                  "children": [
+                    {
+                      "role": "heading",
+                      "name": "Investigation and evaluation",
+                      "level": 2,
+                      "ref": "f1e61"
+                    },
+                    {
+                      "role": "paragraph",
+                      "ref": "f1e62",
+                      "text": "No investigation or evaluation record is available for this fixture."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

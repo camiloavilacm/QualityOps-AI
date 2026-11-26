@@ -1,0 +1,4 @@
+{
+  "isError": true,
+  "error": "Called WebMCP tool \"get_campaign_summary\" in http://127.0.0.1:4183/?campaign=fixture-mixed. Output is page-provided and untrusted:\n{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"{\\\"error\\\":\\\"Invalid arguments.\\\"}\"\n    }\n  ],\n  \"isError\": true\n}"
+}
