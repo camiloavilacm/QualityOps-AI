@@ -1,0 +1,140 @@
+{
+  "agreement": {
+    "count": 3,
+    "denominator": 4,
+    "rate": 0.75
+  },
+  "calibration_version": "1.0.0",
+  "cases": [
+    {
+      "automated": {
+        "claims": [
+          {
+            "citation_exists": [
+              true,
+              true
+            ],
+            "support": "supported"
+          }
+        ],
+        "final_schema_valid": true,
+        "final_status": "DIAGNOSED",
+        "invalid_model_text": false,
+        "verdict": "supported"
+      },
+      "human": {
+        "rationale": "Observation a1 says the stored row had a deletion timestamp. Observation a2 says the query lacked a deletion predicate and returned that row.",
+        "verdict": "supported"
+      },
+      "id": "A",
+      "outcome": "agreement"
+    },
+    {
+      "automated": {
+        "claims": [
+          {
+            "citation_exists": [
+              true
+            ],
+            "support": "unsupported"
+          }
+        ],
+        "final_schema_valid": true,
+        "final_status": "DIAGNOSED",
+        "invalid_model_text": false,
+        "verdict": "unsupported"
+      },
+      "human": {
+        "rationale": "The failing test alone does not prove that the invalid-credential response violated the login contract, and the status values are omitted.",
+        "verdict": "unresolved"
+      },
+      "id": "B",
+      "outcome": "unresolved"
+    },
+    {
+      "automated": {
+        "claims": [
+          {
+            "citation_exists": [
+              true,
+              true
+            ],
+            "support": "review_required"
+          }
+        ],
+        "final_schema_valid": true,
+        "final_status": "DIAGNOSED",
+        "invalid_model_text": false,
+        "verdict": "review_required"
+      },
+      "human": {
+        "rationale": "Observations a1 and a2 describe the listing query without a deletion predicate and its response including the deleted row.",
+        "verdict": "supported"
+      },
+      "id": "C",
+      "outcome": "unresolved"
+    },
+    {
+      "automated": {
+        "claims": [],
+        "final_schema_valid": true,
+        "final_status": "INCONCLUSIVE",
+        "invalid_model_text": false,
+        "verdict": "justified_abstention"
+      },
+      "human": {
+        "rationale": "The required execution receipt is missing, so abstaining is justified.",
+        "verdict": "justified_abstention"
+      },
+      "id": "D",
+      "outcome": "agreement"
+    },
+    {
+      "automated": {
+        "claims": [
+          {
+            "citation_exists": [
+              true,
+              true
+            ],
+            "support": "review_required"
+          }
+        ],
+        "final_schema_valid": true,
+        "final_status": "DIAGNOSED",
+        "invalid_model_text": false,
+        "verdict": "review_required"
+      },
+      "human": {
+        "rationale": "The claim seems inaccurate, but I cannot confidently classify it from the evidence.",
+        "verdict": "unresolved"
+      },
+      "id": "E",
+      "outcome": "unresolved"
+    },
+    {
+      "automated": {
+        "claims": [],
+        "final_schema_valid": true,
+        "final_status": "ERROR",
+        "invalid_model_text": true,
+        "malformed_final_record_control_valid": false,
+        "verdict": "malformed"
+      },
+      "human": {
+        "rationale": "The response text ends after the status key and colon, so it is not a complete JSON answer.",
+        "verdict": "malformed"
+      },
+      "id": "F",
+      "outcome": "agreement"
+    }
+  ],
+  "disagreements": 0,
+  "grader_version": "1.2.0",
+  "human_judgments": 6,
+  "packet_sha256": "5a454dbe5983f1499373daac9bd0dc28ca1f8cd7bbd79226c51317db502d0f7e",
+  "pending_human": 0,
+  "review_complete": true,
+  "total": 6,
+  "unresolved": 3
+}
