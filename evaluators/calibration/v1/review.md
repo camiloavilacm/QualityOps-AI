@@ -17,3 +17,7 @@ Keep grader v1.2.0 and its historical benchmark unchanged. For a candidate rubri
 Keep the reversed claim in case E as a negative control. Its result should remain referred for review until a reviewer can classify it confidently. Do not infer support merely because both citations resolve. Add the paraphrase and reversed-claim controls to the candidate rubric tests, then compare candidate and v1.2.0 on the same six cases. Promotion of a rubric change requires a separately reviewed, versioned mapping and must preserve the historical report under v1.2.0.
 
 This is a proposal only. No grader, prompt, or rubric behavior was changed, and no live model evaluation was run.
+
+## Owner disposition
+
+On 2026-11-27, the project owner approved the grader's responses for all six cases and accepted this calibration review. The proposed paraphrase mapping is not adopted. Keep grader v1.2.0 and its historical benchmark unchanged. The blind comparison remains 3/4 exact agreements (75%) with three unresolved comparison cases. Owner acceptance records the project decision and does not rewrite the independent human judgments or agreement calculation.
